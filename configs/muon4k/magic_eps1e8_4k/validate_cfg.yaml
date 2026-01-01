@@ -1,0 +1,20 @@
+run_path: /data/anon/muon4k/magic_eps1e8_4k/validate
+steps:
+- validate:
+    run_path: /data/anon/muon4k/magic_eps1e8_4k/validate
+    model: gpt2
+    overwrite: true
+    scores: /data/anon/muon4k/magic_eps1e8_4k/scores_stack.pt
+    retrained_dir: /data/anon/muon4k/adam_eps1e8/N4k
+    num_subsets: 100
+    data:
+      dataset: /data/anon/bergson-damping/runs/ekfac_vs_n/datasets/train_4k.hf
+      split: train
+      prompt_column: text
+      chunk_length: 0
+    query:
+      dataset: /data/anon/muon4k/magic_eps1e8_4k/query_N10.hf
+      split: train
+      prompt_column: text
+      chunk_length: 0
+    batch_size: 10

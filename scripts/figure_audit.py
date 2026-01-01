@@ -1,0 +1,147 @@
+"""Every point each figure needs, and whether it exists / is running / is unscheduled.
+
+Reads the axis constants out of scaling_plot_mpl.py rather than restating them, so
+this cannot drift from what the figures actually draw. A point counts as PRESENT
+only if the delta is in experiments.csv, which is what the plots read -- a value
+sitting in data/filter_deltas.csv but not synced across is still a hole in the
+figure, and that is exactly how the Muon 128k point stayed invisible.
+
+Pass a file of live config paths to distinguish RUNNING from MISSING.
+
+Ends by checking figures/ holds exactly the PDF set scripts/make_figures.py
+produces (EXPECTED_FIGURES there); a missing or stray figure exits non-zero.
+Point holes are reported, not fatal -- they are the state of the experiment.
+"""
+import csv
+import glob
+import os
+import re
+import sys
+
+from make_figures import EXPECTED_FIGURES, check_figure_set
+
+
+def _has_value(cell: str) -> bool:
+    """A recorded delta counts only if it parses to a finite float -- a
+    literal 'nan' in the CSV rendered as a present-but-invisible figure point
+    and hid a dead 128k MAGIC pipeline for days."""
+    try:
+        import math
+        return math.isfinite(float(cell))
+    except (TypeError, ValueError):
+        return False
+
+
+ROOT = "/data/anon/metasmoothness"
+E = "/data/anon/paper_runs/experiments"
+src = open(ROOT + "/scripts/scaling_plot_mpl.py").read()
+
+NS = eval(re.search(r"^NS = (\[[^\]]*\])", src, re.M).group(1))
+BATCHES = eval(re.search(r"^BATCHES = (\[[^\]]*\])", src, re.M).group(1))
+TOP40 = eval(re.search(r"^TOP40_ROWS = (\[.*?\])\n", src, re.S | re.M).group(1))
+SERIES = [("AdamW", ("plan_adam_eps1e17_", "sm_adamw_eps1e17_")),
+          ("Muon", ("plan_muon_eps1e17_", "sm_muon_eps1e17_"))]
+PREFER = ("plan_muon_eps1e17_4k_bs256_lr2e-4",)
+
+rows = list(csv.DictReader(open(ROOT + "/experiments.csv")))
+alive = set()
+if len(sys.argv) > 1:
+    alive = {l.strip() for l in open(sys.argv[1]) if l.strip()}
+
+
+def pick(prefixes, suffix):
+    for r in sorted(rows, key=lambda r: r["run_id"] not in PREFER):
+        if r["run_id"].startswith(prefixes) and r["run_id"].endswith(suffix):
+            return r
+    return None
+
+
+def status(run_id, method):
+    """PRESENT / RUNNING / PARTIAL / MISSING for one (row, method) point."""
+    r = next((x for x in rows if x["run_id"] == run_id), None)
+    if r and _has_value(r.get(f"filter_{method}_delta")):
+        return "present", ""
+    if not r:
+        return "missing", "no row in experiments.csv"
+    d = os.path.join(E, run_id)
+    # Attribute a running config to the METHOD it advances. Matching any config
+    # under the row made a top-40 shard read as evidence that the second scorer
+    # was running, which is a false confirmation -- the worst kind of audit bug.
+    marks = ("magic",) if method == "magic" else ("filter_proponents", "filter_top40", "ekfac")
+    running = [c for c in alive if c.startswith(d + os.sep)
+               and any(k in os.path.basename(c) for k in marks)]
+    # A row's own base/training config lives in configs/experiments/<run_id>.yaml,
+    # not under the run directory, so the prefix test above cannot see it. Without
+    # this a row whose base is training right now reports MISSING.
+    running += [c for c in alive if os.path.basename(c) == run_id + ".yaml"]
+    if running:
+        return "running", os.path.basename(running[0])[:34] + (f" (+{len(running)-1})" if len(running) > 1 else "")
+    # scores present but no filter yet -> the filter is the missing step
+    if method == "ekfac" and os.path.isfile(os.path.join(d, "ekfac_scores/scores/info.json")):
+        return "missing", "ekfac scores done, filter not run"
+    if method == "magic":
+        pq = os.path.join(d, "per_query")
+        n = len(glob.glob(pq + "/q*.pt")) if os.path.isdir(pq) else 0
+        for sub in ("magic_scores", "magic_scores_ssd2", "magic_scores_only"):
+            p = os.path.join(d, sub, "per_query")
+            if os.path.isdir(p):
+                n = max(n, len(glob.glob(p + "/q*.pt")))
+        if n:
+            return "partial", f"{n}/20 queries scored"
+        return "missing", "no magic scores"
+    return "missing", ""
+
+
+FIGS = []
+FIGS.append(("filter_scaling.pdf  (left: top 1%)",
+             [(f"{n//1000}k", pick(SERIES[0][1], f"{n//1000}k_bs256"), "ekfac") for n in NS]))
+FIGS.append(("filter_scaling.pdf  (right: top 40)",
+             [(f"{n//1000}k", next((x for x in rows if x["run_id"] == rid), None), "top40")
+              for n, rid in TOP40]))
+# The Muon appendix is one figure: corpus scaling (AdamW vs Muon, Muon to 256k)
+# beside the 16k batch sweep. Its *_absolute companion draws the same points.
+FIGS.append(("filter_muon_appendix.pdf  (left: AdamW vs Muon corpus scaling)",
+             [(f"{name} {n//1000}k", pick(pre, f"{n//1000}k_bs256"), "ekfac")
+              for name, pre in SERIES for n in NS
+              if n <= 256000]))
+FIGS.append(("filter_muon_appendix.pdf  (right: batch sweep at 16k)",
+             [(f"{name} bs{b}", pick(pre, f"16k_bs{b}"), "ekfac")
+              for name, pre in SERIES for b in BATCHES]))
+FIGS.append(("filter_method_appendix.pdf  (EK-FAC vs MAGIC)",
+             [(f"{m.upper()} {n//1000}k", pick(SERIES[0][1], f"{n//1000}k_bs256"), m)
+              # Panel (b) top-40 caps at 128k (66M tokens); serial MAGIC scoring
+              # stops at 64k. Beyond those the figure has no point, so auditing
+              # them produced permanent false MISSING flags.
+              for m in ("ekfac", "magic") for n in NS
+              if n <= 64000]))
+
+for title, points in FIGS:
+    holes = []
+    n_present = 0
+    for label, r, method in points:
+        if r is None:
+            holes.append((label, "missing", "no row"))
+            continue
+        if method == "top40":
+            p = os.path.join(E, r["run_id"], "filter_top40_ekfac", "filter_summary.csv")
+            if os.path.isfile(p):
+                n_present += 1
+            else:
+                holes.append((label, "missing", "no top-40 summary"))
+            continue
+        st, note = status(r["run_id"], method)
+        if st == "present":
+            n_present += 1
+        else:
+            holes.append((label, st, note or r["run_id"]))
+    print(f"  {title}: {n_present}/{len(points)} points")
+    for label, st, note in holes:
+        print(f"     {label:16s} {st.upper():8s} {note}")
+
+# filter_variants_appendix, filter_heldout, filter_scaling_qwen, qwen15b_heldout_trend
+# and filter_vs_lds read their own sources (experiments.csv rows, per-run
+# summaries, data/qwen15b_heldout_v2.csv); their scripts print what they drew.
+print(f"  figure files ({len(EXPECTED_FIGURES)} expected in figures/):")
+missing, stray = check_figure_set()
+if missing or stray:
+    sys.exit(f"figure set mismatch: missing={missing} stray={stray}")

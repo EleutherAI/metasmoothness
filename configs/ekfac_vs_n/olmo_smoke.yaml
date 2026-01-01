@@ -1,0 +1,64 @@
+steps:
+- magic:
+    run_path: runs/ekfac_vs_n_olmo_smoke/N4k
+    model: runs/ekfac_vs_n/olmo2_reinit
+    overwrite: true
+    cleanup_ckpts: true
+    data: &id002
+      dataset: runs/ekfac_vs_n/datasets/train_4k.hf
+      split: train
+      chunk_length: 0
+    query: &id003
+      dataset: runs/ekfac_vs_n/datasets/query_50.hf
+      split: train
+      chunk_length: 0
+    distributed: &id001
+      nproc_per_node: 8
+      nnode: 1
+    eps_root: 1.0e-06
+    optimizer: muon
+    weight_decay: 0.1
+    batch_size: 64
+    num_epochs: 1
+    lr_schedule:
+      lr_scheduler_type: polynomial
+      lr: 0.005
+      lr_start: 1.0e-06
+      lr_end: 0.0005
+      warmup_steps: 0.25
+    subset_strategy: random
+    num_subsets: 2
+    subset_fraction: 0.01
+    save_optimizer_state: false
+    save_retrained_models: true
+- ekfac:
+    index_cfg:
+      run_path: runs/ekfac_vs_n_olmo_smoke/N4k_scores
+      model: runs/ekfac_vs_n_olmo_smoke/N4k/retrained/base
+      overwrite: true
+      token_batch_size: 1024
+      max_batch_size: 64
+      filter_modules: lm_head
+      distributed: *id001
+      data: *id002
+    hessian_cfg:
+      method: kfac
+      ev_correction: true
+    score_cfg:
+      batch_size: 1024
+    preprocess_cfg:
+      unit_normalize: false
+    hessian_pipeline_cfg:
+      query: *id003
+      query_aggregation: none
+      inversion_cfg:
+        damping_factor: 0.1
+- validate:
+    run_path: runs/ekfac_vs_n_olmo_smoke/N4k_validate
+    model: gpt2
+    overwrite: true
+    scores: runs/ekfac_vs_n_olmo_smoke/N4k_scores/scores
+    retrained_dir: runs/ekfac_vs_n_olmo_smoke/N4k
+    data: *id002
+    query: *id003
+    batch_size: 50

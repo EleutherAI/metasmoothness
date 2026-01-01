@@ -1,0 +1,67 @@
+We tune the peak learning rate separately for every configuration whose
+optimization problem differs from our reference configuration -- that is, for
+every change of dataset size, batch size, epoch count, optimizer, or model.
+Selection is always by mean per-token cross-entropy on a held-out set of 4000
+documents disjoint from every training set; we never select on training loss,
+since on small repeated corpora the training-loss optimum memorises and can
+generalise worse than the untrained model.
+
+We initially use a learning rate grid of {1e-4, 2e-4, 4e-4} for GPT-2
+fine-tuning, obtained by sweeping the reference configuration (N = 16k
+documents, batch size 256, two epochs) over the five values {1e-4, 2e-4, 4e-4,
+8e-4, 2e-3}. Both AdamW and Muon select 2e-4 there, and we take that value as
+the centre of a three-point grid {0.5x, 1x, 2x} for every other configuration.
+We space grids by factors of two because the reference sweep fixes both ends of
+the useful range: moving a factor of two away from the optimum costs between
+0.002 and 0.010 nats of held-out loss, a factor of four costs 0.042, and a
+factor of ten costs 0.140, while retraining a fixed configuration under a
+different seed moves held-out loss by about 0.001 nats. A finer grid would
+therefore resolve seed noise rather than mistuning, and a coarser one would miss
+real mistuning.
+
+Only that one centre, 2e-4, is taken from our own measurements. Where we shift a
+grid away from it we do so on conventional grounds rather than on our own data.
+On the batch-size axis we scale the centre by sqrt(bs/256) and round to a factor
+of two, giving centres of 5e-5 at batch sizes 16 and 32, 1e-4 at 64 and 128, and
+2e-4 at 512. For GPT-2 medium we shift one step down to 1e-4, as larger models
+under standard parameterisation conventionally prefer lower learning rates. At
+N >= 128k we likewise centre at 1e-4, reflecting the drift towards lower
+learning rates already visible at smaller sizes rather than letting a long and
+expensive run land on a grid endpoint. The weight-decay, gradient-clipping,
+epoch-count and logit-scale groups keep the reference centre of 2e-4; those
+groups exist to verify that the optimum has not moved, not to hunt for it.
+
+We extend a grid whenever the lowest held-out loss falls on one of its
+endpoints, adding a single further point a factor of two beyond that endpoint
+and re-checking. We stop after two extensions, on the grounds that an optimum
+more than a factor of four from the centre indicates something unexpected about
+the configuration and warrants investigation rather than further sweeping. Eight
+of the plotted configurations required an extension. AdamW at N = 4k and
+N = 64k, Muon at N = 64k, and the four-epoch variant each extended downwards by
+one step to 5e-5; AdamW at N = 128k and N = 256k each extended upwards by one
+step to 4e-4; and Muon at N = 4k extended upwards by one step to 8e-4. The
+logit-scale-0.25 variant is the only configuration that required both permitted
+extensions, moving upwards through 8e-4 to 1.6e-3. The three largest
+configurations were swept on a wider grid from the outset rather than by
+extension: AdamW at N = 512k over seven values from 2.5e-5 to 1.6e-3, and Muon
+at N = 256k and N = 512k over six and five values respectively. No configuration
+on the batch-size axis required an extension.
+
+Where the best and second-best points of a grid differ by less than 0.002 nats
+-- twice the measured seed noise, and so the resolution limit of the selection
+metric -- we keep the grid centre rather than the numerical winner. This holds
+the learning rate fixed along an axis unless the data clearly demand a change,
+so that most comparisons remain one-factor. Two of the plotted configurations
+are decided this way: Muon at batch size 16, where 2.5e-5 beats the centre 5e-5
+by 0.0002 nats, and the logit-scale-0.5 variant, where 4e-4 beats the centre
+2e-4 by 0.0008 nats. Both keep the centre.
+
+The resulting learning rates are as follows. On the corpus-size axis at batch
+size 256, AdamW uses 1e-4 at N = 4k and N = 64k, 2e-4 at N = 8k, 16k, 32k, 128k
+and 256k, and 8e-4 at N = 512k; Muon uses 2e-4 at N = 8k, 16k, 32k and 256k, and
+1e-4 at N = 64k and N = 128k. On the batch-size axis at N = 16k both optimizers
+use 5e-5 at batch sizes 16 and 32, 1e-4 at 64 and 128, and 2e-4 at 256 and 512.
+Among the N = 16k variants, the weight-decay, gradient-clipping and
+logit-scale-0.5 groups keep 2e-4; four epochs and GPT-2 medium select 1e-4; and
+logit scale 0.25 selects 8e-4, the only variant whose optimum moves by more than
+a factor of two.

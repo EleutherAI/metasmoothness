@@ -1,0 +1,40 @@
+steps:
+- ekfac:
+    index_cfg:
+      run_path: runs/ekfac_vs_n/N4k_scores
+      model: runs/ekfac_vs_n/N4k/retrained/base
+      overwrite: true
+      token_batch_size: 1024
+      max_batch_size: 64
+      filter_modules: lm_head
+      distributed:
+        nproc_per_node: 8
+        nnode: 1
+      data: &id001
+        dataset: runs/ekfac_vs_n/datasets/train_4k.hf
+        split: train
+        chunk_length: 0
+    hessian_cfg:
+      method: kfac
+      ev_correction: true
+    score_cfg:
+      batch_size: 1024
+    preprocess_cfg:
+      unit_normalize: false
+    hessian_pipeline_cfg:
+      query: &id002
+        dataset: runs/ekfac_vs_n/datasets/query_50.hf
+        split: train
+        chunk_length: 0
+      query_aggregation: none
+      inversion_cfg:
+        damping_factor: 0.1
+- validate:
+    run_path: runs/ekfac_vs_n/N4k_validate
+    model: gpt2
+    overwrite: true
+    scores: runs/ekfac_vs_n/N4k_scores/scores
+    retrained_dir: runs/ekfac_vs_n/N4k
+    data: *id001
+    query: *id002
+    batch_size: 50

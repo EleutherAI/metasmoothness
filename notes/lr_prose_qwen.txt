@@ -1,0 +1,50 @@
+For Qwen 2.5 1.5B we select the peak learning rate by the same criterion as for
+GPT-2 -- mean per-token cross-entropy on a held-out set of 4000 documents
+disjoint from every training set -- but on a different grid. Rather than a
+three-point window around a centre with data-driven extensions, we sweep a fixed
+six-point grid at every dataset size, {1, 2, 5} x 1e-5 and {1, 2, 5} x 1e-4.
+Successive points differ by a factor of two or two and a half, so the grid has
+approximately the resolution of the factor-of-two grid we use for GPT-2 while
+spanning a decade and a half in a single pass; sweeping the full range once is
+cheaper at this model scale than paying for a sequence of extension runs. At
+N = 4k and N = 8k we omit the 5e-4 point, since 2e-4 already costs more than
+0.18 nats against the optimum at those sizes. At N = 32k, 5e-4 diverged.
+
+The optimum is an interior point of the grid at every dataset size, so no rung
+required an extension. It is also nearly flat at the bottom: at N = 4k the
+entire range from 1e-5 to 5e-5 spans 0.0073 nats of held-out loss, and the
+per-rung optimum moves only once across the whole chain, from 2e-5 at N = 4k and
+8k to 5e-5 at every larger size. Larger learning rates are clearly worse
+everywhere: 1e-4 costs between 0.017 and 0.054 nats against the optimum
+depending on the rung, 2e-4 costs between 0.086 and 0.193, and 5e-4 costs
+between 0.29 and 0.53 where it converges at all.
+
+We therefore use a single peak learning rate of 5e-5 for every rung of the Qwen
+chain. It is the per-rung optimum at every N >= 16k. At N = 4k and N = 8k the
+per-rung optimum is instead 2e-5, better by 0.0021 and 0.0013 nats respectively
+-- differences at the resolution limit of the selection metric. Holding the
+learning rate fixed keeps the dataset-size axis a one-factor comparison, which a
+per-rung retune would break; this matters more here than for GPT-2, since the
+Qwen rungs are nested by construction (the query set is chunks [0, 20) and each
+training set is chunks [20, 20+N) of one pool) and are intended to differ only
+in how much of that pool the model has seen.
+
+Other than the learning rate, every rung uses identical hyperparameters: batch
+size 256, two epochs, AdamW with betas (0.95, 0.975) and weight decay 0.01, a
+polynomial schedule decaying to one tenth of the peak with warmup over the first
+25% of steps, bfloat16, and seed 42. The sweep scales the whole schedule rather
+than the peak alone, since the final learning rate is defined as one tenth of
+the peak, which keeps each sweep a one-parameter family.
+
+
+Sweep results (held-out cross-entropy). Selected value marked *, per-rung
+optimum marked + where it differs. Rungs 4k-64k are plotted.
+
+     N       1e-5      2e-5      5e-5      1e-4      2e-4      5e-4
+    4k     2.6537   2.6464+   2.6485*   2.7005    2.8395        --
+    8k     2.6504   2.6436+   2.6449*   2.6803    2.8277        --
+   16k     2.6466   2.6397    2.6389*   2.6667    2.7860    3.1709
+   32k     2.6428   2.6368    2.6354*   2.6590    2.7590  diverged
+   64k     2.6392   2.6342    2.6324*   2.6528    2.7386    2.9970
+  128k     2.6368   2.6314    2.6288*   2.6474    2.7232    2.9525
+  256k     2.6345   2.6284    2.6245*   2.6415    2.7101    2.9125

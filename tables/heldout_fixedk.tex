@@ -1,0 +1,20 @@
+\begin{table}[t]
+\centering
+\caption{Held-out EK-FAC filtering efficacy for GPT-2 by training-set size and filtering amount: QLD (nats) when removing the top 1\%, the top 40, or the top 400 proponents of each query. Mean over $Q=20$ held-out queries with 95\% bootstrap confidence intervals. At 4,000 documents the top 1\% is the top 40. The top-400 runs use three random controls per pair of queries; the others use the shared random-control retrains of Figure~\ref{fig:filter_scaling}.}
+\label{tab:fixedk}
+\small
+\begin{tabular}{@{}rrccc@{}}
+\toprule
+Documents & Tokens & \shortstack{QLD, top 1\% removed\\(nats)} & \shortstack{QLD, top 40 removed\\(nats)} & \shortstack{QLD, top 400 removed\\(nats)} \\
+\midrule
+4k & 4M & 0.008 [0.007, 0.010] & 0.008 [0.007, 0.010] & 0.041 [0.038, 0.044] \\
+8k & 8M & 0.020 [0.016, 0.025] & 0.013 [0.010, 0.016] & 0.054 [0.049, 0.061] \\
+16k & 16M & 0.029 [0.024, 0.036] & 0.012 [0.009, 0.015] & 0.051 [0.044, 0.061] \\
+32k & 33M & 0.039 [0.035, 0.045] & 0.011 [0.009, 0.013] & 0.045 [0.040, 0.052] \\
+64k & 66M & 0.041 [0.036, 0.047] & 0.008 [0.006, 0.011] & 0.031 [0.027, 0.035] \\
+128k & 131M & 0.075 [0.067, 0.087] & 0.013 [0.008, 0.023] & -- \\
+256k & 262M & 0.102 [0.087, 0.124] & 0.018 [0.007, 0.038] & -- \\
+512k & 524M & 0.116 [0.106, 0.128] & 0.014 [0.007, 0.024] & -- \\
+\bottomrule
+\end{tabular}
+\end{table}

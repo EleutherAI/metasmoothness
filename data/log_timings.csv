@@ -1,0 +1,1773 @@
+log,phase,seconds,iters,passes
+_logs/adam128k_control_0.log,Training,4794,1000,1
+_logs/adam128k_control_0.log,Validating,4553,1,1
+_logs/adam128k_control_1.log,Training,4794,1000,1
+_logs/adam128k_control_1.log,Validating,4564,1,1
+_logs/adam128k_control_2.log,Training,4406,1000,1
+_logs/adam128k_control_2.log,Validating,4410,1,1
+_logs/adam128k_ekfac_q0_2.log,Training,4415,1000,1
+_logs/adam128k_ekfac_q0_2.log,filter-proponents,8827,2,1
+_logs/adam128k_ekfac_q10_12.log,Training,4472,1000,1
+_logs/adam128k_ekfac_q10_12.log,filter-proponents,8942,2,1
+_logs/adam128k_ekfac_q12_14.log,Training,4420,1000,1
+_logs/adam128k_ekfac_q12_14.log,filter-proponents,8812,2,1
+_logs/adam128k_ekfac_q14_16.log,Training,4414,1000,1
+_logs/adam128k_ekfac_q14_16.log,filter-proponents,8824,2,1
+_logs/adam128k_ekfac_q16_18.log,Training,4425,1000,1
+_logs/adam128k_ekfac_q16_18.log,filter-proponents,8849,2,1
+_logs/adam128k_ekfac_q18_20.log,Training,4942,1000,1
+_logs/adam128k_ekfac_q18_20.log,filter-proponents,9146,2,1
+_logs/adam128k_ekfac_q18_20.log,random,13306,3,1
+_logs/adam128k_ekfac_q2_4.log,Training,4454,1000,1
+_logs/adam128k_ekfac_q2_4.log,filter-proponents,8906,2,1
+_logs/adam128k_ekfac_q4_6.log,Training,4405,1000,1
+_logs/adam128k_ekfac_q4_6.log,filter-proponents,8807,2,1
+_logs/adam128k_ekfac_q6_8.log,Training,4421,1000,1
+_logs/adam128k_ekfac_q6_8.log,filter-proponents,8840,2,1
+_logs/adam128k_ekfac_q8_10.log,Training,4425,1000,1
+_logs/adam128k_ekfac_q8_10.log,filter-proponents,8851,2,1
+_logs/adam256k_control_0.log,Training,8880,2000,1
+_logs/adam256k_control_0.log,Validating,8874,1,1
+_logs/adam256k_control_1.log,Training,8946,2000,1
+_logs/adam256k_control_1.log,Validating,8938,1,1
+_logs/adam256k_control_2.log,Training,8933,2000,1
+_logs/adam256k_control_2.log,Validating,8926,1,1
+_logs/adam256k_q0_2.log,Evaluating bank,6,3,1
+_logs/adam256k_q0_2.log,Training,8857,2000,1
+_logs/adam256k_q0_2.log,filter-proponents,17688,2,1
+_logs/adam256k_q10_12.log,Evaluating bank,5,3,1
+_logs/adam256k_q10_12.log,Training,8920,2000,1
+_logs/adam256k_q10_12.log,filter-proponents,17813,2,1
+_logs/adam256k_q12_14.log,Evaluating bank,5,3,1
+_logs/adam256k_q12_14.log,Training,9009,2000,1
+_logs/adam256k_q12_14.log,filter-proponents,17991,2,1
+_logs/adam256k_q14_16.log,Evaluating bank,6,3,1
+_logs/adam256k_q14_16.log,Training,8976,2000,1
+_logs/adam256k_q14_16.log,filter-proponents,17919,2,1
+_logs/adam256k_q16_18.log,Evaluating bank,6,3,1
+_logs/adam256k_q16_18.log,Training,8903,2000,1
+_logs/adam256k_q16_18.log,filter-proponents,17774,2,1
+_logs/adam256k_q18_20.log,Evaluating bank,6,3,1
+_logs/adam256k_q18_20.log,Training,8817,2000,1
+_logs/adam256k_q18_20.log,filter-proponents,17612,2,1
+_logs/adam256k_q2_4.log,Evaluating bank,5,3,1
+_logs/adam256k_q2_4.log,Training,8952,2000,1
+_logs/adam256k_q2_4.log,filter-proponents,17873,2,1
+_logs/adam256k_q4_6.log,Evaluating bank,5,3,1
+_logs/adam256k_q4_6.log,Training,8908,2000,1
+_logs/adam256k_q4_6.log,filter-proponents,17782,2,1
+_logs/adam256k_q6_8.log,Evaluating bank,7,3,1
+_logs/adam256k_q6_8.log,Training,8802,2000,1
+_logs/adam256k_q6_8.log,filter-proponents,17580,2,1
+_logs/adam256k_q8_10.log,Evaluating bank,5,3,1
+_logs/adam256k_q8_10.log,Training,8875,2000,1
+_logs/adam256k_q8_10.log,filter-proponents,17709,2,1
+_logs/bank64kbs32_0_5.log,Training,2523,4000,1
+_logs/bank64kbs32_0_5.log,Validating,12593,5,1
+_logs/bank64kbs32_10_15.log,Training,2515,4000,1
+_logs/bank64kbs32_10_15.log,Validating,12578,5,1
+_logs/bank64kbs32_15_20.log,Training,2489,4000,1
+_logs/bank64kbs32_15_20.log,Validating,12447,5,1
+_logs/bank64kbs32_20_25.log,Training,2519,4000,1
+_logs/bank64kbs32_20_25.log,Validating,12597,5,1
+_logs/bank64kbs32_25_30.log,Training,2576,4000,1
+_logs/bank64kbs32_25_30.log,Validating,12876,5,1
+_logs/bank64kbs32_30_35.log,Training,2515,4000,1
+_logs/bank64kbs32_30_35.log,Validating,12577,5,1
+_logs/bank64kbs32_35_40.log,Training,2519,4000,1
+_logs/bank64kbs32_35_40.log,Validating,12599,5,1
+_logs/bank64kbs32_40_45.log,Training,2528,4000,1
+_logs/bank64kbs32_40_45.log,Validating,12625,5,1
+_logs/bank64kbs32_45_50.log,Training,2540,4000,1
+_logs/bank64kbs32_45_50.log,Validating,12682,5,1
+_logs/bank64kbs32_50_55.log,Training,2492,4000,1
+_logs/bank64kbs32_50_55.log,Validating,12465,5,1
+_logs/bank64kbs32_55_60.log,Training,2510,4000,1
+_logs/bank64kbs32_55_60.log,Validating,12551,5,1
+_logs/bank64kbs32_5_10.log,Training,2537,4000,1
+_logs/bank64kbs32_5_10.log,Validating,12672,5,1
+_logs/bank64kbs32_60_65.log,Training,2524,4000,1
+_logs/bank64kbs32_60_65.log,Validating,12622,5,1
+_logs/bank64kbs32_65_70.log,Training,2534,4000,1
+_logs/bank64kbs32_65_70.log,Validating,12668,5,1
+_logs/bank64kbs32_70_75.log,Training,2516,4000,1
+_logs/bank64kbs32_70_75.log,Validating,12584,5,1
+_logs/bank64kbs32_75_80.log,Training,2522,4000,1
+_logs/bank64kbs32_75_80.log,Validating,12611,5,1
+_logs/bank64kbs32_80_85.log,Training,2518,4000,1
+_logs/bank64kbs32_80_85.log,Validating,12591,5,1
+_logs/bank64kbs32_85_90.log,Training,2498,4000,1
+_logs/bank64kbs32_85_90.log,Validating,12496,5,1
+_logs/bank64kbs32_90_95.log,Training,2500,4000,1
+_logs/bank64kbs32_90_95.log,Validating,12506,5,1
+_logs/bank64kbs32_95_100.log,Training,2539,4000,1
+_logs/bank64kbs32_95_100.log,Validating,12752,5,1
+_logs/bank_512_top1_relaunch2.log,Training,15175,4000,1
+_logs/bank_512_top1_relaunch2.log,Validating,45486,3,1
+_logs/bank_top40_128k.log,Training,4418,1000,1
+_logs/bank_top40_128k.log,Validating,13291,3,1
+_logs/bank_top40_256k.log,Training,8834,2000,1
+_logs/bank_top40_256k.log,Validating,26518,3,1
+_logs/bank_top40_s0.log,Training,4406,1000,1
+_logs/bank_top40_s0.log,Validating,4412,1,1
+_logs/bank_top40_s1.log,Training,4456,1000,1
+_logs/bank_top40_s1.log,Validating,4468,1,1
+_logs/bank_top40_s2.log,Training,4460,1000,1
+_logs/bank_top40_s2.log,Validating,4462,1,1
+_logs/bm25_filter_4k.log,Training,142,32,1
+_logs/bm25_filter_4k_retry.log,Training,142,32,1
+_logs/bm25_filter_4k_retry.log,filter-proponents,2864,20,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q0_2.log,Training,4419,1000,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q0_2.log,filter-proponents,8823,2,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q10_12.log,Training,4419,1000,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q10_12.log,filter-proponents,8842,2,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q12_14.log,Training,4426,1000,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q12_14.log,filter-proponents,8857,2,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q14_16.log,Training,4441,1000,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q14_16.log,filter-proponents,8886,2,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q16_18.log,Training,4383,1000,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q16_18.log,filter-proponents,8769,2,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q18_20.log,Training,4430,1000,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q18_20.log,filter-proponents,8864,2,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q2_4.log,Training,4457,1000,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q2_4.log,filter-proponents,8914,2,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q4_6.log,Training,4433,1000,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q4_6.log,filter-proponents,8870,2,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q6_8.log,Training,4470,1000,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q6_8.log,filter-proponents,8944,2,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q8_10.log,Training,4461,1000,1
+_logs/bm25_plan_adam_eps1e17_128k_bs256_q8_10.log,filter-proponents,8924,2,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q0_2.log,Training,7595,2000,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q0_2.log,filter-proponents,15189,2,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q10_12.log,Training,8912,2000,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q10_12.log,filter-proponents,17802,2,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q12_14.log,Training,8870,2000,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q12_14.log,filter-proponents,17727,2,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q14_16.log,Training,8943,2000,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q14_16.log,filter-proponents,17841,2,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q16_18.log,Training,8791,2000,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q16_18.log,filter-proponents,17574,2,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q18_20.log,Training,8869,2000,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q18_20.log,filter-proponents,17725,2,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q2_4.log,Training,7579,2000,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q2_4.log,filter-proponents,15160,2,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q4_6.log,Training,7573,2000,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q4_6.log,filter-proponents,15148,2,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q6_8.log,Training,8904,2000,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q6_8.log,filter-proponents,17793,2,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q8_10.log,Training,8999,2000,1
+_logs/bm25_plan_adam_eps1e17_256k_bs256_q8_10.log,filter-proponents,17977,2,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q0_2.log,Training,1110,250,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q0_2.log,filter-proponents,2220,2,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q10_12.log,Training,1105,250,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q10_12.log,filter-proponents,2213,2,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q12_14.log,Training,1117,250,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q12_14.log,filter-proponents,2236,2,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q14_16.log,Training,1121,250,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q14_16.log,filter-proponents,2245,2,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q16_18.log,Training,1099,250,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q16_18.log,filter-proponents,2201,2,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q18_20.log,Training,1113,250,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q18_20.log,filter-proponents,2229,2,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q2_4.log,Training,1101,250,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q2_4.log,filter-proponents,2203,2,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q4_6.log,Training,1131,250,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q4_6.log,filter-proponents,2265,2,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q6_8.log,Training,1106,250,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q6_8.log,filter-proponents,2139,2,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q6_8_rerun.log,Training,1107,250,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q6_8_rerun.log,filter-proponents,2216,2,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q8_10.log,Training,1115,250,1
+_logs/bm25_plan_adam_eps1e17_32k_bs256_q8_10.log,filter-proponents,2234,2,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q0_2.log,Training,2219,500,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q0_2.log,filter-proponents,4422,2,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q10_12.log,Training,2226,500,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q10_12.log,filter-proponents,4452,2,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q12_14.log,Training,2200,500,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q12_14.log,filter-proponents,4400,2,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q14_16.log,Training,2210,500,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q14_16.log,filter-proponents,4424,2,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q16_18.log,Training,2195,500,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q16_18.log,filter-proponents,4389,2,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q18_20.log,Training,2222,500,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q18_20.log,filter-proponents,4444,2,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q2_4.log,Training,2200,500,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q2_4.log,filter-proponents,4401,2,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q4_6.log,Training,2217,500,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q4_6.log,filter-proponents,4436,2,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q6_8.log,Training,2218,500,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q6_8.log,filter-proponents,4439,2,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q8_10.log,Training,2202,500,1
+_logs/bm25_plan_adam_eps1e17_64k_bs256_q8_10.log,filter-proponents,4406,2,1
+_logs/bm25_plan_adam_eps1e17_8k_bs256_q0_2.log,Training,290,63,1
+_logs/bm25_plan_adam_eps1e17_8k_bs256_q10_12.log,Training,287,63,1
+_logs/bm25_plan_adam_eps1e17_8k_bs256_q12_14.log,Training,289,63,1
+_logs/bm25_plan_adam_eps1e17_8k_bs256_q14_16.log,Training,291,63,1
+_logs/bm25_plan_adam_eps1e17_8k_bs256_q16_18.log,Training,289,63,1
+_logs/bm25_plan_adam_eps1e17_8k_bs256_q18_20.log,Training,291,63,1
+_logs/bm25_plan_adam_eps1e17_8k_bs256_q2_4.log,Training,288,63,1
+_logs/bm25_plan_adam_eps1e17_8k_bs256_q4_6.log,Training,287,63,1
+_logs/bm25_plan_adam_eps1e17_8k_bs256_q6_8.log,Training,288,63,1
+_logs/bm25_plan_adam_eps1e17_8k_bs256_q8_10.log,Training,289,63,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q0_2.log,Training,562,125,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q0_2.log,filter-proponents,1129,2,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q10_12.log,Training,594,125,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q10_12.log,filter-proponents,1189,2,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q12_14.log,Training,561,125,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q12_14.log,filter-proponents,1125,2,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q14_16.log,Training,559,125,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q14_16.log,filter-proponents,1121,2,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q16_18.log,Training,569,125,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q16_18.log,filter-proponents,1141,2,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q18_20.log,Training,558,125,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q18_20.log,filter-proponents,1121,2,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q2_4.log,Training,557,125,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q2_4.log,filter-proponents,1111,2,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q4_6.log,Training,559,125,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q4_6.log,filter-proponents,1120,2,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q6_8.log,Training,552,125,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q6_8.log,filter-proponents,1105,2,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q8_10.log,Training,560,125,1
+_logs/bm25_sm_adamw_eps1e17_16k_bs256_q8_10.log,filter-proponents,1122,2,1
+_logs/bm25_top1_256k_q11_12_nproc1_fixedquery_clover-0.log,Evaluating bank,10,3,1
+_logs/bm25_top1_256k_q11_12_nproc1_fixedquery_clover-0.log,Training,17232,2000,1
+_logs/bm25_top1_256k_q11_12_nproc1_fixedquery_clover-0.log,filter-proponents,17214,1,1
+_logs/bm25_top1_256k_q13_14_nproc1_fixedquery_clover-0.log,Evaluating bank,9,3,1
+_logs/bm25_top1_256k_q13_14_nproc1_fixedquery_clover-0.log,Training,17280,2000,1
+_logs/bm25_top1_256k_q13_14_nproc1_fixedquery_clover-0.log,filter-proponents,17268,1,1
+_logs/bm25_top1_256k_q15_16_nproc1_fixedquery_heather-0.log,Evaluating bank,10,3,1
+_logs/bm25_top1_256k_q15_16_nproc1_fixedquery_heather-0.log,Training,17279,2000,1
+_logs/bm25_top1_256k_q15_16_nproc1_fixedquery_heather-0.log,filter-proponents,17274,1,1
+_logs/bm25_top1_256k_q17_18_nproc1_fixedquery_heather-0.log,Evaluating bank,11,3,1
+_logs/bm25_top1_256k_q17_18_nproc1_fixedquery_heather-0.log,Training,16953,2000,1
+_logs/bm25_top1_256k_q17_18_nproc1_fixedquery_heather-0.log,filter-proponents,16948,1,1
+_logs/bm25_top1_256k_q19_20_nproc1_fixedquery_heather-0.log,Evaluating bank,9,3,1
+_logs/bm25_top1_256k_q19_20_nproc1_fixedquery_heather-0.log,Training,17176,2000,1
+_logs/bm25_top1_256k_q19_20_nproc1_fixedquery_heather-0.log,filter-proponents,17165,1,1
+_logs/bm25_top1_256k_q7_8_nproc1_fixedquery_clover-0.log,Evaluating bank,10,3,1
+_logs/bm25_top1_256k_q7_8_nproc1_fixedquery_clover-0.log,Training,17053,2000,1
+_logs/bm25_top1_256k_q7_8_nproc1_fixedquery_clover-0.log,filter-proponents,17039,1,1
+_logs/bm25_top1_256k_q9_10_nproc1_fixedquery_clover-0.log,Evaluating bank,10,3,1
+_logs/bm25_top1_256k_q9_10_nproc1_fixedquery_clover-0.log,Training,17190,2000,1
+_logs/bm25_top1_256k_q9_10_nproc1_fixedquery_clover-0.log,filter-proponents,17179,1,1
+_logs/bm25_top1_8k_q0_2_filter2.log,Training,288,63,1
+_logs/bm25_top1_8k_q0_2_filter2.log,filter-proponents,580,2,1
+_logs/bm25_top1_8k_q0_2_fixed.log,Training,288,63,1
+_logs/bm25_top1_8k_q0_2_rerun.log,Training,288,63,1
+_logs/bm25_top1_8k_q10_12_filter2.log,Training,290,63,1
+_logs/bm25_top1_8k_q10_12_filter2.log,filter-proponents,584,2,1
+_logs/bm25_top1_8k_q10_12_fixed.log,Training,289,63,1
+_logs/bm25_top1_8k_q10_12_rerun.log,Training,292,63,1
+_logs/bm25_top1_8k_q11_12_nproc1_fixedquery_clover-0.log,Training,546,63,1
+_logs/bm25_top1_8k_q11_12_nproc1_fixedquery_clover-0.log,filter-proponents,550,1,1
+_logs/bm25_top1_8k_q11_12_nproc1_retry3_clover-0.log,Training,546,63,1
+_logs/bm25_top1_8k_q11_12_single.log,Training,563,63,1
+_logs/bm25_top1_8k_q11_12_single_bell2.log,Training,289,63,1
+_logs/bm25_top1_8k_q12_14_filter2.log,Training,287,63,1
+_logs/bm25_top1_8k_q12_14_filter2.log,filter-proponents,576,2,1
+_logs/bm25_top1_8k_q12_14_fixed.log,Training,286,63,1
+_logs/bm25_top1_8k_q12_14_rerun.log,Training,292,63,1
+_logs/bm25_top1_8k_q13_14_nproc1_fixedquery_heather-0.log,Training,546,63,1
+_logs/bm25_top1_8k_q13_14_nproc1_fixedquery_heather-0.log,filter-proponents,550,1,1
+_logs/bm25_top1_8k_q13_14_nproc1_retry3_heather-0.log,Training,545,63,1
+_logs/bm25_top1_8k_q13_14_single.log,Training,561,63,1
+_logs/bm25_top1_8k_q13_14_single_bell2.log,Training,287,63,1
+_logs/bm25_top1_8k_q14_16_filter2.log,Training,289,63,1
+_logs/bm25_top1_8k_q14_16_filter2.log,filter-proponents,583,2,1
+_logs/bm25_top1_8k_q14_16_fixed.log,Training,289,63,1
+_logs/bm25_top1_8k_q14_16_rerun.log,Training,287,63,1
+_logs/bm25_top1_8k_q15_16_nproc1_fixedquery_clover-0.log,Training,548,63,1
+_logs/bm25_top1_8k_q15_16_nproc1_fixedquery_clover-0.log,filter-proponents,552,1,1
+_logs/bm25_top1_8k_q15_16_nproc1_retry3_clover-0.log,Training,548,63,1
+_logs/bm25_top1_8k_q15_16_single.log,Training,289,63,1
+_logs/bm25_top1_8k_q16_18_filter2.log,Training,289,63,1
+_logs/bm25_top1_8k_q16_18_filter2.log,filter-proponents,582,2,1
+_logs/bm25_top1_8k_q16_18_fixed.log,Training,288,63,1
+_logs/bm25_top1_8k_q16_18_rerun.log,Training,289,63,1
+_logs/bm25_top1_8k_q17_18_nproc1_fixedquery_heather-0.log,Training,550,63,1
+_logs/bm25_top1_8k_q17_18_nproc1_fixedquery_heather-0.log,filter-proponents,554,1,1
+_logs/bm25_top1_8k_q17_18_nproc1_retry3_heather-0.log,Training,549,63,1
+_logs/bm25_top1_8k_q17_18_single.log,Training,287,63,1
+_logs/bm25_top1_8k_q18_20_filter2.log,Training,291,63,1
+_logs/bm25_top1_8k_q18_20_filter2.log,filter-proponents,587,2,1
+_logs/bm25_top1_8k_q18_20_fixed.log,Training,291,63,1
+_logs/bm25_top1_8k_q18_20_rerun.log,Training,287,63,1
+_logs/bm25_top1_8k_q19_20_nproc1_fixedquery_clover-0.log,Training,544,63,1
+_logs/bm25_top1_8k_q19_20_nproc1_fixedquery_clover-0.log,filter-proponents,547,1,1
+_logs/bm25_top1_8k_q1_2_single.log,Training,289,63,1
+_logs/bm25_top1_8k_q1_2_single.log,filter-proponents,291,1,1
+_logs/bm25_top1_8k_q2_4_filter2.log,Training,288,63,1
+_logs/bm25_top1_8k_q2_4_filter2.log,filter-proponents,582,2,1
+_logs/bm25_top1_8k_q2_4_fixed.log,Training,289,63,1
+_logs/bm25_top1_8k_q2_4_rerun.log,Training,295,63,1
+_logs/bm25_top1_8k_q3_4_nproc1_fixedquery_clover-0.log,Training,541,63,1
+_logs/bm25_top1_8k_q3_4_nproc1_fixedquery_clover-0.log,filter-proponents,544,1,1
+_logs/bm25_top1_8k_q3_4_nproc1_retry2_clover-0.log,Training,541,63,1
+_logs/bm25_top1_8k_q3_4_single.log,Training,292,63,1
+_logs/bm25_top1_8k_q4_6_filter2.log,Training,287,63,1
+_logs/bm25_top1_8k_q4_6_filter2.log,filter-proponents,578,2,1
+_logs/bm25_top1_8k_q4_6_fixed.log,Training,287,63,1
+_logs/bm25_top1_8k_q4_6_rerun.log,Training,289,63,1
+_logs/bm25_top1_8k_q5_6_nproc1_fixedquery_heather-0.log,Training,549,63,1
+_logs/bm25_top1_8k_q5_6_nproc1_fixedquery_heather-0.log,filter-proponents,552,1,1
+_logs/bm25_top1_8k_q5_6_nproc1_retry2_heather-0.log,Training,549,63,1
+_logs/bm25_top1_8k_q5_6_single.log,Training,291,63,1
+_logs/bm25_top1_8k_q6_8_filter2.log,Training,289,63,1
+_logs/bm25_top1_8k_q6_8_filter2.log,filter-proponents,581,2,1
+_logs/bm25_top1_8k_q6_8_fixed.log,Training,289,63,1
+_logs/bm25_top1_8k_q6_8_rerun.log,Training,290,63,1
+_logs/bm25_top1_8k_q7_8_nproc1_fixedquery_clover-0.log,Training,546,63,1
+_logs/bm25_top1_8k_q7_8_nproc1_fixedquery_clover-0.log,filter-proponents,550,1,1
+_logs/bm25_top1_8k_q7_8_nproc1_retry2_clover-0.log,Training,546,63,1
+_logs/bm25_top1_8k_q7_8_single.log,Training,288,63,1
+_logs/bm25_top1_8k_q8_10_filter2.log,Training,289,63,1
+_logs/bm25_top1_8k_q8_10_filter2.log,filter-proponents,582,2,1
+_logs/bm25_top1_8k_q8_10_fixed.log,Training,289,63,1
+_logs/bm25_top1_8k_q8_10_rerun.log,Training,288,63,1
+_logs/bm25_top1_8k_q9_10_nproc1_fixedquery_heather-0.log,Training,539,63,1
+_logs/bm25_top1_8k_q9_10_nproc1_fixedquery_heather-0.log,filter-proponents,542,1,1
+_logs/bm25_top1_8k_q9_10_nproc1_retry3_heather-0.log,Training,538,63,1
+_logs/bm25_top1_8k_q9_10_single.log,Training,562,63,1
+_logs/bm25_top1_8k_q9_10_single_bell2.log,Training,290,63,1
+_logs/bm25_top40_256k_q0_2_resume3_lily-0.log,Training,8941,2000,1
+_logs/bm25_top40_256k_q0_2_resume3_lily-0.log,filter-proponents,17890,2,1
+_logs/bm25_top40_256k_q10_12_resume3_orchid-0.log,Training,8875,2000,1
+_logs/bm25_top40_256k_q10_12_resume3_orchid-0.log,filter-proponents,17754,2,1
+_logs/bm25_top40_256k_q12_14_resume3_orchid-0.log,Training,8842,2000,1
+_logs/bm25_top40_256k_q12_14_resume3_orchid-0.log,filter-proponents,17692,2,1
+_logs/bm25_top40_256k_q14_16_resume3_orchid-0.log,Training,8907,2000,1
+_logs/bm25_top40_256k_q14_16_resume3_orchid-0.log,filter-proponents,17822,2,1
+_logs/bm25_top40_256k_q16_18_resume3_poppy-0.log,Training,10785,2000,1
+_logs/bm25_top40_256k_q16_18_resume3_poppy-0.log,filter-proponents,17585,2,1
+_logs/bm25_top40_256k_q18_20_resume3_poppy-0.log,Training,11100,2000,1
+_logs/bm25_top40_256k_q18_20_resume3_poppy-0.log,filter-proponents,18088,2,1
+_logs/bm25_top40_256k_q2_4_resume3_lily-0.log,Training,8870,2000,1
+_logs/bm25_top40_256k_q2_4_resume3_lily-0.log,filter-proponents,17741,2,1
+_logs/bm25_top40_256k_q4_6_resume3_lily-0.log,Training,8865,2000,1
+_logs/bm25_top40_256k_q4_6_resume3_lily-0.log,filter-proponents,17728,2,1
+_logs/bm25_top40_256k_q6_8_resume3_lily-0.log,Training,8827,2000,1
+_logs/bm25_top40_256k_q6_8_resume3_lily-0.log,filter-proponents,17655,2,1
+_logs/bm25_top40_256k_q8_10_resume3_orchid-0.log,Training,8848,2000,1
+_logs/bm25_top40_256k_q8_10_resume3_orchid-0.log,filter-proponents,17708,2,1
+_logs/bm25_top40_32k_q8_10_rerun2_yarrow-0.log,Training,1114,250,1
+_logs/bm25_top40_32k_q8_10_rerun2_yarrow-0.log,filter-proponents,2233,2,1
+_logs/bm25_top40_32k_q8_10_rerun_shared-ord-0.log,Training,1119,250,1
+_logs/bm25_top40_32k_q8_10_rerun_shared-ord-0.log,filter-proponents,2206,2,1
+_logs/bm25_top40_8k_q0_2_rerun2_wisteria-0.log,Training,289,63,1
+_logs/bm25_top40_8k_q0_2_rerun2_wisteria-0.log,filter-proponents,582,2,1
+_logs/bm25_top40_8k_q0_2_resume_bellflower-0.log,Training,295,63,1
+_logs/bm25_top40_8k_q0_2_resume_bellflower-0.log,filter-proponents,589,2,1
+_logs/bm25_top40_8k_q10_12_resume_tulip-0.log,Training,291,63,1
+_logs/bm25_top40_8k_q10_12_resume_tulip-0.log,filter-proponents,587,2,1
+_logs/bm25_top40_8k_q12_14_resume_tulip-0.log,Training,293,63,1
+_logs/bm25_top40_8k_q12_14_resume_tulip-0.log,filter-proponents,589,2,1
+_logs/bm25_top40_8k_q14_16_resume_tulip-0.log,Training,287,63,1
+_logs/bm25_top40_8k_q14_16_resume_tulip-0.log,filter-proponents,579,2,1
+_logs/bm25_top40_8k_q16_18_resume_violet-0.log,Training,290,63,1
+_logs/bm25_top40_8k_q16_18_resume_violet-0.log,filter-proponents,585,2,1
+_logs/bm25_top40_8k_q18_20_resume_violet-0.log,Training,293,63,1
+_logs/bm25_top40_8k_q18_20_resume_violet-0.log,filter-proponents,591,2,1
+_logs/bm25_top40_8k_q2_4_rerun2_wisteria-0.log,Training,291,63,1
+_logs/bm25_top40_8k_q2_4_rerun2_wisteria-0.log,filter-proponents,587,2,1
+_logs/bm25_top40_8k_q2_4_resume_bellflower-0.log,Training,289,63,1
+_logs/bm25_top40_8k_q2_4_resume_bellflower-0.log,filter-proponents,583,2,1
+_logs/bm25_top40_8k_q4_6_rerun2_wisteria-0.log,Training,291,63,1
+_logs/bm25_top40_8k_q4_6_rerun2_wisteria-0.log,filter-proponents,586,2,1
+_logs/bm25_top40_8k_q4_6_resume_bellflower-0.log,Training,289,63,1
+_logs/bm25_top40_8k_q4_6_resume_bellflower-0.log,filter-proponents,581,2,1
+_logs/bm25_top40_8k_q6_8_rerun2_wisteria-0.log,Training,288,63,1
+_logs/bm25_top40_8k_q6_8_rerun2_wisteria-0.log,filter-proponents,581,2,1
+_logs/bm25_top40_8k_q6_8_resume_bellflower-0.log,Training,293,63,1
+_logs/bm25_top40_8k_q6_8_resume_bellflower-0.log,filter-proponents,577,2,1
+_logs/bm25_top40_8k_q8_10_resume_tulip-0.log,Training,289,63,1
+_logs/bm25_top40_8k_q8_10_resume_tulip-0.log,filter-proponents,581,2,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q0_2.log,Training,4479,1000,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q0_2.log,filter-proponents,8952,2,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q10_12.log,Training,4442,1000,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q10_12.log,filter-proponents,8886,2,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q12_14.log,Training,4411,1000,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q12_14.log,filter-proponents,8824,2,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q14_16.log,Training,4453,1000,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q14_16.log,filter-proponents,8908,2,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q16_18.log,Training,4404,1000,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q16_18.log,filter-proponents,8811,2,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q18_20.log,Training,4421,1000,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q18_20.log,filter-proponents,8850,2,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q2_4.log,Training,4442,1000,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q2_4.log,filter-proponents,8872,2,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q4_6.log,Training,4419,1000,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q4_6.log,filter-proponents,8840,2,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q6_8.log,Training,4402,1000,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q6_8.log,filter-proponents,8804,2,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q8_10.log,Training,4436,1000,1
+_logs/bm25_top40_plan_adam_eps1e17_128k_bs256_q8_10.log,filter-proponents,8873,2,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q0_2.log,Training,8781,2000,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q0_2.log,filter-proponents,17550,2,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q10_12.log,Training,8972,2000,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q10_12.log,filter-proponents,17935,2,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q12_14.log,Training,9489,2000,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q12_14.log,filter-proponents,18964,2,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q14_16.log,Training,8975,2000,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q14_16.log,filter-proponents,17935,2,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q16_18.log,Training,8947,2000,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q16_18.log,filter-proponents,17891,2,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q18_20.log,Training,9093,2000,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q18_20.log,filter-proponents,18173,2,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q2_4.log,Training,8894,2000,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q2_4.log,filter-proponents,17785,2,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q4_6.log,Training,8869,2000,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q4_6.log,filter-proponents,17733,2,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q6_8.log,Training,8949,2000,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q6_8.log,filter-proponents,17888,2,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q8_10.log,Training,8837,2000,1
+_logs/bm25_top40_plan_adam_eps1e17_256k_bs256_q8_10.log,filter-proponents,17662,2,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q0_2.log,Training,1109,250,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q0_2.log,filter-proponents,2219,2,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q10_12.log,Training,1116,250,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q10_12.log,filter-proponents,2236,2,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q12_14.log,Training,1106,250,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q12_14.log,filter-proponents,2215,2,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q14_16.log,Training,1119,250,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q14_16.log,filter-proponents,2241,2,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q16_18.log,Training,1122,250,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q16_18.log,filter-proponents,2247,2,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q18_20.log,Training,1100,250,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q18_20.log,filter-proponents,2203,2,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q2_4.log,Training,1103,250,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q2_4.log,filter-proponents,2209,2,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q4_6.log,Training,1102,250,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q4_6.log,filter-proponents,2206,2,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q6_8.log,Training,1131,250,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q6_8.log,filter-proponents,2265,2,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q8_10.log,Training,1107,250,1
+_logs/bm25_top40_plan_adam_eps1e17_32k_bs256_q8_10.log,filter-proponents,2064,2,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q0_2.log,Training,2224,500,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q0_2.log,filter-proponents,4448,2,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q10_12.log,Training,2208,500,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q10_12.log,filter-proponents,4424,2,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q12_14.log,Training,2210,500,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q12_14.log,filter-proponents,4424,2,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q14_16.log,Training,2226,500,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q14_16.log,filter-proponents,4449,2,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q16_18.log,Training,2228,500,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q16_18.log,filter-proponents,4460,2,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q18_20.log,Training,2252,500,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q18_20.log,filter-proponents,4507,2,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q2_4.log,Training,2209,500,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q2_4.log,filter-proponents,4418,2,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q4_6.log,Training,2198,500,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q4_6.log,filter-proponents,4396,2,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q6_8.log,Training,2216,500,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q6_8.log,filter-proponents,4432,2,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q8_10.log,Training,2198,500,1
+_logs/bm25_top40_plan_adam_eps1e17_64k_bs256_q8_10.log,filter-proponents,4397,2,1
+_logs/bm25_top40_plan_adam_eps1e17_8k_bs256_q0_2.log,Training,289,63,1
+_logs/bm25_top40_plan_adam_eps1e17_8k_bs256_q10_12.log,Training,292,63,1
+_logs/bm25_top40_plan_adam_eps1e17_8k_bs256_q12_14.log,Training,292,63,1
+_logs/bm25_top40_plan_adam_eps1e17_8k_bs256_q14_16.log,Training,297,63,1
+_logs/bm25_top40_plan_adam_eps1e17_8k_bs256_q16_18.log,Training,293,63,1
+_logs/bm25_top40_plan_adam_eps1e17_8k_bs256_q18_20.log,Training,292,63,1
+_logs/bm25_top40_plan_adam_eps1e17_8k_bs256_q2_4.log,Training,292,63,1
+_logs/bm25_top40_plan_adam_eps1e17_8k_bs256_q4_6.log,Training,289,63,1
+_logs/bm25_top40_plan_adam_eps1e17_8k_bs256_q6_8.log,Training,292,63,1
+_logs/bm25_top40_plan_adam_eps1e17_8k_bs256_q8_10.log,Training,310,63,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q0_2.log,Training,554,125,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q0_2.log,filter-proponents,1111,2,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q10_12.log,Training,561,125,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q10_12.log,filter-proponents,1125,2,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q12_14.log,Training,560,125,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q12_14.log,filter-proponents,1122,2,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q14_16.log,Training,569,125,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q14_16.log,filter-proponents,1140,2,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q16_18.log,Training,559,125,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q16_18.log,filter-proponents,1122,2,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q18_20.log,Training,555,125,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q18_20.log,filter-proponents,1114,2,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q2_4.log,Training,558,125,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q2_4.log,filter-proponents,1120,2,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q4_6.log,Training,553,125,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q4_6.log,filter-proponents,1106,2,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q6_8.log,Training,561,125,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q6_8.log,filter-proponents,1123,2,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q8_10.log,Training,593,125,1
+_logs/bm25_top40_sm_adamw_eps1e17_16k_bs256_q8_10.log,filter-proponents,1191,2,1
+_logs/bs512_ekfac.log,Computing Approximating Hessians with kfac,862,8000,1
+_logs/bs512_ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),1568,8000,1
+_logs/bs512_ekfac.log,Computing New worker - Collecting gradients,759,8010,2
+_logs/bs512_filter.log,Training,484,63,1
+_logs/bs512_filter.log,filter-proponents,9742,20,1
+_logs/bs512_filter.log,random,1461,3,1
+_logs/ekfac_512k_bs256.log,Computing Approximating Hessians with kfac,14737,128000,1
+_logs/ekfac_512k_bs256.log,Computing Approximating Hessians with kfac (eigenvalue correction),35828,128000,1
+_logs/ekfac_512k_bs256.log,Computing New worker - Collecting gradients,18736,256005,3
+_logs/fmagic128_q0_2.log,Evaluating bank,58,3,1
+_logs/fmagic128_q0_2.log,Training,4430,1000,1
+_logs/fmagic128_q0_2.log,filter-proponents,8856,2,1
+_logs/fmagic128_q10_12.log,Evaluating bank,5,3,1
+_logs/fmagic128_q10_12.log,Training,4430,1000,1
+_logs/fmagic128_q10_12.log,filter-proponents,8854,2,1
+_logs/fmagic128_q12_14.log,Evaluating bank,15,3,1
+_logs/fmagic128_q12_14.log,Training,4421,1000,1
+_logs/fmagic128_q12_14.log,filter-proponents,8838,2,1
+_logs/fmagic128_q14_16.log,Evaluating bank,59,3,1
+_logs/fmagic128_q14_16.log,Training,4399,1000,1
+_logs/fmagic128_q14_16.log,filter-proponents,8796,2,1
+_logs/fmagic128_q16_18.log,Evaluating bank,6,3,1
+_logs/fmagic128_q16_18.log,Training,4517,1000,1
+_logs/fmagic128_q16_18.log,filter-proponents,9032,2,1
+_logs/fmagic128_q18_20.log,Evaluating bank,6,3,1
+_logs/fmagic128_q18_20.log,Training,4420,1000,1
+_logs/fmagic128_q18_20.log,filter-proponents,8249,2,1
+_logs/fmagic128_q2_4.log,Evaluating bank,5,3,1
+_logs/fmagic128_q2_4.log,Training,4467,1000,1
+_logs/fmagic128_q2_4.log,filter-proponents,8927,2,1
+_logs/fmagic128_q4_6.log,Evaluating bank,58,3,1
+_logs/fmagic128_q4_6.log,Training,4426,1000,1
+_logs/fmagic128_q4_6.log,filter-proponents,8840,2,1
+_logs/fmagic128_q6_8.log,Evaluating bank,5,3,1
+_logs/fmagic128_q6_8.log,Training,4477,1000,1
+_logs/fmagic128_q6_8.log,filter-proponents,8953,2,1
+_logs/fmagic128_q8_10.log,Evaluating bank,5,3,1
+_logs/fmagic128_q8_10.log,Training,4498,1000,1
+_logs/fmagic128_q8_10.log,filter-proponents,8993,2,1
+_logs/fsdp_smoketest.log,Backward,41,2,2
+_logs/fsdp_smoketest.log,Training,154,32,1
+_logs/gptmed_filter.log,Training,1659,1000,1
+_logs/gptmed_filter.log,filter-proponents,33146,20,1
+_logs/heldout128k_1pct_q0_5.log,Training,9026,2000,2
+_logs/heldout128k_1pct_q0_5.log,filter-proponents,44427,10,2
+_logs/heldout128k_1pct_q0_5.log,random,39937,9,3
+_logs/heldout128k_1pct_q10_15.log,Training,4372,1000,1
+_logs/heldout128k_1pct_q10_15.log,filter-proponents,21883,5,1
+_logs/heldout128k_1pct_q10_15.log,random,13143,3,1
+_logs/heldout128k_1pct_q15_20.log,Training,4469,1000,1
+_logs/heldout128k_1pct_q15_20.log,filter-proponents,22306,5,1
+_logs/heldout128k_1pct_q15_20.log,random,13337,3,1
+_logs/heldout128k_1pct_q5_10.log,Training,4437,1000,1
+_logs/heldout128k_1pct_q5_10.log,filter-proponents,22201,5,1
+_logs/heldout128k_1pct_q5_10.log,random,13332,3,1
+_logs/heldout128k_filter1pct.log,Training,4436,1000,1
+_logs/heldout128k_top40.log,Training,4420,1000,1
+_logs/heldout128k_top40_q0_5.log,Training,4404,1000,1
+_logs/heldout128k_top40_q10_15.log,Training,4411,1000,1
+_logs/heldout128k_top40_q15_20.log,Training,4429,1000,1
+_logs/heldout128k_top40_q5_10.log,Training,4389,1000,1
+_logs/heldout16k_1pct.log,Training,551,125,1
+_logs/heldout16k_1pct.log,filter-proponents,11048,20,1
+_logs/heldout16k_1pct.log,random,1655,3,1
+_logs/heldout16k_ekfac.log,Computing New worker - Collecting gradients,367,4005,2
+_logs/heldout16k_top40.log,Training,565,125,1
+_logs/heldout16k_top40.log,filter-proponents,11342,20,1
+_logs/heldout16k_top40.log,random,1700,3,1
+_logs/heldout256k_1pct_q0_2.log,Training,9035,2000,1
+_logs/heldout256k_1pct_q0_5.log,Training,26776,6000,3
+_logs/heldout256k_1pct_q0_5.log,filter-proponents,44733,5,1
+_logs/heldout256k_1pct_q10_12.log,Training,8875,2000,1
+_logs/heldout256k_1pct_q10_15.log,Training,26626,6000,3
+_logs/heldout256k_1pct_q10_15.log,filter-proponents,44387,5,1
+_logs/heldout256k_1pct_q12_14.log,Training,8772,2000,1
+_logs/heldout256k_1pct_q14_16.log,Training,8945,2000,1
+_logs/heldout256k_1pct_q15_20.log,Training,26639,6000,3
+_logs/heldout256k_1pct_q15_20.log,filter-proponents,44250,5,1
+_logs/heldout256k_1pct_q16_18.log,Training,8882,2000,1
+_logs/heldout256k_1pct_q18_20.log,Training,8883,2000,1
+_logs/heldout256k_1pct_q2_4.log,Training,8911,2000,1
+_logs/heldout256k_1pct_q4_6.log,Training,8878,2000,1
+_logs/heldout256k_1pct_q5_10.log,Training,26714,6000,3
+_logs/heldout256k_1pct_q5_10.log,filter-proponents,44478,5,1
+_logs/heldout256k_1pct_q6_8.log,Training,8834,2000,1
+_logs/heldout256k_1pct_q8_10.log,Training,8872,2000,1
+_logs/heldout256k_top40_q0_5.log,Evaluating bank,5,3,1
+_logs/heldout256k_top40_q0_5.log,Training,26722,6000,3
+_logs/heldout256k_top40_q0_5.log,filter-proponents,62542,10,2
+_logs/heldout256k_top40_q10_15.log,Evaluating bank,65,3,1
+_logs/heldout256k_top40_q10_15.log,Training,17764,4000,2
+_logs/heldout256k_top40_q10_15.log,filter-proponents,62002,10,2
+_logs/heldout256k_top40_q15_20.log,Evaluating bank,66,3,1
+_logs/heldout256k_top40_q15_20.log,Training,18152,4000,2
+_logs/heldout256k_top40_q15_20.log,filter-proponents,88146,10,2
+_logs/heldout256k_top40_q5_10.log,Evaluating bank,5,3,1
+_logs/heldout256k_top40_q5_10.log,Training,26584,6000,3
+_logs/heldout256k_top40_q5_10.log,filter-proponents,62001,10,2
+_logs/heldout32k_1pct_q0_5.log,Training,1122,250,1
+_logs/heldout32k_1pct_q0_5.log,filter-proponents,5615,5,1
+_logs/heldout32k_1pct_q0_5.log,random,3367,3,1
+_logs/heldout32k_1pct_q10_15.log,Training,1136,250,1
+_logs/heldout32k_1pct_q10_15.log,filter-proponents,5689,5,1
+_logs/heldout32k_1pct_q10_15.log,random,3413,3,1
+_logs/heldout32k_1pct_q15_20.log,Training,1118,250,1
+_logs/heldout32k_1pct_q15_20.log,filter-proponents,5600,5,1
+_logs/heldout32k_1pct_q15_20.log,random,3359,3,1
+_logs/heldout32k_1pct_q5_10.log,Training,1117,250,1
+_logs/heldout32k_1pct_q5_10.log,filter-proponents,5594,5,1
+_logs/heldout32k_1pct_q5_10.log,random,3356,3,1
+_logs/heldout32k_ekfac.log,Computing New worker - Collecting gradients,1424,16005,3
+_logs/heldout32k_top40_q0_5.log,Training,1110,250,1
+_logs/heldout32k_top40_q0_5.log,filter-proponents,5558,5,1
+_logs/heldout32k_top40_q0_5.log,random,6667,6,2
+_logs/heldout32k_top40_q10_15.log,Training,1095,250,1
+_logs/heldout32k_top40_q10_15.log,filter-proponents,5483,5,1
+_logs/heldout32k_top40_q10_15.log,random,6577,6,2
+_logs/heldout32k_top40_q15_20.log,Training,1107,250,1
+_logs/heldout32k_top40_q15_20.log,filter-proponents,5547,5,1
+_logs/heldout32k_top40_q15_20.log,random,3326,3,1
+_logs/heldout32k_top40_q5_10.log,Training,1107,250,1
+_logs/heldout32k_top40_q5_10.log,filter-proponents,5547,5,1
+_logs/heldout32k_top40_q5_10.log,random,3327,3,1
+_logs/heldout4k_1pct.log,Training,142,32,1
+_logs/heldout4k_1pct.log,filter-proponents,2883,20,1
+_logs/heldout4k_1pct.log,random,432,3,1
+_logs/heldout4k_ekfac.log,Computing New worker - Collecting gradients,150,1010,3
+_logs/heldout512k_filter1pct.log,Training,17716,4000,1
+_logs/heldout64k_bm25_q0_5.log,Training,2216,500,1
+_logs/heldout64k_bm25_q10_15.log,Training,2194,500,1
+_logs/heldout64k_bm25_q15_20.log,Training,2210,500,1
+_logs/heldout64k_bm25_q5_10.log,Training,2207,500,1
+_logs/heldout64k_filter1pct.log,Training,2211,500,1
+_logs/heldout64k_filter1pct.log,filter-proponents,44282,20,1
+_logs/heldout64k_filter1pct.log,random,6649,3,1
+_logs/heldout64k_top40.log,Training,2211,500,1
+_logs/heldout64k_top40.log,filter-proponents,44248,20,1
+_logs/heldout64k_top40.log,random,6641,3,1
+_logs/heldout8k_1pct.log,Training,288,63,1
+_logs/heldout8k_1pct.log,filter-proponents,5821,20,1
+_logs/heldout8k_1pct.log,random,873,3,1
+_logs/heldout8k_ekfac.log,Computing New worker - Collecting gradients,368,4005,3
+_logs/heldout8k_top40.log,Training,290,63,1
+_logs/heldout8k_top40.log,filter-proponents,5871,20,1
+_logs/heldout8k_top40.log,random,880,3,1
+_logs/heldout_ekfac_128k.log,Computing New worker - Collecting gradients,5662,64008,12
+_logs/heldout_ekfac_256k.log,Computing New worker - Collecting gradients,9891,112010,12
+_logs/heldout_ekfac_512k.log,Computing New worker - Collecting gradients,22317,256005,3
+_logs/heldout_ekfac_64k.log,Computing New worker - Collecting gradients,2813,32005,3
+_logs/heldout_muon128k_ekfac.log,Computing New worker - Collecting gradients,2413,32012,10
+_logs/heldout_muon256k_ekfac.log,Computing New worker - Collecting gradients,17,5,1
+_logs/heldout_muon64k_ekfac.log,Computing New worker - Collecting gradients,2849,32005,3
+_logs/jina16k_1pct.log,Training,557,125,1
+_logs/jina16k_1pct.log,filter-proponents,11183,20,1
+_logs/jina16k_1pct.log,random,1677,3,1
+_logs/jina16k_top40.log,Training,553,125,1
+_logs/jina16k_top40.log,filter-proponents,11111,20,1
+_logs/jina16k_top40.log,random,1667,3,1
+_logs/london_adamw_filter.log,Training,549,125,1
+_logs/london_adamw_filter.log,filter-proponents,11009,20,1
+_logs/london_muon_filter.log,Evaluating bank,239,100,1
+_logs/london_muon_filter.log,Training,575,125,1
+_logs/london_muon_filter.log,filter-proponents,11537,20,1
+_logs/magic128_canary_q2_4.log,Training,5,1,1
+_logs/magic128_full_scores.log,Training,5,1,1
+_logs/magic128_iso2_q0_2.log,Training,5,1,1
+_logs/magic128_iso2_q4_6.log,Training,5,1,1
+_logs/magic128_iso2_q6_8.log,Training,5,1,1
+_logs/magic128_iso_q0_2.log,Training,5,1,1
+_logs/magic128_iso_q2_4.log,Training,5,1,1
+_logs/magic128_iso_q4_6.log,Training,5,1,1
+_logs/magic128_iso_q6_8.log,Training,5,1,1
+_logs/magic128_q0_2.log,Training,5,1,1
+_logs/magic128_q10_12.log,Training,5,1,1
+_logs/magic128_q12_14.log,Training,5,1,1
+_logs/magic128_q14_16.log,Training,5,1,1
+_logs/magic128_q16_18.log,Training,5,1,1
+_logs/magic128_q18_20.log,Training,5,1,1
+_logs/magic128_q2_4.log,Training,5,1,1
+_logs/magic128_q4_6.log,Training,5,1,1
+_logs/magic128_q6_8.log,Training,5,1,1
+_logs/magic128_q8_10.log,Training,5,1,1
+_logs/magic128_retry_q0_2.log,Training,5,1,1
+_logs/magic128_retry_q10_12.log,Training,5,1,1
+_logs/magic128_retry_q12_14.log,Training,5,1,1
+_logs/magic128_retry_q14_16.log,Training,5,1,1
+_logs/magic128_retry_q16_18.log,Training,5,1,1
+_logs/magic128_retry_q18_20.log,Training,5,1,1
+_logs/magic128_retry_q2_4.log,Training,5,1,1
+_logs/magic128_retry_q4_6.log,Training,5,1,1
+_logs/magic128_retry_q6_8.log,Training,5,1,1
+_logs/magic128_retry_q8_10.log,Training,5,1,1
+_logs/magic128fix_q0_2.log,Training,5,1,1
+_logs/magic128fix_q18_20.log,Training,5,1,1
+_logs/magic128k_canary_q18_20_20260901T021318Z.log,Training,4,1,1
+_logs/magic128k_q10_12.log,Training,5,1,1
+_logs/magic128k_q12_14.log,Training,5,1,1
+_logs/magic128k_q14_16.log,Training,5,1,1
+_logs/magic128k_q16_18.log,Training,5,1,1
+_logs/magic128k_q18_20.log,Training,5,1,1
+_logs/magic128k_q2_4.log,Training,5,1,1
+_logs/magic128k_q4_6.log,Training,5,1,1
+_logs/magic128k_q6_8.log,Training,5,1,1
+_logs/magic128k_q8_10.log,Training,5,1,1
+_logs/magic128k_repair_forward_20260901T020804Z.log,Training,9,2,1
+_logs/magic128k_rerun3_q0_2_20260901T021623Z.log,Training,4,1,1
+_logs/magic128k_rerun3_q10_12_20260901T021647Z.log,Training,4,1,1
+_logs/magic128k_rerun3_q12_14_20260901T021652Z.log,Training,4,1,1
+_logs/magic128k_rerun3_q14_16_20260901T021657Z.log,Training,4,1,1
+_logs/magic128k_rerun3_q16_18_20260901T021702Z.log,Training,4,1,1
+_logs/magic128k_rerun3_q2_4_20260901T021629Z.log,Training,4,1,1
+_logs/magic128k_rerun3_q4_6_20260901T021634Z.log,Training,4,1,1
+_logs/magic128k_rerun3_q6_8_20260901T021638Z.log,Training,4,1,1
+_logs/magic128k_rerun3_q8_10_20260901T021642Z.log,Training,4,1,1
+_logs/magic128k_rerun4_q0_2_20260901T035140Z.log,Training,4,1,1
+_logs/magic128k_rerun4_q18_20_20260901T035135Z.log,Training,4,1,1
+_logs/magic128k_rerun_q0_2_20260901T015634Z.log,Training,5,1,1
+_logs/magic128k_rerun_q2_4_20260901T015640Z.log,Training,5,1,1
+_logs/magic128k_rerun_q4_6_20260901T015644Z.log,Training,5,1,1
+_logs/magic128k_rerun_q6_8_20260901T015649Z.log,Training,5,1,1
+_logs/magic128k_scores2.log,Training,4401,1000,1
+_logs/magic256_q0_2.log,Training,5,1,1
+_logs/magic256_q10_12_priv.log,Training,5,1,1
+_logs/magic256_q12_14_priv.log,Training,5,1,1
+_logs/magic256_q14_16_priv.log,Training,6,1,1
+_logs/magic256_q16_18_priv.log,Training,5,1,1
+_logs/magic256_q18_20.log,Training,5,1,1
+_logs/magic256_q18_20_retry.log,Training,5,1,1
+_logs/magic256_q19_20.log,Training,5,1,1
+_logs/magic256_q1_2.log,Training,5,1,1
+_logs/magic256_q2_4_priv.log,Training,5,1,1
+_logs/magic256_q4_6_priv.log,Training,5,1,1
+_logs/magic256_q6_8_priv.log,Training,6,1,1
+_logs/magic256_q8_10_priv.log,Training,5,1,1
+_logs/magic256_trajectory.log,Training,4416,1000,1
+_logs/magic256fix_q0_2.log,Training,9,1,1
+_logs/magic256fix_q10_12.log,Training,9,1,1
+_logs/magic256fix_q11_12.log,Training,9,1,1
+_logs/magic256fix_q12_14.log,Training,9,1,1
+_logs/magic256fix_q13_14.log,Training,9,1,1
+_logs/magic256fix_q14_16.log,Training,9,1,1
+_logs/magic256fix_q15_16.log,Training,9,1,1
+_logs/magic256fix_q16_18.log,Training,9,1,1
+_logs/magic256fix_q17_18.log,Training,9,1,1
+_logs/magic256fix_q18_20.log,Training,9,1,1
+_logs/magic256fix_q19_20.log,Training,9,1,1
+_logs/magic256fix_q2_4.log,Training,9,1,1
+_logs/magic256fix_q3_4.log,Training,9,1,1
+_logs/magic256fix_q4_6.log,Training,9,1,1
+_logs/magic256fix_q5_6.log,Training,9,1,1
+_logs/magic256fix_q6_8.log,Training,9,1,1
+_logs/magic256fix_q7_8.log,Training,9,1,1
+_logs/magic256fix_q8_10.log,Training,9,1,1
+_logs/magic256fix_q9_10.log,Training,9,1,1
+_logs/magic2k_adam.log,Backward,25720,6000,3
+_logs/magic2k_adam.log,Training,1,1,1
+_logs/magic2k_muon.log,Backward,19967,4000,2
+_logs/magic2k_muon.log,Training,1,1,1
+_logs/magic2k_muon_q0_2.log,Backward,22425,4000,2
+_logs/magic2k_muon_q0_2.log,Training,2,2,2
+_logs/magic2k_muon_q10_12.log,Training,1,1,1
+_logs/magic2k_muon_q12_14.log,Backward,22171,4000,2
+_logs/magic2k_muon_q12_14.log,Training,1,1,1
+_logs/magic2k_muon_q14_16.log,Backward,33150,8000,4
+_logs/magic2k_muon_q14_16.log,Training,6,3,2
+_logs/magic2k_muon_q16_18.log,Backward,24492,6000,3
+_logs/magic2k_muon_q16_18.log,Training,1,1,1
+_logs/magic2k_muon_q18_20.log,Backward,32550,8000,4
+_logs/magic2k_muon_q18_20.log,Training,1,1,1
+_logs/magic2k_muon_q2_4.log,Backward,33298,8000,4
+_logs/magic2k_muon_q2_4.log,Training,1,1,1
+_logs/magic2k_muon_q4_6.log,Backward,26604,6000,3
+_logs/magic2k_muon_q4_6.log,Training,2,2,2
+_logs/magic2k_muon_q6_8.log,Backward,24275,4000,2
+_logs/magic2k_muon_q6_8.log,Training,1,1,1
+_logs/magic2k_muon_q8_10.log,Backward,24263,4000,2
+_logs/magic2k_muon_q8_10.log,Training,1,1,1
+_logs/magic4k_adam.log,Backward,42773,8000,2
+_logs/magic4k_adam.log,Training,1,1,1
+_logs/magic4k_adam_q0_2.log,Training,1,1,1
+_logs/magic4k_adam_q2_4.log,Training,1,1,1
+_logs/magic4k_adam_q4_6.log,Training,1,1,1
+_logs/magic4k_adam_q6_8.log,Training,1,1,1
+_logs/magic4k_muon.log,Training,1,1,1
+_logs/magic4k_muon_q0_2.log,Training,1,1,1
+_logs/magic4k_muon_q10_12.log,Training,1,1,1
+_logs/magic4k_muon_q2_4.log,Training,1,1,1
+_logs/magic4k_muon_q4_6.log,Training,1,1,1
+_logs/magic4k_muon_q6_8.log,Training,1,1,1
+_logs/magic4k_muon_q8_10.log,Training,1,1,1
+_logs/magic64kbs32_scores.log,Training,2538,4000,1
+_logs/magic_muon64kbs32_scores.log,Training,3259,4000,1
+_logs/mbank4k_65_70.log,Training,6433,8000,2
+_logs/mbank4k_65_70.log,Validating,16142,5,1
+_logs/mbank4k_68_69.log,Training,3220,4000,1
+_logs/mbank4k_68_69.log,Validating,3222,1,1
+_logs/mbank4k_69_70.log,Training,3235,4000,1
+_logs/mbank4k_69_70.log,Validating,3246,1,1
+_logs/mbank4k_70_75.log,Training,3228,4000,1
+_logs/mbank4k_70_75.log,Validating,16156,5,1
+_logs/mbank4k_74_75.log,Training,3246,4000,1
+_logs/mbank4k_74_75.log,Validating,3256,1,1
+_logs/mbank4k_75_80.log,Training,3222,4000,1
+_logs/mbank4k_75_80.log,Validating,16119,5,1
+_logs/mbank4k_79_80.log,Training,3224,4000,1
+_logs/mbank4k_79_80.log,Validating,3217,1,1
+_logs/mbank4k_80_85.log,Training,3239,4000,1
+_logs/mbank4k_80_85.log,Validating,16197,5,1
+_logs/mbank4k_85_90.log,Training,3184,4000,1
+_logs/mbank4k_85_90.log,Validating,15928,5,1
+_logs/mbank4k_90_95.log,Training,3211,4000,1
+_logs/mbank4k_90_95.log,Validating,16060,5,1
+_logs/mbank4k_95_100.log,Training,6433,8000,2
+_logs/mbank4k_95_100.log,Validating,16133,5,1
+_logs/mbank4k_98_99.log,Training,3233,4000,1
+_logs/mbank4k_98_99.log,Validating,3237,1,1
+_logs/mbank4k_99_100.log,Training,3183,4000,1
+_logs/mbank4k_99_100.log,Validating,3184,1,1
+_logs/mbank64kbs32_0_5.log,Training,3214,4000,1
+_logs/mbank64kbs32_0_5.log,Validating,16131,5,1
+_logs/mbank64kbs32_10_15.log,Training,3234,4000,1
+_logs/mbank64kbs32_10_15.log,Validating,16231,5,1
+_logs/mbank64kbs32_15_20.log,Training,3344,4000,1
+_logs/mbank64kbs32_15_20.log,Validating,16779,5,1
+_logs/mbank64kbs32_20_25.log,Training,3218,4000,1
+_logs/mbank64kbs32_20_25.log,Validating,16148,5,1
+_logs/mbank64kbs32_25_30.log,Training,3226,4000,1
+_logs/mbank64kbs32_25_30.log,Validating,16193,5,1
+_logs/mbank64kbs32_30_35.log,Training,3312,4000,1
+_logs/mbank64kbs32_30_35.log,Validating,16631,5,1
+_logs/mbank64kbs32_35_40.log,Training,3217,4000,1
+_logs/mbank64kbs32_35_40.log,Validating,16146,5,1
+_logs/mbank64kbs32_40_45.log,Training,3269,4000,1
+_logs/mbank64kbs32_40_45.log,Validating,16400,5,1
+_logs/mbank64kbs32_45_50.log,Training,3242,4000,1
+_logs/mbank64kbs32_45_50.log,Validating,16266,5,1
+_logs/mbank64kbs32_50_55.log,Training,3223,4000,1
+_logs/mbank64kbs32_50_55.log,Validating,16178,5,1
+_logs/mbank64kbs32_55_60.log,Training,3269,4000,1
+_logs/mbank64kbs32_55_60.log,Validating,16403,5,1
+_logs/mbank64kbs32_5_10.log,Training,3207,4000,1
+_logs/mbank64kbs32_5_10.log,Validating,16097,5,1
+_logs/mbank64kbs32_60_65.log,Training,3230,4000,1
+_logs/mbank64kbs32_60_65.log,Validating,16239,5,1
+_logs/ms256_adam.log,Training,44370,10000,5
+_logs/ms256_muon.log,Training,36404,8000,4
+_logs/ms512_adam_bs256.log,Training,53092,12000,3
+_logs/mth128k_q0_2.log,Training,5,1,1
+_logs/mth128k_q10_12.log,Training,5,1,1
+_logs/mth128k_q12_14.log,Training,5,1,1
+_logs/mth128k_q14_16.log,Training,5,1,1
+_logs/mth128k_q16_18.log,Training,5,1,1
+_logs/mth128k_q18_20.log,Training,5,1,1
+_logs/mth128k_q2_4.log,Training,5,1,1
+_logs/mth128k_q4_6.log,Training,5,1,1
+_logs/mth128k_q6_8.log,Training,5,1,1
+_logs/mth128k_q8_10.log,Training,5,1,1
+_logs/muon128k_control_0.log,Training,4598,1000,1
+_logs/muon128k_control_0.log,Validating,4602,1,1
+_logs/muon128k_control_1.log,Training,4586,1000,1
+_logs/muon128k_control_1_retry.log,Training,4569,1000,1
+_logs/muon128k_control_1_retry.log,Validating,4579,1,1
+_logs/muon128k_control_2.log,Training,4575,1000,1
+_logs/muon128k_control_2.log,Validating,4586,1,1
+_logs/muon128k_q0_2.log,Training,4593,1000,1
+_logs/muon128k_q0_2.log,filter-proponents,9168,2,1
+_logs/muon128k_q10_12.log,Training,4647,1000,1
+_logs/muon128k_q10_12.log,filter-proponents,9296,2,1
+_logs/muon128k_q12_14.log,Training,4594,1000,1
+_logs/muon128k_q12_14.log,filter-proponents,9192,2,1
+_logs/muon128k_q14_16.log,Training,4586,1000,1
+_logs/muon128k_q14_16.log,filter-proponents,9172,2,1
+_logs/muon128k_q16_18.log,Training,4600,1000,1
+_logs/muon128k_q16_18.log,filter-proponents,9197,2,1
+_logs/muon128k_q18_20.log,Training,4672,1000,1
+_logs/muon128k_q18_20.log,filter-proponents,9345,2,1
+_logs/muon128k_q2_4.log,Training,4631,1000,1
+_logs/muon128k_q2_4.log,filter-proponents,9257,2,1
+_logs/muon128k_q4_6.log,Training,4576,1000,1
+_logs/muon128k_q4_6.log,filter-proponents,9155,2,1
+_logs/muon128k_q6_8.log,Training,4598,1000,1
+_logs/muon128k_q6_8.log,filter-proponents,9200,2,1
+_logs/muon128k_q8_10.log,Training,4607,1000,1
+_logs/muon128k_q8_10.log,filter-proponents,9211,2,1
+_logs/muon16k_bs512_base.log,Backward,27580,567,9
+_logs/muon16k_bs512_base.log,Training,570,63,1
+_logs/muon256_tier2_ekfac.log,Computing Approximating Hessians with kfac,12086,64000,1
+_logs/muon256_tier2_ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),34587,128000,2
+_logs/muon256_tier2_ekfac.log,Computing New worker - Collecting gradients,81,10,2
+_logs/muon512_bank_s0.log,Training,18432,4000,1
+_logs/muon512_bank_s1.log,Training,18540,4000,1
+_logs/muon512_bank_s2.log,Training,36733,8000,2
+_logs/muon512_bank_s2.log,Validating,18369,1,1
+_logs/muon512_ekfac.log,Computing Approximating Hessians with kfac,22918,128000,1
+_logs/muon512_ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),40403,128000,1
+_logs/muon512_ekfac.log,Computing New worker - Collecting gradients,22493,256010,4
+_logs/muon64k_magic_q0_2.log,Training,4592,1000,2
+_logs/muon64k_magic_q0_2.log,filter-proponents,4602,2,1
+_logs/muon64k_magic_q10_12.log,Training,4616,1000,2
+_logs/muon64k_magic_q10_12.log,filter-proponents,4628,2,1
+_logs/muon64k_magic_q12_14.log,Training,2290,500,1
+_logs/muon64k_magic_q12_14.log,filter-proponents,4575,2,1
+_logs/muon64k_magic_q14_16.log,Training,2294,500,1
+_logs/muon64k_magic_q14_16.log,filter-proponents,4588,2,1
+_logs/muon64k_magic_q16_18.log,Training,2298,500,1
+_logs/muon64k_magic_q16_18.log,filter-proponents,4595,2,1
+_logs/muon64k_magic_q18_20.log,Training,2296,500,1
+_logs/muon64k_magic_q18_20.log,filter-proponents,4594,2,1
+_logs/muon64k_magic_q2_4.log,Training,4592,1000,2
+_logs/muon64k_magic_q2_4.log,filter-proponents,4594,2,1
+_logs/muon64k_magic_q4_6.log,Training,4624,1000,2
+_logs/muon64k_magic_q4_6.log,filter-proponents,4576,2,1
+_logs/muon64k_magic_q6_8.log,Training,4604,1000,2
+_logs/muon64k_magic_q6_8.log,filter-proponents,4610,2,1
+_logs/muon64k_magic_q8_10.log,Training,4581,1000,2
+_logs/muon64k_magic_q8_10.log,filter-proponents,4575,2,1
+_logs/plan_adam_eps1e17_256k_bs256_base.log,Training,8966,2000,1
+_logs/plan_adam_eps1e17_256k_bs256_ekfac.log,Computing Approximating Hessians with kfac,7580,16000,1
+_logs/plan_adam_eps1e17_256k_bs256_ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),42278,80000,5
+_logs/plan_adam_eps1e17_256k_bs256_ekfac.log,Computing New worker - Collecting gradients,11415,128012,14
+_logs/plan_muon_256k_base.log,Training,9345,2000,1
+_logs/plan_muon_eps1e17_128k_bs256_ekfac.log,Computing Approximating Hessians with kfac,4340,8000,1
+_logs/plan_muon_eps1e17_128k_bs256_ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),50122,88000,11
+_logs/plan_muon_eps1e17_128k_bs256_ekfac.log,Computing New worker - Collecting gradients,5749,64010,13
+_logs/probe_1_5b.log,Training,540,64,2
+_logs/q15b_128k_ekfac_fixed.log,Computing Approximating Hessians with kfac,46611,12000,2
+_logs/q15b_128k_ekfac_fixed.log,Computing New worker - Collecting gradients,516,10,2
+_logs/q15b_16k_ekfac_fixed.log,Computing Approximating Hessians with kfac,10524,4000,1
+_logs/q15b_16k_ekfac_fixed.log,Computing Approximating Hessians with kfac (eigenvalue correction),15478,4000,1
+_logs/q15b_16k_ekfac_fixed.log,Computing New worker - Collecting gradients,34307,40005,11
+_logs/q15b_16k_filter1pct.log,Training,1602,125,1
+_logs/q15b_16k_filter1pct.log,filter-proponents,32189,20,1
+_logs/q15b_16k_filter1pct.log,random,4824,3,1
+_logs/q15b_16k_top40.log,Training,1601,125,1
+_logs/q15b_16k_top40.log,filter-proponents,32182,20,1
+_logs/q15b_16k_top40.log,random,4819,3,1
+_logs/q15b_256k_ekfac_fixed.log,Computing Approximating Hessians with kfac,46601,12000,2
+_logs/q15b_256k_ekfac_fixed.log,Computing New worker - Collecting gradients,258,5,1
+_logs/q15b_32k_ekfac_fixed.log,Computing New worker - Collecting gradients,68806,80000,10
+_logs/q15b_32k_filter1pct.log,Training,3258,250,1
+_logs/q15b_32k_filter1pct.log,filter-proponents,65315,20,1
+_logs/q15b_32k_filter1pct.log,random,9797,3,1
+_logs/q15b_32k_top40.log,Training,3201,250,1
+_logs/q15b_32k_top40.log,filter-proponents,64175,20,1
+_logs/q15b_32k_top40.log,random,9615,3,1
+_logs/q15b_4k_ekfac_fixed.log,Computing New worker - Collecting gradients,8508,10000,10
+_logs/q15b_4k_filter1pct.log,Training,414,32,1
+_logs/q15b_4k_filter1pct.log,filter-proponents,8302,20,1
+_logs/q15b_4k_filter1pct.log,random,1244,3,1
+_logs/q15b_64k_ekfac_64k.log,Computing Approximating Hessians with kfac,5772,2000,1
+_logs/q15b_64k_ekfac_64k.log,Computing New worker - Collecting gradients,324,6,6
+_logs/q15b_64k_ekfac_fixed.log,Computing Approximating Hessians with kfac,35976,12000,2
+_logs/q15b_64k_ekfac_fixed.log,Computing Approximating Hessians with kfac (eigenvalue correction),22125,4000,1
+_logs/q15b_64k_ekfac_fixed.log,Computing New worker - Collecting gradients,12797,8010,4
+_logs/q15b_8k_ekfac_fixed.log,Computing New worker - Collecting gradients,17017,20000,10
+_logs/q15b_8k_filter1pct.log,Training,812,63,1
+_logs/q15b_8k_filter1pct.log,filter-proponents,16306,20,1
+_logs/q15b_8k_filter1pct.log,random,2444,3,1
+_logs/q15b_8k_lr0.0001.log,Training,429,63,1
+_logs/q15b_8k_lr2e-05.log,Training,444,63,1
+_logs/q15b_8k_lr5e-05.log,Training,441,63,1
+_logs/q15b_8k_top40.log,Training,812,63,1
+_logs/q15b_8k_top40.log,filter-proponents,16267,20,1
+_logs/q15b_8k_top40.log,random,2438,3,1
+_logs/q15b_lr0.0001.log,Training,385,32,1
+_logs/q15b_lr0.0002.log,Training,388,32,1
+_logs/q15b_lr2e-05.log,Training,385,32,1
+_logs/q15b_lr5e-05.log,Training,384,32,1
+_logs/qwen15_16k_ekfac.log,Computing Approximating Hessians with kfac,11100,4000,1
+_logs/qwen15_16k_ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),17633,4000,1
+_logs/qwen15_16k_ekfac.log,Computing New worker - Collecting gradients,522,10,2
+_logs/qwen15_16k_ekfac_nproc4.log,Computing Approximating Hessians with kfac,23648,2000,1
+_logs/qwen15_16k_ekfac_nproc4.log,Computing New worker - Collecting gradients,386,6,2
+_logs/qwen15_256k_ekfac_nproc4.log,Computing New worker - Collecting gradients,313,6,2
+_logs/qwen15_32k_ekfac.log,Computing Approximating Hessians with kfac,21073,8000,1
+_logs/qwen15_32k_ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),31891,8000,1
+_logs/qwen15_32k_ekfac.log,Computing New worker - Collecting gradients,544,10,2
+_logs/qwen15_4k_ekfac.log,Computing Approximating Hessians with kfac,3655,1000,1
+_logs/qwen15_4k_ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),9831,2000,2
+_logs/qwen15_4k_ekfac.log,Computing New worker - Collecting gradients,593,10,2
+_logs/qwen15_4k_ekfac_relaunch.log,Computing Approximating Hessians with kfac,2826,1000,1
+_logs/qwen15_4k_ekfac_relaunch.log,Computing Approximating Hessians with kfac (eigenvalue correction),5071,1000,1
+_logs/qwen15_4k_ekfac_relaunch.log,Computing New worker - Collecting gradients,367,10,2
+_logs/qwen15_8k_ekfac.log,Computing Approximating Hessians with kfac,7116,2000,1
+_logs/qwen15_8k_ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),8121,2000,1
+_logs/qwen15_8k_ekfac.log,Computing New worker - Collecting gradients,588,10,2
+_logs/qwen15_8k_ekfac_nproc4.log,Computing Approximating Hessians with kfac,13597,4000,2
+_logs/qwen15_8k_ekfac_nproc4.log,Computing Approximating Hessians with kfac (eigenvalue correction),8742,2000,1
+_logs/qwen15_8k_ekfac_nproc4.log,Computing New worker - Collecting gradients,317,10,2
+_logs/qwen15b_128k_ekfac.log,Computing New worker - Collecting gradients,158,5,1
+_logs/qwen15b_128k_lr0.0001_abs.log,Training,12814,1000,1
+_logs/qwen15b_128k_lr0.0002_abs.log,Training,12852,1000,1
+_logs/qwen15b_128k_lr0.0005_abs.log,Training,13758,1000,1
+_logs/qwen15b_128k_lr1e-05_abs.log,Training,12775,1000,1
+_logs/qwen15b_128k_lr2e-05_abs.log,Training,12826,1000,1
+_logs/qwen15b_128k_lr5e-05_abs.log,Training,12900,1000,1
+_logs/qwen15b_128k_reuse32_4shard_bs64_qbs1_timeout8_applybs1_lotus_4567.log,Computing New worker - Collecting gradients,331324,512000,32
+_logs/qwen15b_128k_row.log,Training,12882,1000,1
+_logs/qwen15b_16k_reuse32_4shard_bs64_qbs1_violet_g0_3.log,Computing New worker - Collecting gradients,107940,160000,80
+_logs/qwen15b_16k_row_abs.log,Training,1945,125,1
+_logs/qwen15b_256k_lr0.0001_abs.log,Training,25737,2000,1
+_logs/qwen15b_256k_lr0.0002_abs.log,Training,25708,2000,1
+_logs/qwen15b_256k_lr0.0005_abs.log,Training,25526,2000,1
+_logs/qwen15b_256k_lr1e-05_abs.log,Training,25996,2000,1
+_logs/qwen15b_256k_lr2e-05_abs.log,Training,25896,2000,1
+_logs/qwen15b_256k_lr5e-05_abs.log,Training,26011,2000,1
+_logs/qwen15b_256k_reuse32_4shard_bs64_qbs1_timeout8_applybs1_wisteria_g0_3.log,Computing New worker - Collecting gradients,345881,512000,16
+_logs/qwen15b_256k_row.log,Training,25588,2000,1
+_logs/qwen15b_32k_row_abs.log,Training,3200,250,1
+_logs/qwen15b_4k_ekfac_retry.log,Computing Approximating Hessians with kfac,3130,1000,1
+_logs/qwen15b_4k_ekfac_retry.log,Computing Approximating Hessians with kfac (eigenvalue correction),3744,1000,1
+_logs/qwen15b_4k_ekfac_retry.log,Computing New worker - Collecting gradients,317,10,2
+_logs/qwen15b_4k_filter_q0_4_allium_20260901b.log,Evaluating bank,150,3,1
+_logs/qwen15b_4k_filter_q0_4_allium_20260901b.log,Training,502,32,1
+_logs/qwen15b_4k_filter_q0_4_allium_20260901b.log,filter-proponents,2011,4,1
+_logs/qwen15b_4k_filter_q0_4_anon-ord_20260901c.log,Evaluating bank,149,3,1
+_logs/qwen15b_4k_filter_q0_4_anon-ord_20260901c.log,Training,504,32,1
+_logs/qwen15b_4k_filter_q0_4_anon-ord_20260901c.log,filter-proponents,2012,4,1
+_logs/qwen15b_4k_filter_q12_16_allium_20260901c.log,Evaluating bank,48,3,1
+_logs/qwen15b_4k_filter_q12_16_allium_20260901c.log,Training,502,32,1
+_logs/qwen15b_4k_filter_q12_16_allium_20260901c.log,filter-proponents,2006,4,1
+_logs/qwen15b_4k_filter_q16_20_iris_20260901c.log,Evaluating bank,152,3,1
+_logs/qwen15b_4k_filter_q16_20_iris_20260901c.log,Training,502,32,1
+_logs/qwen15b_4k_filter_q16_20_iris_20260901c.log,filter-proponents,2011,4,1
+_logs/qwen15b_4k_filter_q4_8_allium_20260901c.log,Evaluating bank,50,3,1
+_logs/qwen15b_4k_filter_q4_8_allium_20260901c.log,Training,507,32,1
+_logs/qwen15b_4k_filter_q4_8_allium_20260901c.log,filter-proponents,2037,4,1
+_logs/qwen15b_4k_filter_q8_12_allium_20260901c.log,Evaluating bank,48,3,1
+_logs/qwen15b_4k_filter_q8_12_allium_20260901c.log,Training,505,32,1
+_logs/qwen15b_4k_filter_q8_12_allium_20260901c.log,filter-proponents,2026,4,1
+_logs/qwen15b_4k_reuse32_4shard_bs64_qbs1_yarrow_g0_3.log,Computing New worker - Collecting gradients,26810,40000,80
+_logs/qwen15b_4k_row_abs.log,Training,509,32,1
+_logs/qwen15b_64k_ekfac.log,Computing Approximating Hessians with kfac,55031,16000,1
+_logs/qwen15b_64k_ekfac.log,Computing New worker - Collecting gradients,522,10,2
+_logs/qwen15b_64k_lr0.0001_abs.log,Training,6451,500,1
+_logs/qwen15b_64k_lr0.0002_abs.log,Training,6421,500,1
+_logs/qwen15b_64k_lr2e-05_abs.log,Training,6427,500,1
+_logs/qwen15b_64k_lr5e-05_abs.log,Training,6444,500,1
+_logs/qwen15b_64k_reuse32_4shard_bs64_qbs1_timeout8_applybs1_lotus_0123.log,Computing New worker - Collecting gradients,285662,440000,55
+_logs/qwen15b_64k_row_abs.log,Training,6440,500,1
+_logs/qwen15b_8k_ekfac_resume_score_bs32_expandable.log,Computing New worker - Collecting gradients,10661,16000,8
+_logs/qwen15b_8k_filter_q0_4_violet_20260901b.log,Training,991,63,1
+_logs/qwen15b_8k_filter_q12_16_wisteria_20260901b.log,Training,979,63,1
+_logs/qwen15b_8k_filter_q16_20_wisteria_20260901b.log,Training,976,63,1
+_logs/qwen15b_8k_filter_q4_8_violet_20260901b.log,Training,992,63,1
+_logs/qwen15b_8k_filter_q8_12_violet_20260901b.log,Training,988,63,1
+_logs/qwen15b_8k_reuse32_4shard_bs64_qbs1_tulip_g0_3.log,Computing New worker - Collecting gradients,45569,68000,68
+_logs/qwen15b_8k_row_abs.log,Training,996,63,1
+_logs/qwen7b_lr2e-05.log,Training,1232,32,1
+_logs/t2s43_16k_base.log,Training,554,125,1
+_logs/t2s43_16k_ekfac.log,Computing Approximating Hessians with kfac,702,4000,1
+_logs/t2s43_16k_ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),1106,4000,1
+_logs/t2s43_16k_ekfac.log,Computing New worker - Collecting gradients,715,8005,3
+_logs/t2s43_16k_filter.log,Training,555,125,1
+_logs/t2s43_16k_filter.log,filter-proponents,11172,20,1
+_logs/t2s43_16k_filter.log,random,1675,3,1
+_logs/t40m32_q0_2.log,Training,1101,250,1
+_logs/t40m32_q0_2.log,filter-proponents,2205,2,1
+_logs/t40m32_q0_2.log,random,3306,3,1
+_logs/t40m32_q10_12.log,Training,1121,250,1
+_logs/t40m32_q10_12.log,filter-proponents,2246,2,1
+_logs/t40m32_q10_12.log,random,3369,3,1
+_logs/t40m32_q12_14.log,Training,1117,250,1
+_logs/t40m32_q12_14.log,filter-proponents,2238,2,1
+_logs/t40m32_q12_14.log,random,6713,6,2
+_logs/t40m32_q14_16.log,Training,1135,250,1
+_logs/t40m32_q14_16.log,filter-proponents,2274,2,1
+_logs/t40m32_q14_16.log,random,3411,3,1
+_logs/t40m32_q16_18.log,Training,1119,250,1
+_logs/t40m32_q16_18.log,filter-proponents,2242,2,1
+_logs/t40m32_q16_18.log,random,3363,3,1
+_logs/t40m32_q18_20.log,Training,1111,250,1
+_logs/t40m32_q18_20.log,filter-proponents,2225,2,1
+_logs/t40m32_q18_20.log,random,3337,3,1
+_logs/t40m32_q2_4.log,Training,1130,250,1
+_logs/t40m32_q2_4.log,filter-proponents,2264,2,1
+_logs/t40m32_q2_4.log,random,3397,3,1
+_logs/t40m32_q4_6.log,Training,1105,250,1
+_logs/t40m32_q4_6.log,filter-proponents,2107,2,1
+_logs/t40m32_q4_6.log,random,3116,3,1
+_logs/t40m32_q4_6_s43.log,Training,1128,250,1
+_logs/t40m32_q4_6_s43.log,filter-proponents,2215,2,1
+_logs/t40m32_q4_6_s43.log,random,3323,3,1
+_logs/t40m32_q6_8.log,Training,1116,250,1
+_logs/t40m32_q6_8.log,filter-proponents,2236,2,1
+_logs/t40m32_q6_8.log,random,3353,3,1
+_logs/t40m32_q8_10.log,Training,1186,250,1
+_logs/t40m32_q8_10.log,filter-proponents,2375,2,1
+_logs/t40m32_q8_10.log,random,3563,3,1
+_logs/t40m64_q0_2.log,Training,2220,500,1
+_logs/t40m64_q0_2.log,filter-proponents,4440,2,1
+_logs/t40m64_q0_2.log,random,6658,3,1
+_logs/t40m64_q10_12.log,Training,2196,500,1
+_logs/t40m64_q10_12.log,filter-proponents,4394,2,1
+_logs/t40m64_q10_12.log,random,6590,3,1
+_logs/t40m64_q12_14.log,Training,2208,500,1
+_logs/t40m64_q12_14.log,filter-proponents,4418,2,1
+_logs/t40m64_q12_14.log,random,6627,3,1
+_logs/t40m64_q14_16.log,Training,2216,500,1
+_logs/t40m64_q14_16.log,filter-proponents,4436,2,1
+_logs/t40m64_q14_16.log,random,6654,3,1
+_logs/t40m64_q16_18.log,Training,2226,500,1
+_logs/t40m64_q16_18.log,filter-proponents,4434,2,1
+_logs/t40m64_q16_18.log,random,6649,3,1
+_logs/t40m64_q18_20.log,Training,2210,500,1
+_logs/t40m64_q18_20.log,filter-proponents,4422,2,1
+_logs/t40m64_q18_20.log,random,6633,3,1
+_logs/t40m64_q2_4.log,Training,2206,500,1
+_logs/t40m64_q2_4.log,filter-proponents,4417,2,1
+_logs/t40m64_q2_4.log,random,6622,3,1
+_logs/t40m64_q4_6.log,Training,2198,500,1
+_logs/t40m64_q4_6.log,filter-proponents,4395,2,1
+_logs/t40m64_q4_6.log,random,6592,3,1
+_logs/t40m64_q6_8.log,Training,2212,500,1
+_logs/t40m64_q6_8.log,filter-proponents,4429,2,1
+_logs/t40m64_q6_8.log,random,6644,3,1
+_logs/t40m64_q8_10.log,Training,2205,500,1
+_logs/t40m64_q8_10.log,filter-proponents,4409,2,1
+_logs/t40m64_q8_10.log,random,6611,3,1
+_logs/t40magic_16k.log,Training,1653,375,3
+_logs/t40magic_16k.log,filter-proponents,11081,60,3
+_logs/t40magic_16k.log,random,1662,3,1
+_logs/t40magic_32k_q0_10.log,Training,4431,1000,4
+_logs/t40magic_32k_q0_10.log,filter-proponents,33278,30,3
+_logs/t40magic_32k_q0_10.log,random,13306,12,4
+_logs/t40magic_32k_q10_20.log,Training,4429,1000,4
+_logs/t40magic_32k_q10_20.log,filter-proponents,33313,30,3
+_logs/t40magic_32k_q10_20.log,random,9990,9,3
+_logs/t40magic_4k.log,Training,141,32,1
+_logs/t40magic_4k.log,filter-proponents,2890,20,1
+_logs/t40magic_4k.log,random,433,3,1
+_logs/t40magic_64k_q0_5.log,Training,8918,2000,4
+_logs/t40magic_64k_q0_5.log,filter-proponents,33350,15,3
+_logs/t40magic_64k_q0_5.log,random,6650,3,1
+_logs/t40magic_64k_q10_15.log,Training,11086,2500,5
+_logs/t40magic_64k_q10_15.log,filter-proponents,33381,15,3
+_logs/t40magic_64k_q10_15.log,random,20078,9,3
+_logs/t40magic_64k_q15_20.log,Training,8830,2000,4
+_logs/t40magic_64k_q15_20.log,filter-proponents,33200,15,3
+_logs/t40magic_64k_q15_20.log,random,13322,6,2
+_logs/t40magic_64k_q5_10.log,Training,11116,2500,5
+_logs/t40magic_64k_q5_10.log,filter-proponents,44655,20,4
+_logs/t40magic_64k_q5_10.log,random,6690,3,1
+_logs/t40magic_8k.log,Training,287,63,1
+_logs/t40magic_8k.log,filter-proponents,5814,20,1
+_logs/t40magic_8k.log,random,872,3,1
+_logs/top40_128k_q0_2.log,Evaluating bank,6,3,1
+_logs/top40_128k_q0_2.log,Training,3788,1000,1
+_logs/top40_128k_q0_2.log,filter-proponents,7581,2,1
+_logs/top40_128k_q10_12.log,Evaluating bank,5,3,1
+_logs/top40_128k_q10_12.log,Training,4422,1000,1
+_logs/top40_128k_q10_12.log,filter-proponents,8845,2,1
+_logs/top40_128k_q12_14.log,Evaluating bank,6,3,1
+_logs/top40_128k_q12_14.log,Training,4419,1000,1
+_logs/top40_128k_q12_14.log,filter-proponents,8837,2,1
+_logs/top40_128k_q14_16.log,Evaluating bank,5,3,1
+_logs/top40_128k_q14_16.log,Training,4389,1000,1
+_logs/top40_128k_q14_16.log,filter-proponents,8778,2,1
+_logs/top40_128k_q16_18.log,Evaluating bank,5,3,1
+_logs/top40_128k_q16_18.log,Training,4416,1000,1
+_logs/top40_128k_q16_18.log,filter-proponents,8832,2,1
+_logs/top40_128k_q18_20.log,Evaluating bank,7,3,1
+_logs/top40_128k_q18_20.log,Training,4398,1000,1
+_logs/top40_128k_q18_20.log,filter-proponents,8824,2,1
+_logs/top40_128k_q2_4.log,Training,4416,1000,1
+_logs/top40_128k_q2_4.log,filter-proponents,8838,2,1
+_logs/top40_128k_q4_6.log,Evaluating bank,6,3,1
+_logs/top40_128k_q4_6.log,Training,4405,1000,1
+_logs/top40_128k_q4_6.log,filter-proponents,8810,2,1
+_logs/top40_128k_q6_8.log,Evaluating bank,5,3,1
+_logs/top40_128k_q6_8.log,Training,4409,1000,1
+_logs/top40_128k_q6_8.log,filter-proponents,8819,2,1
+_logs/top40_128k_q8_10.log,Evaluating bank,5,3,1
+_logs/top40_128k_q8_10.log,Training,4436,1000,1
+_logs/top40_128k_q8_10.log,filter-proponents,8877,2,1
+_logs/top40_256k_q0_2.log,Training,8915,2000,1
+_logs/top40_256k_q0_2.log,filter-proponents,17834,2,1
+_logs/top40_256k_q16_18.log,Training,8936,2000,1
+_logs/top40_256k_q16_18.log,filter-proponents,17863,2,1
+_logs/top40_256k_q18_20.log,Training,8893,2000,1
+_logs/top40_256k_q18_20.log,filter-proponents,17775,2,1
+_logs/top40_256k_q2_4.log,Training,8810,2000,1
+_logs/top40_256k_q2_4.log,filter-proponents,17605,2,1
+_logs/top40_256k_q4_6.log,Training,8840,2000,1
+_logs/top40_256k_q4_6.log,filter-proponents,17674,2,1
+_logs/top40_256k_q6_8.log,Training,8810,2000,1
+_logs/top40_256k_q6_8.log,filter-proponents,17600,2,1
+_logs/top40_256k_q8_10.log,Training,8884,2000,1
+_logs/top40_256k_q8_10.log,filter-proponents,17765,2,1
+_logs/tune_adamw_1m_bs256_lr0.0004.log,Training,29590,7813,1
+_logs/tune_adamw_1m_bs256_lr0.0008.log,Training,29580,7813,1
+_logs/tune_adamw_1m_bs256_lr0.0016.log,Training,29578,7813,1
+_logs/tune_adamw_1m_bs256_lr0.0032.log,Training,29608,7813,1
+_logs/tune_adamw_512k_bs256_a100_lr0.0001.log,Training,15170,4000,1
+_logs/tune_adamw_512k_bs256_a100_lr0.0002.log,Training,15161,4000,1
+_logs/tune_adamw_512k_bs256_a100_lr0.0004.log,Training,15185,4000,1
+_logs/tune_adamw_512k_bs256_a100_lr0.0008.log,Training,15157,4000,1
+_logs/tune_adamw_512k_bs256_a100_lr0.0016.log,Training,15171,4000,1
+_logs/tune_adamw_512k_bs256_a100_lr0.0032.log,Training,15201,4000,1
+_logs/tune_adamw_512k_bs256_lr0.0001.log,Training,17762,4000,1
+_logs/tune_adamw_512k_bs256_lr0.0002.log,Training,18104,4000,1
+_logs/tune_adamw_512k_bs256_lr0.0004.log,Training,18303,4000,1
+_logs/tune_adamw_512k_bs256_lr0.0008.log,Training,17929,4000,1
+_logs/tune_adamw_512k_bs256_lr0.0016.log,Training,17573,4000,1
+_logs/tune_adamw_512k_bs256_lr2.5e-05.log,Training,17690,4000,1
+_logs/tune_adamw_512k_bs256_lr5e-05.log,Training,17756,4000,1
+_logs/tune_muon512_lr0.0001.log,Training,18280,4000,1
+_logs/tune_muon512_lr0.0002.log,Training,18483,4000,1
+_logs/tune_muon512_lr0.0004.log,Training,18358,4000,1
+_logs/tune_muon512_lr0.0008.log,Training,18537,4000,1
+_logs/tune_muon512_lr0.0016.log,Training,18473,4000,1
+_logs/tune_muon_256k_bs256_lr0.0001.log,Training,9227,2000,1
+_logs/tune_muon_256k_bs256_lr0.0002.log,Training,9429,2000,1
+_logs/tune_muon_256k_bs256_lr0.0004.log,Training,9315,2000,1
+_logs/tune_muon_256k_bs256_lr0.0008.log,Training,9221,2000,1
+_logs/tune_muon_256k_bs256_lr0.0016.log,Training,9228,2000,1
+_logs/tune_muon_256k_bs256_lr5e-05.log,Training,9220,2000,1
+diagnostics/ms_16k_bs128_lr2e-4/ms.log,Training,1115,500,2
+diagnostics/ms_16k_bs32_lr2e-4/ms.log,Training,1263,2000,2
+diagnostics/ms_16k_bs64_lr2e-4/ms.log,Training,579,500,1
+diagnostics/ms_16k_ep4_lr2e-4/ms.log,Training,3301,750,3
+diagnostics/ms_anchor_lr5e-5/ms.log,Training,1107,250,2
+diagnostics/ms_bs16_lr2e-4/ms.log,Training,741,2000,1
+diagnostics/ms_scale0.25_lr2e-4/ms.log,Training,563,125,1
+experiments/_logs/plan_adam_eps1e17_128k_bs256_ekfac.log,Computing Approximating Hessians with kfac,4311,8000,1
+experiments/_logs/plan_adam_eps1e17_128k_bs256_ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),28585,56000,7
+experiments/_logs/plan_adam_eps1e17_128k_bs256_ekfac.log,Computing New worker - Collecting gradients,5043,56012,13
+experiments/_logs/plan_muon_eps1e17_128k_bs256_base.log,Training,4692,1000,1
+experiments/gm1024_seedvar_s21/ms.log,Training,34395,375,3
+experiments/gm1024_seedvar_s22/ms.log,Training,34302,375,3
+experiments/gm16k_seedvar_s11/ms.log,Training,5947,2000,2
+experiments/gm16k_seedvar_s12/ms.log,Training,5933,2000,2
+experiments/gpt2medium_128k_bs2048_lr1.25e-5/ms.log,Training,11733,250,2
+experiments/gpt2medium_128k_bs2048_lr2.5e-5/ms.log,Training,11819,250,2
+experiments/gpt2medium_128k_bs2048_lr3.1e-6/ms.log,Training,34994,375,3
+experiments/gpt2medium_128k_bs2048_lr5e-5/ms.log,Training,34677,375,3
+experiments/gpt2medium_128k_bs2048_lr6.25e-6/ms.log,Training,34795,375,3
+experiments/gpt2medium_16k_bs256_lr1.25e-5/ms.log,Training,776,125,1
+experiments/gpt2medium_16k_bs256_lr2.5e-5/ms.log,Training,2331,375,3
+experiments/gpt2medium_16k_bs256_lr5e-5/ms.log,Training,1543,250,2
+experiments/gpt2medium_16k_bs32/ekfac.log,Computing Approximating Hessians with kfac,1238,4000,1
+experiments/gpt2medium_16k_bs32/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),2120,4000,1
+experiments/gpt2medium_16k_bs32/ekfac.log,Computing New worker - Collecting gradients,859,4005,2
+experiments/gpt2medium_16k_bs32/experiment.log,Backward,325527,40000,40
+experiments/gpt2medium_16k_bs32/experiment.log,Training,790,1000,1
+experiments/gpt2medium_16k_bs32/ms.log,Training,2326,3000,3
+experiments/gpt2medium_256k_bs4096_lr1.25e-5/ms.log,Training,68783,375,3
+experiments/gpt2medium_256k_bs4096_lr1e-4/ms.log,Training,69274,375,3
+experiments/gpt2medium_256k_bs4096_lr2.5e-5/ms.log,Training,69450,375,3
+experiments/gpt2medium_256k_bs4096_lr3.1e-6/ms.log,Training,35445,375,3
+experiments/gpt2medium_256k_bs4096_lr6.25e-6/ms.log,Training,35436,375,3
+experiments/gpt2medium_32k_bs512_lr1.25e-5/ms.log,Training,3007,250,2
+experiments/gpt2medium_32k_bs512_lr2.5e-5/ms.log,Training,3004,250,2
+experiments/gpt2medium_32k_bs512_lr3.1e-6/ms.log,Training,3005,250,2
+experiments/gpt2medium_32k_bs512_lr5e-5/ms.log,Training,4514,375,3
+experiments/gpt2medium_32k_bs512_lr6.25e-6/ms.log,Training,4510,375,3
+experiments/gpt2medium_64k_bs1024_lr1.25e-5/ms.log,Training,8871,375,3
+experiments/gpt2medium_64k_bs1024_lr2.5e-5/ms.log,Training,8815,375,3
+experiments/gpt2medium_64k_bs1024_lr5e-5/ms.log,Training,17324,375,3
+experiments/gpt2medium_64k_bs1024_lr6.25e-6/ms.log,Training,8820,375,3
+experiments/gpt2medium_64k_bs32/ms.log,Training,9013,12000,3
+experiments/london128k_bs256_adamw/ms.log,Training,13384,3000,3
+experiments/london128k_bs256_muon/ms.log,Training,13943,3000,3
+experiments/london16k_bs16_adamw/ms.log,Training,2357,6000,3
+experiments/london16k_bs16_muon/ms.log,Training,3370,6000,3
+experiments/london16k_bs256_adamw/ekfac.log,Computing Approximating Hessians with kfac,460,4000,1
+experiments/london16k_bs256_adamw/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),1086,4000,1
+experiments/london16k_bs256_adamw/ekfac.log,Computing New worker - Collecting gradients,303,4005,2
+experiments/london16k_bs256_adamw/experiment.log,Backward,61425,2375,19
+experiments/london16k_bs256_adamw/experiment.log,Training,488,125,1
+experiments/london16k_bs256_adamw/ms.log,Training,1103,250,2
+experiments/london16k_bs256_adamw_seed1/ms.log,Training,1653,375,3
+experiments/london16k_bs256_adamw_seed2/ms.log,Training,1119,250,2
+experiments/london16k_bs256_muon/ekfac.log,Computing Approximating Hessians with kfac,464,4000,1
+experiments/london16k_bs256_muon/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),696,4000,1
+experiments/london16k_bs256_muon/ekfac.log,Computing New worker - Collecting gradients,597,8005,3
+experiments/london16k_bs256_muon/experiment.log,Backward,58095,2250,18
+experiments/london16k_bs256_muon/experiment.log,Training,4,1,1
+experiments/london16k_bs256_muon/experiment.log,Validating,49455,100,1
+experiments/london16k_bs256_muon/ms.log,Training,998,250,2
+experiments/london16k_bs256_muon_seed1/ms.log,Training,1167,250,2
+experiments/london16k_bs256_muon_seed2/ms.log,Training,1149,250,2
+experiments/london16k_bs256_muon_seed3/ms.log,Training,1147,250,2
+experiments/london16k_bs256_muon_seed4/ms.log,Training,1157,250,2
+experiments/london16k_bs256_muon_seed5/ms.log,Training,1145,250,2
+experiments/london32k_bs256_adamw/ms.log,Training,3311,750,3
+experiments/london32k_bs256_adamw_seed1/ms.log,Training,3315,750,3
+experiments/london32k_bs256_muon/ms.log,Training,3470,750,3
+experiments/london32k_bs256_muon_seed1/ms.log,Training,1167,250,1
+experiments/london32k_bs256_muon_seed2/ms.log,Training,2300,500,2
+experiments/london64k_bs256_adamw/ms.log,Training,4404,1000,2
+experiments/london64k_bs256_adamw_lr8e-4/ms.log,Training,4404,1000,2
+experiments/london64k_bs256_adamw_lr8e-4_seed1/ms.log,Training,4413,1000,2
+experiments/london64k_bs256_adamw_lr8e-4_seed2/ms.log,Training,4453,1000,2
+experiments/london64k_bs256_adamw_seed1/ms.log,Training,6609,1500,3
+experiments/london64k_bs256_adamw_seed2/ms.log,Training,6663,1500,3
+experiments/london64k_bs256_muon/ms.log,Training,4600,1000,2
+experiments/london64k_bs256_muon_lr8e-4/ms.log,Training,6918,1500,3
+experiments/london64k_bs256_muon_lr8e-4_seed1/ms.log,Training,6867,1500,3
+experiments/london64k_bs256_muon_lr8e-4_seed2/ms.log,Training,4599,1000,2
+experiments/london64k_bs256_muon_seed1/ms.log,Training,4601,1000,2
+experiments/london64k_bs256_muon_seed2/ms.log,Training,6940,1500,3
+experiments/london64k_bs256_muon_seed3/ms.log,Training,2274,500,1
+experiments/london64k_bs256_muon_seed4/ms.log,Training,6988,1500,3
+experiments/muon4k_mslr_00001/ms.log,Training,146,32,1
+experiments/muon4k_mslr_00002/ms.log,Training,146,32,1
+experiments/muon4k_mslr_00008/ms.log,Training,293,64,2
+experiments/muon4k_seedvar_s1/ms.log,Training,279,32,1
+experiments/muon4k_seedvar_s2/ms.log,Training,553,64,2
+experiments/muon4k_seedvar_s3/ms.log,Training,557,64,2
+experiments/plan_adam_eps1e17_128k_bs256/base.log,Training,4428,1000,1
+experiments/plan_adam_eps1e17_128k_bs32/ekfac.log,Computing Approximating Hessians with kfac,5670,32000,1
+experiments/plan_adam_eps1e17_128k_bs32/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),17453,64000,2
+experiments/plan_adam_eps1e17_128k_bs32/ekfac.log,Computing New worker - Collecting gradients,5724,64010,4
+experiments/plan_adam_eps1e17_128k_bs32/filter_proponents_ekfac_q0_7.log,Training,5029,8000,1
+experiments/plan_adam_eps1e17_128k_bs32/filter_proponents_ekfac_q0_7.log,filter-proponents,35212,7,1
+experiments/plan_adam_eps1e17_128k_bs32/filter_proponents_ekfac_q14_20.log,Training,5070,8000,1
+experiments/plan_adam_eps1e17_128k_bs32/filter_proponents_ekfac_q14_20.log,filter-proponents,30392,6,1
+experiments/plan_adam_eps1e17_128k_bs32/filter_proponents_ekfac_q7_14.log,Training,5226,8000,1
+experiments/plan_adam_eps1e17_128k_bs32/filter_proponents_ekfac_q7_14.log,filter-proponents,36578,7,1
+experiments/plan_adam_eps1e17_16k_bs128/ekfac.log,Computing Approximating Hessians with kfac,716,4000,1
+experiments/plan_adam_eps1e17_16k_bs128/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),4642,16000,4
+experiments/plan_adam_eps1e17_16k_bs128/ekfac.log,Computing New worker - Collecting gradients,767,8010,4
+experiments/plan_adam_eps1e17_16k_bs128/filter_proponents_ekfac.log,Training,249,250,1
+experiments/plan_adam_eps1e17_16k_bs128/filter_proponents_ekfac.log,filter-proponents,4968,20,1
+experiments/plan_adam_eps1e17_16k_bs128/filter_proponents_magic.log,Evaluating bank,145,100,1
+experiments/plan_adam_eps1e17_16k_bs128/filter_proponents_magic.log,Training,249,250,1
+experiments/plan_adam_eps1e17_16k_bs128/filter_proponents_magic.log,filter-proponents,4963,20,1
+experiments/plan_adam_eps1e17_16k_bs128/ms.log,Training,556,250,1
+experiments/plan_adam_eps1e17_16k_bs128/run.log,Backward,17444,2250,9
+experiments/plan_adam_eps1e17_16k_bs128/run.log,Training,2,1,1
+experiments/plan_adam_eps1e17_16k_bs128/run.log,Validating,24820,100,1
+experiments/plan_adam_eps1e17_16k_bs16/ekfac.log,Computing Approximating Hessians with kfac,941,4000,1
+experiments/plan_adam_eps1e17_16k_bs16/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),1522,4000,1
+experiments/plan_adam_eps1e17_16k_bs16/ekfac.log,Computing New worker - Collecting gradients,772,8010,4
+experiments/plan_adam_eps1e17_16k_bs16/filter_proponents_ekfac.log,Evaluating bank,106,100,1
+experiments/plan_adam_eps1e17_16k_bs16/filter_proponents_ekfac.log,Training,661,2000,1
+experiments/plan_adam_eps1e17_16k_bs16/filter_proponents_ekfac.log,filter-proponents,11320,20,1
+experiments/plan_adam_eps1e17_16k_bs16/filter_proponents_magic.log,Training,572,2000,1
+experiments/plan_adam_eps1e17_16k_bs16/filter_proponents_magic.log,filter-proponents,11410,20,1
+experiments/plan_adam_eps1e17_16k_bs16/ms.log,Training,736,2000,1
+experiments/plan_adam_eps1e17_16k_bs16/run.log,Backward,32861,12000,6
+experiments/plan_adam_eps1e17_16k_bs16/run.log,Training,584,2000,1
+experiments/plan_adam_eps1e17_16k_clip1.0/ekfac.log,Computing Approximating Hessians with kfac,717,4000,1
+experiments/plan_adam_eps1e17_16k_clip1.0/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),1039,4000,1
+experiments/plan_adam_eps1e17_16k_clip1.0/ekfac.log,Computing New worker - Collecting gradients,736,8005,3
+experiments/plan_adam_eps1e17_16k_clip1.0/filter_proponents_ekfac.log,Evaluating bank,1126,100,1
+experiments/plan_adam_eps1e17_16k_clip1.0/filter_proponents_ekfac.log,Training,1239,125,1
+experiments/plan_adam_eps1e17_16k_clip1.0/filter_proponents_ekfac.log,filter-proponents,24169,20,1
+experiments/plan_adam_eps1e17_16k_clip1.0/filter_proponents_magic.log,Evaluating bank,1804,100,1
+experiments/plan_adam_eps1e17_16k_clip1.0/filter_proponents_magic.log,Training,558,125,1
+experiments/plan_adam_eps1e17_16k_clip1.0/filter_proponents_magic.log,filter-proponents,24731,20,1
+experiments/plan_adam_eps1e17_16k_clip1.0/ms.log,Training,1669,375,3
+experiments/plan_adam_eps1e17_16k_clip1.0/run.log,Backward,58387,1875,15
+experiments/plan_adam_eps1e17_16k_clip1.0/run.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_clip1.0/run.log,Validating,56517,100,1
+experiments/plan_adam_eps1e17_16k_clip1.0/slice_0_4.a100py31115.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_clip1.0/slice_0_4.a100py31115.log,Validating,1904,4,1
+experiments/plan_adam_eps1e17_16k_clip1.0/slice_55_100.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_clip1.0/slice_55_100.log,Validating,25680,45,1
+experiments/plan_adam_eps1e17_16k_ep4/ekfac.log,Computing Approximating Hessians with kfac,822,4000,1
+experiments/plan_adam_eps1e17_16k_ep4/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),1334,4000,1
+experiments/plan_adam_eps1e17_16k_ep4/ekfac.log,Computing New worker - Collecting gradients,768,8010,4
+experiments/plan_adam_eps1e17_16k_ep4/filter_proponents_ekfac.log,Training,1107,250,1
+experiments/plan_adam_eps1e17_16k_ep4/filter_proponents_ekfac.log,filter-proponents,22170,20,1
+experiments/plan_adam_eps1e17_16k_ep4/filter_proponents_magic.log,Evaluating bank,1615,100,1
+experiments/plan_adam_eps1e17_16k_ep4/filter_proponents_magic.log,Training,1104,250,1
+experiments/plan_adam_eps1e17_16k_ep4/filter_proponents_magic.log,filter-proponents,22108,20,1
+experiments/plan_adam_eps1e17_16k_ep4/ms.log,Training,2207,500,2
+experiments/plan_adam_eps1e17_16k_ep4/run.log,Backward,8852,250,1
+experiments/plan_adam_eps1e17_16k_ep4/run.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_ep4/slice_30_48.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_ep4/slice_30_48.log,Validating,20112,18,1
+experiments/plan_adam_eps1e17_16k_ep4/slice_48_65.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_ep4/slice_48_65.log,Validating,18919,17,1
+experiments/plan_adam_eps1e17_16k_ep4/slice_65_82.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_ep4/slice_65_82.log,Validating,19095,17,1
+experiments/plan_adam_eps1e17_16k_ep4/slice_82_100.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_ep4/slice_82_100.log,Validating,20205,18,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/ekfac.log,Computing Approximating Hessians with kfac,1235,4000,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),2122,4000,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/ekfac.log,Computing New worker - Collecting gradients,1672,8005,3
+experiments/plan_adam_eps1e17_16k_gpt2-medium/filter_proponents_ekfac.log,Training,657,125,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/filter_proponents_ekfac.log,filter-proponents,13106,20,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/filter_proponents_magic.log,Evaluating bank,469,100,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/filter_proponents_magic.log,Training,669,125,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/filter_proponents_magic.log,filter-proponents,14744,20,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/ms.log,Training,665,125,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/run.log,Backward,23540,625,5
+experiments/plan_adam_eps1e17_16k_gpt2-medium/run.log,Training,9,1,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/slice_40_60.log,Training,8,1,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/slice_40_60.log,Validating,12990,20,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/slice_60_80.log,Training,8,1,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/slice_64_80.log,Training,8,1,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/slice_64_80.log,Validating,10386,16,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/slice_80_100.log,Training,8,1,1
+experiments/plan_adam_eps1e17_16k_gpt2-medium/slice_80_100.log,Validating,13006,20,1
+experiments/plan_adam_eps1e17_16k_scale0.25/ekfac.log,Computing Approximating Hessians with kfac,2870,16000,4
+experiments/plan_adam_eps1e17_16k_scale0.25/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),1162,4000,1
+experiments/plan_adam_eps1e17_16k_scale0.25/ekfac.log,Computing New worker - Collecting gradients,758,8010,4
+experiments/plan_adam_eps1e17_16k_scale0.25/filter_proponents_ekfac.log,Training,589,125,1
+experiments/plan_adam_eps1e17_16k_scale0.25/filter_proponents_ekfac.log,filter-proponents,11403,20,1
+experiments/plan_adam_eps1e17_16k_scale0.25/filter_proponents_magic.log,Evaluating bank,1851,100,1
+experiments/plan_adam_eps1e17_16k_scale0.25/filter_proponents_magic.log,Training,590,125,1
+experiments/plan_adam_eps1e17_16k_scale0.25/filter_proponents_magic.log,filter-proponents,11423,20,1
+experiments/plan_adam_eps1e17_16k_scale0.25/ms.log,Training,1131,250,2
+experiments/plan_adam_eps1e17_16k_scale0.25/run.log,Backward,71490,2250,18
+experiments/plan_adam_eps1e17_16k_scale0.25/run.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_scale0.25/run.log,Validating,57618,100,1
+experiments/plan_adam_eps1e17_16k_scale0.25/slice_55_100.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_scale0.25/slice_55_100.log,Validating,25769,45,1
+experiments/plan_adam_eps1e17_16k_scale0.5/ekfac.log,Computing Approximating Hessians with kfac,684,4000,1
+experiments/plan_adam_eps1e17_16k_scale0.5/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),1108,4000,1
+experiments/plan_adam_eps1e17_16k_scale0.5/ekfac.log,Computing New worker - Collecting gradients,760,8005,3
+experiments/plan_adam_eps1e17_16k_scale0.5/filter_proponents_ekfac.log,Training,572,125,1
+experiments/plan_adam_eps1e17_16k_scale0.5/filter_proponents_ekfac.log,filter-proponents,11449,20,1
+experiments/plan_adam_eps1e17_16k_scale0.5/filter_proponents_magic.log,Evaluating bank,1976,100,1
+experiments/plan_adam_eps1e17_16k_scale0.5/filter_proponents_magic.log,Training,685,125,1
+experiments/plan_adam_eps1e17_16k_scale0.5/filter_proponents_magic.log,filter-proponents,11287,20,1
+experiments/plan_adam_eps1e17_16k_scale0.5/ms.log,Training,1131,250,2
+experiments/plan_adam_eps1e17_16k_scale0.5/run.log,Backward,67513,2125,17
+experiments/plan_adam_eps1e17_16k_scale0.5/run.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_scale0.5/run.log,Validating,57388,100,1
+experiments/plan_adam_eps1e17_16k_scale0.5/slice_55_100.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_scale0.5/slice_55_100.log,Validating,25835,45,1
+experiments/plan_adam_eps1e17_16k_wd0.0/ekfac.log,Computing Approximating Hessians with kfac,716,4000,1
+experiments/plan_adam_eps1e17_16k_wd0.0/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),2301,8000,2
+experiments/plan_adam_eps1e17_16k_wd0.0/ekfac.log,Computing New worker - Collecting gradients,765,8010,4
+experiments/plan_adam_eps1e17_16k_wd0.0/filter_proponents_ekfac.log,Evaluating bank,3765,200,2
+experiments/plan_adam_eps1e17_16k_wd0.0/filter_proponents_ekfac.log,Training,1213,125,1
+experiments/plan_adam_eps1e17_16k_wd0.0/filter_proponents_ekfac.log,filter-proponents,23626,20,1
+experiments/plan_adam_eps1e17_16k_wd0.0/filter_proponents_magic.log,Training,548,125,1
+experiments/plan_adam_eps1e17_16k_wd0.0/filter_proponents_magic.log,filter-proponents,24308,20,1
+experiments/plan_adam_eps1e17_16k_wd0.0/ms.log,Training,1651,375,3
+experiments/plan_adam_eps1e17_16k_wd0.0/run.log,Backward,59180,1875,15
+experiments/plan_adam_eps1e17_16k_wd0.0/run.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_wd0.0/run.log,Validating,57291,100,1
+experiments/plan_adam_eps1e17_16k_wd0.0/slice_0_4.a100py31115.log,Training,4,1,1
+experiments/plan_adam_eps1e17_16k_wd0.0/slice_0_4.a100py31115.log,Validating,1902,4,1
+experiments/plan_adam_eps1e17_16k_wd0.0/slice_55_100.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_wd0.0/slice_55_100.log,Validating,25354,45,1
+experiments/plan_adam_eps1e17_16k_wd0.1/ekfac.log,Computing Approximating Hessians with kfac,675,4000,1
+experiments/plan_adam_eps1e17_16k_wd0.1/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),4394,16000,4
+experiments/plan_adam_eps1e17_16k_wd0.1/ekfac.log,Computing New worker - Collecting gradients,746,8005,3
+experiments/plan_adam_eps1e17_16k_wd0.1/filter_proponents_ekfac.log,Training,1241,125,1
+experiments/plan_adam_eps1e17_16k_wd0.1/filter_proponents_ekfac.log,filter-proponents,19503,20,1
+experiments/plan_adam_eps1e17_16k_wd0.1/filter_proponents_magic.log,Evaluating bank,1838,100,1
+experiments/plan_adam_eps1e17_16k_wd0.1/filter_proponents_magic.log,Training,552,125,1
+experiments/plan_adam_eps1e17_16k_wd0.1/filter_proponents_magic.log,filter-proponents,11066,20,1
+experiments/plan_adam_eps1e17_16k_wd0.1/ms.log,Training,556,125,1
+experiments/plan_adam_eps1e17_16k_wd0.1/run.log,Backward,58613,1875,15
+experiments/plan_adam_eps1e17_16k_wd0.1/run.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_wd0.1/run.log,Validating,56530,100,1
+experiments/plan_adam_eps1e17_16k_wd0.1/slice_0_4.a100py31115.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_wd0.1/slice_0_4.a100py31115.log,Validating,1903,4,1
+experiments/plan_adam_eps1e17_16k_wd0.1/slice_55_100.log,Training,5,1,1
+experiments/plan_adam_eps1e17_16k_wd0.1/slice_55_100.log,Validating,25284,45,1
+experiments/plan_adam_eps1e17_256k_bs32/base.log,Training,10125,16000,1
+experiments/plan_adam_eps1e17_256k_bs32/ekfac.log,Computing Approximating Hessians with kfac,11452,64000,1
+experiments/plan_adam_eps1e17_256k_bs32/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),17054,64000,1
+experiments/plan_adam_eps1e17_256k_bs32/ekfac.log,Computing New worker - Collecting gradients,11333,128010,4
+experiments/plan_adam_eps1e17_256k_bs32/filter_proponents_ekfac_q0_4.log,Training,9992,16000,1
+experiments/plan_adam_eps1e17_256k_bs32/filter_proponents_ekfac_q14_20.log,Training,10123,16000,1
+experiments/plan_adam_eps1e17_256k_bs32/filter_proponents_ekfac_q4_7.log,Training,10058,16000,1
+experiments/plan_adam_eps1e17_256k_bs32/filter_proponents_ekfac_q7_14.log,Training,10035,16000,1
+experiments/plan_adam_eps1e17_32k_bs256/ekfac.log,Computing Approximating Hessians with kfac,1938,8000,1
+experiments/plan_adam_eps1e17_32k_bs256/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),2903,8000,1
+experiments/plan_adam_eps1e17_32k_bs256/ekfac.log,Computing New worker - Collecting gradients,1478,16010,4
+experiments/plan_adam_eps1e17_32k_bs256/filter_proponents_ekfac.log,Evaluating bank,1703,100,1
+experiments/plan_adam_eps1e17_32k_bs256/filter_proponents_ekfac.log,Training,1117,250,1
+experiments/plan_adam_eps1e17_32k_bs256/filter_proponents_ekfac.log,filter-proponents,22374,20,1
+experiments/plan_adam_eps1e17_32k_bs256/filter_proponents_magic.log,Training,1108,250,1
+experiments/plan_adam_eps1e17_32k_bs256/filter_proponents_magic.log,filter-proponents,22175,20,1
+experiments/plan_adam_eps1e17_32k_bs256/filter_top40_ekfac.log,Training,1118,250,1
+experiments/plan_adam_eps1e17_32k_bs256/filter_top40_ekfac.log,filter-proponents,22381,20,1
+experiments/plan_adam_eps1e17_32k_bs256/filter_top40_ekfac.log,random,3357,3,1
+experiments/plan_adam_eps1e17_32k_bs256/ms.log,Training,1114,250,1
+experiments/plan_adam_eps1e17_32k_bs256/run.log,Backward,17937,500,2
+experiments/plan_adam_eps1e17_32k_bs256/run.log,Training,5,1,1
+experiments/plan_adam_eps1e17_32k_bs256/slice_25_50.log,Training,5,1,1
+experiments/plan_adam_eps1e17_32k_bs256/slice_25_50.log,Validating,27992,25,1
+experiments/plan_adam_eps1e17_32k_bs256/slice_50_75.log,Training,5,1,1
+experiments/plan_adam_eps1e17_32k_bs256/slice_50_75.log,Validating,28221,25,1
+experiments/plan_adam_eps1e17_32k_bs256/slice_75_100.log,Training,5,1,1
+experiments/plan_adam_eps1e17_32k_bs256/slice_75_100.log,Validating,27875,25,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_build.log,Training,1912,500,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_22_24.log,Training,1902,500,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_22_24.log,Validating,3806,2,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_24_30.log,Training,1894,500,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_24_30.log,Validating,11373,6,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_30_40.log,Training,1903,500,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_35_40.log,Training,1903,500,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_37_40.log,Validating,5688,3,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_40_50.log,Training,1907,500,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_45_50.log,Training,1891,500,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_45_50.log,Validating,9465,5,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_50_60.log,Training,1892,500,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_50_60.log,Validating,18933,10,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_60_70.log,Training,1906,500,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_60_70.log,Validating,19062,10,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_70_80.log,Training,1902,500,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_70_80.log,Validating,19029,10,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_80_90.log,Training,1892,500,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_80_90.log,Validating,18938,10,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_90_100.log,Training,1891,500,1
+experiments/plan_adam_eps1e17_64k_bs256/bank_shard_90_100.log,Validating,18931,10,1
+experiments/plan_adam_eps1e17_64k_bs256/ekfac.log,Computing Approximating Hessians with kfac,1829,16000,1
+experiments/plan_adam_eps1e17_64k_bs256/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),2764,16000,1
+experiments/plan_adam_eps1e17_64k_bs256/ekfac.log,Computing New worker - Collecting gradients,1181,16005,2
+experiments/plan_adam_eps1e17_64k_bs256/filter_proponents_ekfac.log,Training,1217,500,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_proponents_ekfac.log,filter-proponents,24347,20,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_proponents_magic.log,Training,1894,500,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_proponents_magic_q0_7.log,Evaluating bank,1994,100,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_proponents_magic_q0_7.log,Training,2200,500,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_proponents_magic_q0_7.log,filter-proponents,15410,7,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_proponents_magic_q14_20.log,Evaluating bank,1749,100,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_proponents_magic_q14_20.log,Training,2195,500,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_proponents_magic_q14_20.log,filter-proponents,13177,6,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_proponents_magic_q7_14.log,Training,2224,500,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_proponents_magic_q7_14.log,filter-proponents,15584,7,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_top40_ekfac.log,Training,2199,500,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_top40_ekfac_q0_7.log,Training,2210,500,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_top40_ekfac_q0_7.log,filter-proponents,15484,7,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_top40_ekfac_q0_7.log,random,6635,3,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_top40_ekfac_q14_20.log,Training,2207,500,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_top40_ekfac_q14_20.log,filter-proponents,13253,6,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_top40_ekfac_q14_20.log,random,13259,6,2
+experiments/plan_adam_eps1e17_64k_bs256/filter_top40_ekfac_q7_14.log,Training,2211,500,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_top40_ekfac_q7_14.log,filter-proponents,15494,7,1
+experiments/plan_adam_eps1e17_64k_bs256/filter_top40_ekfac_q7_14.log,random,6641,3,1
+experiments/plan_adam_eps1e17_64k_bs256/ms.log,Training,3818,1000,2
+experiments/plan_adam_eps1e17_64k_bs256/run.log,Backward,162524,5500,11
+experiments/plan_adam_eps1e17_64k_bs256/run.log,Training,5,1,1
+experiments/plan_adam_eps1e17_64k_bs32/ekfac.log,Computing Approximating Hessians with kfac,2862,16000,1
+experiments/plan_adam_eps1e17_64k_bs32/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),16302,64000,4
+experiments/plan_adam_eps1e17_64k_bs32/ekfac.log,Computing New worker - Collecting gradients,2883,32010,4
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac.log,Training,2513,4000,1
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q0_4.log,Training,2546,4000,1
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q0_4.log,filter-proponents,10225,4,1
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q0_4.log,random,7666,3,1
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q0_7.log,Training,2550,4000,1
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q14_20.log,Training,2514,4000,1
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q14_20.log,filter-proponents,15111,6,1
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q14_20.log,random,7554,3,1
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q4_7.log,Training,2529,4000,1
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q4_7.log,filter-proponents,7598,3,1
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q4_7.log,random,15177,6,2
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q7_14.log,Training,2630,4000,1
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q7_14.log,filter-proponents,18422,7,1
+experiments/plan_adam_eps1e17_64k_bs32/filter_proponents_ekfac_q7_14.log,random,15789,6,2
+experiments/plan_adam_eps1e17_8k_bs256/ekfac.log,Computing Approximating Hessians with kfac,230,2000,1
+experiments/plan_adam_eps1e17_8k_bs256/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),338,2000,1
+experiments/plan_adam_eps1e17_8k_bs256/ekfac.log,Computing New worker - Collecting gradients,161,2005,2
+experiments/plan_adam_eps1e17_8k_bs256/filter_proponents_ekfac.log,Evaluating bank,2003,100,1
+experiments/plan_adam_eps1e17_8k_bs256/filter_proponents_ekfac.log,Training,308,63,1
+experiments/plan_adam_eps1e17_8k_bs256/filter_proponents_ekfac.log,filter-proponents,5800,20,1
+experiments/plan_adam_eps1e17_8k_bs256/filter_proponents_magic.log,Evaluating bank,2020,100,1
+experiments/plan_adam_eps1e17_8k_bs256/filter_proponents_magic.log,Training,310,63,1
+experiments/plan_adam_eps1e17_8k_bs256/filter_proponents_magic.log,filter-proponents,5793,20,1
+experiments/plan_adam_eps1e17_8k_bs256/filter_top40_ekfac.log,Training,288,63,1
+experiments/plan_adam_eps1e17_8k_bs256/filter_top40_ekfac.log,filter-proponents,5803,20,1
+experiments/plan_adam_eps1e17_8k_bs256/filter_top40_ekfac.log,random,870,3,1
+experiments/plan_adam_eps1e17_8k_bs256/ms.log,Training,573,126,2
+experiments/plan_adam_eps1e17_8k_bs256/relaunch2.log,Training,8,1,1
+experiments/plan_adam_eps1e17_8k_bs256/relaunch3.log,Training,8,1,1
+experiments/plan_adam_eps1e17_8k_bs256/relaunch4.log,Training,10,1,1
+experiments/plan_adam_eps1e17_8k_bs256/slice_72_86.log,Training,8,1,1
+experiments/plan_adam_eps1e17_8k_bs256/slice_72_86.log,Validating,7830,14,1
+experiments/plan_adam_eps1e17_8k_bs256/slice_86_100.log,Training,18,1,1
+experiments/plan_adam_eps1e17_8k_bs256/slice_86_100.log,Validating,15432,14,1
+experiments/plan_muon_eps1e17_128k_bs32/base.log,Training,5346,8000,1
+experiments/plan_muon_eps1e17_128k_bs32/ekfac.log,Computing Approximating Hessians with kfac,3675,32000,1
+experiments/plan_muon_eps1e17_128k_bs32/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),8501,32000,1
+experiments/plan_muon_eps1e17_128k_bs32/ekfac.log,Computing New worker - Collecting gradients,4688,64010,4
+experiments/plan_muon_eps1e17_128k_bs32/filter_proponents_ekfac_q0_7.log,Training,6457,8000,1
+experiments/plan_muon_eps1e17_128k_bs32/filter_proponents_ekfac_q14_20.log,Training,6552,8000,1
+experiments/plan_muon_eps1e17_128k_bs32/filter_proponents_ekfac_q7_14.log,Training,6459,8000,1
+experiments/plan_muon_eps1e17_16k_bs128/ekfac.log,Computing Approximating Hessians with kfac,820,4000,1
+experiments/plan_muon_eps1e17_16k_bs128/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),2700,8000,2
+experiments/plan_muon_eps1e17_16k_bs128/ekfac.log,Computing New worker - Collecting gradients,744,8005,3
+experiments/plan_muon_eps1e17_16k_bs128/filter_proponents_ekfac.log,Evaluating bank,1660,100,1
+experiments/plan_muon_eps1e17_16k_bs128/filter_proponents_ekfac.log,Training,2,1,1
+experiments/plan_muon_eps1e17_16k_bs128/filter_proponents_ekfac.log,filter-proponents,12097,20,1
+experiments/plan_muon_eps1e17_16k_bs128/filter_proponents_magic.log,Training,602,250,1
+experiments/plan_muon_eps1e17_16k_bs128/filter_proponents_magic.log,filter-proponents,12048,20,1
+experiments/plan_muon_eps1e17_16k_bs128/ms.log,Training,1215,500,2
+experiments/plan_muon_eps1e17_16k_bs128/run.log,Training,2,1,1
+experiments/plan_muon_eps1e17_16k_bs128/run.log,Validating,38015,100,1
+experiments/plan_muon_eps1e17_16k_bs16/ekfac.log,Computing Approximating Hessians with kfac,464,4000,1
+experiments/plan_muon_eps1e17_16k_bs16/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),2269,8000,2
+experiments/plan_muon_eps1e17_16k_bs16/ekfac.log,Computing New worker - Collecting gradients,606,8010,4
+experiments/plan_muon_eps1e17_16k_bs16/filter_proponents_ekfac.log,Evaluating bank,108,100,1
+experiments/plan_muon_eps1e17_16k_bs16/filter_proponents_ekfac.log,Training,880,2000,1
+experiments/plan_muon_eps1e17_16k_bs16/filter_proponents_ekfac.log,filter-proponents,17608,20,1
+experiments/plan_muon_eps1e17_16k_bs16/filter_proponents_magic.log,Evaluating bank,114,100,1
+experiments/plan_muon_eps1e17_16k_bs16/filter_proponents_magic.log,filter-proponents,17624,20,1
+experiments/plan_muon_eps1e17_16k_bs16/ms.log,Training,1771,4000,2
+experiments/plan_muon_eps1e17_16k_bs16/run.log,Backward,17637,4000,2
+experiments/plan_muon_eps1e17_16k_bs16/run.log,Training,1090,2000,1
+experiments/plan_muon_eps1e17_16k_bs16/slice_92_95.log,Training,1,1,1
+experiments/plan_muon_eps1e17_16k_bs16/slice_92_95.log,Validating,2659,3,1
+experiments/plan_muon_eps1e17_16k_bs16/slice_95_97.log,Training,1,1,1
+experiments/plan_muon_eps1e17_16k_bs16/slice_95_97.log,Validating,1772,2,1
+experiments/plan_muon_eps1e17_16k_bs16/slice_97_100.log,Training,1,1,1
+experiments/plan_muon_eps1e17_16k_bs16/slice_97_100.log,Validating,2654,3,1
+experiments/plan_muon_eps1e17_16k_bs32/ekfac.log,Computing Approximating Hessians with kfac,496,4000,1
+experiments/plan_muon_eps1e17_16k_bs32/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),695,4000,1
+experiments/plan_muon_eps1e17_16k_bs32/ekfac.log,Computing New worker - Collecting gradients,308,4005,2
+experiments/plan_muon_eps1e17_16k_bs32/filter_proponents_magic.log,Training,805,1000,1
+experiments/plan_muon_eps1e17_16k_bs32/filter_proponents_magic.log,filter-proponents,16087,20,1
+experiments/plan_muon_eps1e17_16k_bs32/ms.log,Training,1611,2000,2
+experiments/plan_muon_eps1e17_16k_bs32/run.log,Training,1,1,1
+experiments/plan_muon_eps1e17_16k_bs32/slice_22_48.log,Training,1,1,1
+experiments/plan_muon_eps1e17_16k_bs32/slice_22_48.log,Validating,21084,26,1
+experiments/plan_muon_eps1e17_16k_bs32/slice_48_74.log,Training,1,1,1
+experiments/plan_muon_eps1e17_16k_bs32/slice_48_74.log,Validating,21052,26,1
+experiments/plan_muon_eps1e17_16k_bs32/slice_74_100.log,Training,1,1,1
+experiments/plan_muon_eps1e17_16k_bs32/slice_74_100.log,Validating,21403,26,1
+experiments/plan_muon_eps1e17_16k_bs64/ekfac.log,Computing Approximating Hessians with kfac,511,4000,1
+experiments/plan_muon_eps1e17_16k_bs64/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),696,4000,1
+experiments/plan_muon_eps1e17_16k_bs64/ekfac.log,Computing New worker - Collecting gradients,600,8005,3
+experiments/plan_muon_eps1e17_16k_bs64/filter_proponents_magic.log,Training,680,500,1
+experiments/plan_muon_eps1e17_16k_bs64/filter_proponents_magic.log,filter-proponents,13588,20,1
+experiments/plan_muon_eps1e17_16k_bs64/ms.log,Training,1333,1000,2
+experiments/plan_muon_eps1e17_16k_bs64/run.log,Training,2,1,1
+experiments/plan_muon_eps1e17_16k_bs64/run.log,Validating,70107,100,1
+experiments/plan_muon_eps1e17_256k_bs32/base.log,Training,12958,16000,1
+experiments/plan_muon_eps1e17_256k_bs32/ekfac.log,Computing New worker - Collecting gradients,11,5,1
+experiments/plan_muon_eps1e17_32k_bs256/ekfac.log,Computing Approximating Hessians with kfac,1371,8000,1
+experiments/plan_muon_eps1e17_32k_bs256/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),9694,32000,4
+experiments/plan_muon_eps1e17_32k_bs256/ekfac.log,Computing New worker - Collecting gradients,1494,16010,4
+experiments/plan_muon_eps1e17_32k_bs256/filter_proponents_ekfac.log,Evaluating bank,1649,100,1
+experiments/plan_muon_eps1e17_32k_bs256/filter_proponents_ekfac.log,Training,1147,250,1
+experiments/plan_muon_eps1e17_32k_bs256/filter_proponents_ekfac.log,filter-proponents,22949,20,1
+experiments/plan_muon_eps1e17_32k_bs256/filter_proponents_magic.log,Evaluating bank,1573,100,1
+experiments/plan_muon_eps1e17_32k_bs256/filter_proponents_magic.log,Training,1154,250,1
+experiments/plan_muon_eps1e17_32k_bs256/filter_proponents_magic.log,filter-proponents,23099,20,1
+experiments/plan_muon_eps1e17_32k_bs256/ms.log,Training,2289,500,2
+experiments/plan_muon_eps1e17_32k_bs256/run.log,Backward,146770,4500,18
+experiments/plan_muon_eps1e17_32k_bs256/run.log,Training,1153,250,1
+experiments/plan_muon_eps1e17_32k_bs256/slice_12_25.log,Training,5,1,1
+experiments/plan_muon_eps1e17_32k_bs256/slice_12_25.log,Validating,15062,13,1
+experiments/plan_muon_eps1e17_32k_bs256/slice_25_50.log,Training,12,2,1
+experiments/plan_muon_eps1e17_32k_bs256/slice_25_50.log,Validating,29179,25,1
+experiments/plan_muon_eps1e17_32k_bs256/slice_50_75.log,Training,5,1,1
+experiments/plan_muon_eps1e17_32k_bs256/slice_74_75.log,Training,5,1,1
+experiments/plan_muon_eps1e17_32k_bs256/slice_74_75.log,Validating,1157,1,1
+experiments/plan_muon_eps1e17_32k_bs256/slice_75_100.log,Training,5,1,1
+experiments/plan_muon_eps1e17_32k_bs256/slice_75_100.log,Validating,29257,25,1
+experiments/plan_muon_eps1e17_4k_bs256_lr2e-4/base.log,Training,146,32,1
+experiments/plan_muon_eps1e17_4k_bs256_lr2e-4/ekfac.log,Computing Approximating Hessians with kfac,177,1000,1
+experiments/plan_muon_eps1e17_4k_bs256_lr2e-4/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),274,1000,1
+experiments/plan_muon_eps1e17_4k_bs256_lr2e-4/ekfac.log,Computing New worker - Collecting gradients,218,2005,3
+experiments/plan_muon_eps1e17_4k_bs256_lr2e-4/filter_proponents_ekfac.log,Training,148,32,1
+experiments/plan_muon_eps1e17_4k_bs256_lr2e-4/filter_proponents_ekfac.log,filter-proponents,2987,20,1
+experiments/plan_muon_eps1e17_4k_bs256_lr2e-4/filter_proponents_ekfac.log,random,447,3,1
+experiments/plan_muon_eps1e17_64k_bs256/bank_build.log,Training,2051,500,1
+experiments/plan_muon_eps1e17_64k_bs256/bank_shard_20_30.log,Training,1969,500,1
+experiments/plan_muon_eps1e17_64k_bs256/bank_shard_30_40.log,Training,1971,500,1
+experiments/plan_muon_eps1e17_64k_bs256/bank_shard_30_40.log,Validating,19741,10,1
+experiments/plan_muon_eps1e17_64k_bs256/ekfac.log,Computing Approximating Hessians with kfac,1848,16000,1
+experiments/plan_muon_eps1e17_64k_bs256/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),2787,16000,1
+experiments/plan_muon_eps1e17_64k_bs256/ekfac.log,Computing New worker - Collecting gradients,2372,32010,4
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac.log,Training,2329,500,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q0_7.log,Training,2296,500,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q0_7.log,filter-proponents,16086,7,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q0_7.log,random,6890,3,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q10_14.log,Training,2305,500,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q10_14.log,filter-proponents,9207,4,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q10_14.log,random,6910,3,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q14_20.log,Training,2298,500,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q14_20.log,filter-proponents,13794,6,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q14_20.log,random,6900,3,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q7_10.log,Training,2330,500,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q7_10.log,filter-proponents,6994,3,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q7_10.log,random,6993,3,1
+experiments/plan_muon_eps1e17_64k_bs256/filter_proponents_ekfac_q7_14.log,Training,2328,500,1
+experiments/plan_muon_eps1e17_64k_bs256/ms.log,Training,3963,1000,2
+experiments/plan_muon_eps1e17_64k_bs256/run.log,Backward,133557,4500,9
+experiments/plan_muon_eps1e17_64k_bs256/run.log,Training,4,1,1
+experiments/plan_muon_eps1e17_64k_bs32/ekfac.log,Computing Approximating Hessians with kfac,2712,16000,1
+experiments/plan_muon_eps1e17_64k_bs32/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),4068,16000,1
+experiments/plan_muon_eps1e17_64k_bs32/ekfac.log,Computing New worker - Collecting gradients,2869,32005,3
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac.log,Training,3221,4000,1
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q0_4.log,Training,3221,4000,1
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q0_4.log,filter-proponents,12871,4,1
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q0_4.log,random,19307,6,2
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q0_7.log,Training,3225,4000,1
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q14_20.log,Training,3219,4000,1
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q14_20.log,filter-proponents,19314,6,1
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q14_20.log,random,9650,3,1
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q4_7.log,Training,3201,4000,1
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q4_7.log,filter-proponents,9598,3,1
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q4_7.log,random,9595,3,1
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q7_14.log,Training,3255,4000,1
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q7_14.log,filter-proponents,22770,7,1
+experiments/plan_muon_eps1e17_64k_bs32/filter_proponents_ekfac_q7_14.log,random,9748,3,1
+experiments/plan_muon_eps1e17_8k_bs256/ekfac.log,Computing Approximating Hessians with kfac,233,2000,1
+experiments/plan_muon_eps1e17_8k_bs256/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),345,2000,1
+experiments/plan_muon_eps1e17_8k_bs256/ekfac.log,Computing New worker - Collecting gradients,306,4005,3
+experiments/plan_muon_eps1e17_8k_bs256/filter_proponents_ekfac.log,Evaluating bank,1904,100,1
+experiments/plan_muon_eps1e17_8k_bs256/filter_proponents_ekfac.log,Training,304,63,1
+experiments/plan_muon_eps1e17_8k_bs256/filter_proponents_ekfac.log,filter-proponents,5833,20,1
+experiments/plan_muon_eps1e17_8k_bs256/filter_proponents_magic.log,Evaluating bank,1915,100,1
+experiments/plan_muon_eps1e17_8k_bs256/filter_proponents_magic.log,Training,304,63,1
+experiments/plan_muon_eps1e17_8k_bs256/filter_proponents_magic.log,filter-proponents,5804,20,1
+experiments/plan_muon_eps1e17_8k_bs256/ms.log,Training,859,189,3
+experiments/plan_muon_eps1e17_8k_bs256/run.log,Backward,23561,819,13
+experiments/plan_muon_eps1e17_8k_bs256/run.log,Training,292,63,1
+experiments/plan_muon_eps1e17_8k_bs256/run.log,Validating,30134,100,1
+experiments/sm_adamw_eps1e17_16k_bs256/ekfac.log,Computing Approximating Hessians with kfac,827,4000,1
+experiments/sm_adamw_eps1e17_16k_bs256/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),5134,16000,4
+experiments/sm_adamw_eps1e17_16k_bs256/ekfac.log,Computing New worker - Collecting gradients,769,8010,4
+experiments/sm_adamw_eps1e17_16k_bs256/filter_proponents_ekfac.log,Evaluating bank,1710,100,1
+experiments/sm_adamw_eps1e17_16k_bs256/filter_proponents_ekfac.log,Training,572,125,1
+experiments/sm_adamw_eps1e17_16k_bs256/filter_proponents_ekfac.log,filter-proponents,11100,20,1
+experiments/sm_adamw_eps1e17_16k_bs256/filter_proponents_magic.log,Evaluating bank,1806,100,1
+experiments/sm_adamw_eps1e17_16k_bs256/filter_proponents_magic.log,Training,567,125,1
+experiments/sm_adamw_eps1e17_16k_bs256/filter_proponents_magic.log,filter-proponents,10990,20,1
+experiments/sm_adamw_eps1e17_16k_bs256/filter_top40_ekfac.log,Training,552,125,1
+experiments/sm_adamw_eps1e17_16k_bs256/filter_top40_ekfac.log,filter-proponents,11087,20,1
+experiments/sm_adamw_eps1e17_16k_bs256/filter_top40_ekfac.log,random,1662,3,1
+experiments/sm_adamw_eps1e17_16k_bs256/ms.log,Training,1105,250,2
+experiments/sm_adamw_eps1e17_16k_bs256/run.log,Backward,59662,1875,15
+experiments/sm_adamw_eps1e17_16k_bs256/run.log,Training,5,1,1
+experiments/sm_adamw_eps1e17_16k_bs256/run.log,Validating,56783,100,1
+experiments/sm_adamw_eps1e17_16k_bs256/slice_40_70.log,Training,5,1,1
+experiments/sm_adamw_eps1e17_16k_bs256/slice_40_70.log,Validating,14767,30,1
+experiments/sm_adamw_eps1e17_16k_bs256/slice_70_100.log,Training,5,1,1
+experiments/sm_adamw_eps1e17_16k_bs256/slice_70_100.log,Validating,14268,30,1
+experiments/sm_adamw_eps1e17_16k_bs256_seed1/ms.log,Training,1113,250,2
+experiments/sm_muon_eps1e17_16k_bs256/ekfac.log,Computing Approximating Hessians with kfac,935,4000,1
+experiments/sm_muon_eps1e17_16k_bs256/ekfac.log,Computing Approximating Hessians with kfac (eigenvalue correction),1437,4000,1
+experiments/sm_muon_eps1e17_16k_bs256/ekfac.log,Computing New worker - Collecting gradients,768,8010,4
+experiments/sm_muon_eps1e17_16k_bs256/filter_proponents_ekfac.log,Training,582,125,1
+experiments/sm_muon_eps1e17_16k_bs256/filter_proponents_ekfac.log,filter-proponents,23179,40,2
+experiments/sm_muon_eps1e17_16k_bs256/ms.log,Training,573,125,1
+experiments/sm_muon_eps1e17_16k_bs256/run.log,Backward,65015,2125,17
+experiments/sm_muon_eps1e17_16k_bs256/run.log,Training,578,125,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_18_29.log,Training,5,1,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_18_29.log,Validating,6514,11,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_18_45.log,Training,5,1,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_18_45.log,Validating,15860,27,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_29_40.log,Training,5,1,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_29_40.log,Validating,6525,11,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_40_70.log,Training,4,1,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_40_70.log,Validating,15465,30,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_45_73.log,Training,5,1,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_45_73.log,Validating,16407,28,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_70_100.log,Training,4,1,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_70_100.log,Validating,14854,30,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_73_100.log,Training,5,1,1
+experiments/sm_muon_eps1e17_16k_bs256/slice_73_100.log,Validating,15974,27,1
+experiments/sm_muon_eps1e17_16k_bs256_seed1/ms.log,Training,1147,250,2
+experiments/sm_muon_eps1e17_16k_bs256_seed2/ms.log,Training,2330,500,4
+experiments/sm_muon_eps1e17_16k_bs256_seed3/ms.log,Training,1157,250,2
+tuning/_logs/tune_adamw_256k_bs256_lr0.0001_s42.log,Training,7669,2000,1
+tuning/_logs/tune_adamw_256k_bs256_lr0.0002_s42.log,Training,7643,2000,1
+tuning/_logs/tune_adamw_256k_bs256_lr0.0004_s42.log,Training,7669,2000,1
+tuning/_logs/tune_adamw_256k_bs256_lr5e-05_s42.log,Training,7644,2000,1
+tuning/scale025_ext.log,Training,949,125,1
+tuning/scale025_ext2.log,Training,948,125,1
+tuning/scale_sweeps.log,Training,2845,375,3
+tuning/tune_qwen15b_16k_bs256_lr0.0001_s42/run.log,Training,1617,125,1
+tuning/tune_qwen15b_16k_bs256_lr0.0002_s42/run.log,Training,1625,125,1
+tuning/tune_qwen15b_16k_bs256_lr0.0005_s42/run.log,Training,1614,125,1
+tuning/tune_qwen15b_16k_bs256_lr1e-05_s42/run.log,Training,1614,125,1
+tuning/tune_qwen15b_16k_bs256_lr2e-05_s42/run.log,Training,1620,125,1
+tuning/tune_qwen15b_16k_bs256_lr5e-05_s42/run.log,Training,1628,125,1
+tuning/tune_qwen15b_32k_bs256_lr0.0001_s42/run.log,Training,3202,250,1
+tuning/tune_qwen15b_32k_bs256_lr0.0002_s42/run.log,Training,3215,250,1
+tuning/tune_qwen15b_32k_bs256_lr0.0005_s42/run.log,Training,3131,250,1
+tuning/tune_qwen15b_32k_bs256_lr1e-05_s42/run.log,Training,3233,250,1
+tuning/tune_qwen15b_32k_bs256_lr2e-05_s42/run.log,Training,3210,250,1
+tuning/tune_qwen15b_32k_bs256_lr5e-05_s42/run.log,Training,3226,250,1
+tuning/tune_qwen15b_4k_bs256_lr1e-05_s42/run.log,Training,421,32,1
+tuning/tune_qwen15b_64k_bs256_lr0.0005_s42/run.log,Training,6395,500,1
+tuning/tune_qwen15b_64k_bs256_lr1e-05_s42/run.log,Training,6480,500,1
+tuning/tune_qwen15b_8k_bs256_lr0.0002_s42/run.log,Training,815,63,1
+tuning/tune_qwen15b_8k_bs256_lr1e-05_s42/run.log,Training,822,63,1
