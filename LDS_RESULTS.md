@@ -17,19 +17,19 @@ below. `shuffle` = data-order-per-epoch implementation (see note): **rep** = shu
 `train loss` = final base-model loss on its training set (pending GPU eval). `ΔL1` = relative
 parameter-update L1, ‖θ_final−θ_init‖₁ / ‖θ_init‖₁ (init = gpt2, or the OLMo2 reinit for scratch).
 
-| model | opt | eps_root | N | bs | epochs | steps | empirical metasmooth | EK-FAC LDS | train loss | ΔL1 | shuffle |
-|-------|-----|----------|-----|-----|--------|-------|-----------|-----------|-----------|------|---------|
-| OLMo2 scratch | muon | 1e-6 | 16k | 128 | 6 | 750 | 0.010 | 0.0175 | — | 4.56 | rep |
-| GPT-2 ft | adam | 0 | 16k | 64 | 2 | 500 | 0.437 | 0.1097 | — | 0.086 | rep |
-| GPT-2 ft | adam | 0 | 8k | 64 | 2 | 250 | 0.615 | 0.1410 | — | 0.065 | rep |
-| GPT-2 ft | adam | 0 | 4k | 64 | 2 | 125 | 0.766 | 0.1740 | — | 0.051 | rep |
-| GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 125 | 0.781 | 0.2097 | — | 0.029 | rep |
-| GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | 0.1781 | — | 0.009 | rep |
-| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3033 | — | 0.008 | rep |
-| GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 125 | 0.982 | 0.3369 | — | 0.0074 | rep |
-| GPT-2 ft | adam | 1e-6 | 4k | 64 | 2 | 125 | 0.991 | 0.3173 | — | 0.0016 | rep |
-| GPT-2 ft | muon | 0 | 4k | 64 | 4 | 250 | 0.996 | 0.4683 | — | 0.0057 | rep |
-| GPT-2 ft | muon | 1e-6 | 4k | 64 | 4 | 250 | 0.997 | 0.4738 | — | 0.0057 | rep |
+| model | opt | eps_root | N | bs | epochs | steps | empirical metasmooth | EK-FAC LDS | MAGIC LDS | train loss | ΔL1 | shuffle |
+|-------|-----|----------|-----|-----|--------|-------|-----------|-----------|-----------|-----------|------|---------|
+| OLMo2 scratch | muon | 1e-6 | 16k | 128 | 6 | 750 | 0.010 | 0.0175 | — | 2.92 | 4.56 | rep |
+| GPT-2 ft | adam | 0 | 16k | 64 | 2 | 500 | 0.437 | 0.1097 | — | 2.65 | 0.086 | rep |
+| GPT-2 ft | adam | 0 | 8k | 64 | 2 | 250 | 0.615 | 0.1410 | — | 2.61 | 0.065 | rep |
+| GPT-2 ft | adam | 0 | 4k | 64 | 2 | 125 | 0.766 | 0.1740 | — | 2.61 | 0.051 | rep |
+| GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 125 | 0.781 | 0.2097 | — | 2.71 | 0.029 | rep |
+| GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | 0.1781 | — | 3.07 | 0.009 | rep |
+| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3033 | 0.37 (n=10) | 3.02 | 0.008 | rep |
+| GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 125 | 0.982 | 0.3369 | — | 2.98 | 0.0074 | rep |
+| GPT-2 ft | adam | 1e-6 | 4k | 64 | 2 | 125 | 0.991 | 0.3173 | — | 3.18 | 0.0016 | rep |
+| GPT-2 ft | muon | 0 | 4k | 64 | 4 | 250 | 0.996 | 0.4683 | — | 3.08 | 0.0057 | rep |
+| GPT-2 ft | muon | 1e-6 | 4k | 64 | 4 | 250 | 0.997 | 0.4738 | — | 3.08 | 0.0057 | rep |
 
 **Per-epoch shuffle note:** the run checkout `feat/magic-grad-accum` shuffles the train set once then
 `.repeat(num_epochs)`, so every epoch sees the **same order** (`rep`). The fix — commit `1e6eea7f`
