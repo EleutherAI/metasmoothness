@@ -1,16 +1,18 @@
 # LDS results — EK-FAC / Shampoo / MAGIC / SOURCE / Trackstar
 
-We use GPT-2 for most experiments. We use Olmo-2 for pre-training experiments, because it has a modern architecture similar to the GPT-Nano speedrun competition winner that lets us achieve reasonable pre-training losses very quickly. We also use it to test QK-norm, an architectural feature rumored to improve metasmoothness.
+We use GPT-2 for most experiments. We use Olmo-2 for pre-training experiments because it has a modern architecture similar to the GPT-Nano speedrun competition winner that lets us achieve reasonable pre-training losses quickly. We also use it to test QK-norm, an architectural feature it implements that's rumored to improve metasmoothness.
 
 ## Evaluation
 
-We produce leave-k-out banks containing re-trained models over 100 subsets @1% held out (muon SmolLM2 banks: 50). We compute CIs with a 10k-resample bootstrap.
+We produce leave-k-out banks containing re-trained models over 100 subsets @1% held out (50 for Muon SmolLM2 banks). We compute CIs with a 10k-resample bootstrap.
 
 ## Information for Coding Agents
 
 Some invalid banks trained with `chunk_length = 512` are listed in the [Appendix](#appendix--invalid-banks-chunk_length--0), so coding agents don't accidentally pull invalid related data.
 
-## Metasmoothness ↔ EK-FAC LDS grid (all models / knobs)
+## Results
+
+### Metasmoothness ↔ EK-FAC LDS grid (all models / knobs)
 
 Consolidated view: metasmoothness predicts EK-FAC LDS across **model, optimizer, eps_root, training
 steps, and batch size**. Sorted by metasmoothness. Detailed per-axis sweeps are in the sub-sections
@@ -42,7 +44,7 @@ slightly above the adam curve (high LDS at high metasmoothness).
 "Shuffle each training epoch independently" (#352), on `origin/main` — reshuffles each epoch. Not yet
 rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows are shuffle-agnostic.
 
-## SmolLM2 (`bergson-smollm2-lds-chunks`, `train_{4k,8k,16k,32k}.hf`)
+### SmolLM2 (`bergson-smollm2-lds-chunks`, `train_{4k,8k,16k,32k}.hf`)
 
 | Optimizer | eps_root | lr | N | epochs | metasmooth | Method | LDS | 95% CI | n |
 |-----------|----------|-----|-----|--------|-----------|--------|-----|--------|---|
@@ -80,7 +82,7 @@ rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows
 - muon eps_root acts on Muon's AdamW-fallback parameters (embeddings / lm_head / 1D params); the 2D weights use Newton-Schulz, which eps_root does not touch. So muon EK-FAC is nearly flat across eps_root (5e-5: 0.474 @1e-6 vs 0.468 @0; 1e-4: 0.451 @1e-6 vs 0.454 @0), unlike adam (0.317 @1e-6 → 0.174 @0).
 - MAGIC (metagradient) spotcheck, 5 queries, gpt2 muon @5e-5, nproc=1 eager: eps_root=0 → NaN scores; eps_root=1e-6 → _(running)_.
 
-### adam metasmoothness vs eps_root (4k bank config: adamw, lr 8e-4 poly, bs64, epochs=2, betas 0.95/0.975)
+#### adam metasmoothness vs eps_root (4k bank config: adamw, lr 8e-4 poly, bs64, epochs=2, betas 0.95/0.975)
 
 Sweep between the eps1e-6 (ms 0.991) and eps0 (ms 0.766) endpoints. Single direction_seed, h=0.1 (noisy).
 
@@ -93,7 +95,7 @@ Sweep between the eps1e-6 (ms 0.991) and eps0 (ms 0.766) endpoints. Single direc
 | 1e-10 | 0.781 | 0.2097 [0.182, 0.239] |
 | 0 | 0.766 | 0.1740 |
 
-### adam metasmoothness vs training steps (N-sweep, epochs=2, lr 8e-4, bs64)
+#### adam metasmoothness vs training steps (N-sweep, epochs=2, lr 8e-4, bs64)
 
 Measured at eps_root=0 (un-saturated); eps_root=1e-6 shown for contrast (pinned near the 1.0
 ceiling, hides the trend). Steps = N·epochs/bs.
@@ -109,7 +111,7 @@ At eps0, LDS falls monotonically with steps, tracking metasmoothness (both ~halv
 
 Same direction with data held fixed (4k, eps0, epochs 2→4 = 125→250 steps): 0.766 → 0.663.
 
-### adam metasmoothness — other knobs (eps_root=1e-8, N=4k, epochs=2; baseline bs64/wd0.01/scale1.0 = 0.876)
+#### adam metasmoothness — other knobs (eps_root=1e-8, N=4k, epochs=2; baseline bs64/wd0.01/scale1.0 = 0.876)
 
 | knob | values → metasmooth |
 |------|---------------------|
@@ -133,7 +135,7 @@ consistent with the steps table). Weight decay: no effect over 0–0.3. Output l
 Batch size raises metasmoothness even at fixed step count (0.837→0.992) — a genuine effect, not just
 a step-count proxy. (LDS at bs256/ep8 pending — bank build OOMs at bs256, retrying w/ grad checkpointing.)
 
-## OLMo2 from-scratch (`olmo2_reinit` 124M, SmolLM2 corpus)
+### OLMo2 from-scratch (`olmo2_reinit` 124M, SmolLM2 corpus)
 
 Re-initialized OLMo2 (124M; hidden 768, 12 layers) trained **from scratch** (not fine-tuned) — the
 pre-training proxy that motivated this investigation. muon, 6 epochs, bs128, lr 9e-3, eps_root 1e-6,
@@ -146,7 +148,7 @@ betas 0.95/0.975, wd 0.1, 50 subsets.
 Both metasmoothness (0.010) and LDS (0.018) ≈ 0 — the extreme low-metasmoothness endpoint of the
 grid, consistent with the mechanism. (N32k paused at 4/50 subsets.)
 
-## WikiText (`bergson-wikitext-512-chunks`)
+### WikiText (`bergson-wikitext-512-chunks`)
 
 Two banks, both adamw, 4 epochs, betas 0.95/0.975.
 
@@ -173,15 +175,15 @@ metasmooth measured for each bank's training config (bs64, 4 epochs): lotus 0.99
 - Excluded (n=1 spotchecks): lotus MAGIC `lotus_mq_eval` 0.9893, `lotus_q01_spotcheck` 0.9818, `lotus` 0.9177, `lotus_mq_eval_prefix_backup` 0.9665; and `lotus_interim_q01_08` (n=8, 0.9675).
 - The `gpt2_epsroot0_trackstar50q*` runs are excluded: their config has `retrained_dir=runs/lotus`, so they score epsroot0 gradients against the lotus bank.
 
-## Provenance / reproduction
+# Provenance / reproduction
 
 - SmolLM2 eps_root=1e-6 4k adam bank: HF `EleutherAI/bergson-smollm2-lds-4k` (+ `run_config.yaml`, `subsets.json`). Size-scaling banks: `runs/ekfac_vs_n/N{4,8,16,32}k`. adam eps_root=0 bank: `/mnt/ssd-2/lucia-adam-shampoo/epsroot0_4k_bank/` (code `b3790ba9`). muon banks: `/mnt/ssd-2/lucia/muon4k/{run,run_1e-4,run_eps0_5e-5,run_eps0_1e-4}/N4k` (differ only in eps_root and lr).
 - SmolLM2 scoring summary.csv under `/mnt/ssd-2/lucia-adam-shampoo/*/validate/` and `/mnt/ssd-2/lucia/muon4k/**/validate/`; scoring code `1ba43f92` worktree (+ `feat/shampoo-quarter-power` for the Shampoo power variants). WikiText run dirs under `runs/`.
 - All banks above: `data.chunk_length = 0`.
 
-# Appendix
+## Appendix
 
-## Additional hyperparameters and citations.
+### Additional hyperparameters and citations.
 
 Shampoo −1/2 / −1/4 / −1/8 = methods `shampoo` / `shampoo_quarter` / `shampoo_p025`
 (apply power −1.0 / −0.5 / −0.25 on the fitted factors).
@@ -195,7 +197,7 @@ All SmolLM2 size banks are epochs=2 (`runs/ekfac_vs_n/configs/N{4,8,16,32}k.yaml
 The two adam epochs=4 rows (no Method/LDS) are metasmoothness-only measurements of the adam config
 at epochs=4 — no bank was trained there.
 
-## Appendix — invalid banks (`chunk_length ≠ 0`)
+### Invalid banks (`chunk_length ≠ 0`)
 
 Trained with `data.chunk_length = 512` (WikiText data is already 512-chunked). These
 banks and any LDS scored against them are invalid — **do not add them to the tables
