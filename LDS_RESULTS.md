@@ -1,18 +1,14 @@
 # LDS results — EK-FAC / Shampoo / MAGIC / SOURCE / Trackstar
 
-GPT-2, leave-k-out banks, 100 subsets @1% held out (muon SmolLM2 banks: 50), seed 42.
-LDS = mean over 50 queries of per-query Spearman(predicted `score_sum`, actual
-retrain loss `diff`). CIs = 10k-resample bootstrap (seeded). Compiled 2026-07-21.
+We use GPT-2 for most experiments. We use Olmo-2 for pre-training experiments, because it has a modern architecture similar to the GPT-Nano speedrun competition winner that lets us achieve reasonable pre-training losses very quickly. We also use it to test QK-norm, an architectural feature rumored to improve metasmoothness.
 
-Only banks trained with `data.chunk_length = 0` are included; banks trained with
-`chunk_length = 512` are in the [Appendix](#appendix--invalid-banks-chunk_length--0).
-Shampoo −1/2 / −1/4 / −1/8 = methods `shampoo` / `shampoo_quarter` / `shampoo_p025`
-(apply power −1.0 / −0.5 / −0.25 on the fitted factors).
-metasmooth = empirical metasmoothness (Chang et al. 2024, Def. 2; h=0.1, direction_seed 0),
-measured at each row's exact training config. `epochs` = training epochs of that config. All
-SmolLM2 size banks are epochs=2 (`runs/ekfac_vs_n/configs/N{4,8,16,32}k.yaml`); muon banks epochs=4.
-The two adam epochs=4 rows (no Method/LDS) are metasmoothness-only measurements of the adam config
-at epochs=4 — no bank was trained there.
+## Evaluation
+
+We produce leave-k-out banks containing re-trained models over 100 subsets @1% held out (muon SmolLM2 banks: 50). We compute CIs with a 10k-resample bootstrap.
+
+## Information for Coding Agents
+
+Some invalid banks trained with `chunk_length = 512` are listed in the [Appendix](#appendix--invalid-banks-chunk_length--0), so coding agents don't accidentally pull invalid related data.
 
 ## Metasmoothness ↔ EK-FAC LDS grid (all models / knobs)
 
@@ -22,7 +18,7 @@ below. `shuffle` = data-order-per-epoch implementation (see note): **rep** = shu
 (same order every epoch, checkout `feat/magic-grad-accum`); all runs to date are **rep**. epochs=1
 rows are identical under a per-epoch-shuffle implementation.
 
-| model | opt | eps_root | N | bs | epochs | steps | metasmooth | EK-FAC LDS | shuffle |
+| model | opt | eps_root | N | bs | epochs | steps | empirical metasmooth | EK-FAC LDS | shuffle |
 |-------|-----|----------|-----|-----|--------|-------|-----------|-----------|---------|
 | OLMo2 scratch | muon | 1e-6 | 16k | 128 | 6 | 750 | 0.010 | 0.0175 | rep |
 | GPT-2 ft | adam | 0 | 16k | 64 | 2 | 500 | 0.437 | 0.1097 | rep |
@@ -182,6 +178,22 @@ metasmooth measured for each bank's training config (bs64, 4 epochs): lotus 0.99
 - SmolLM2 eps_root=1e-6 4k adam bank: HF `EleutherAI/bergson-smollm2-lds-4k` (+ `run_config.yaml`, `subsets.json`). Size-scaling banks: `runs/ekfac_vs_n/N{4,8,16,32}k`. adam eps_root=0 bank: `/mnt/ssd-2/lucia-adam-shampoo/epsroot0_4k_bank/` (code `b3790ba9`). muon banks: `/mnt/ssd-2/lucia/muon4k/{run,run_1e-4,run_eps0_5e-5,run_eps0_1e-4}/N4k` (differ only in eps_root and lr).
 - SmolLM2 scoring summary.csv under `/mnt/ssd-2/lucia-adam-shampoo/*/validate/` and `/mnt/ssd-2/lucia/muon4k/**/validate/`; scoring code `1ba43f92` worktree (+ `feat/shampoo-quarter-power` for the Shampoo power variants). WikiText run dirs under `runs/`.
 - All banks above: `data.chunk_length = 0`.
+
+# Appendix
+
+## Additional hyperparameters and citations.
+
+Shampoo −1/2 / −1/4 / −1/8 = methods `shampoo` / `shampoo_quarter` / `shampoo_p025`
+(apply power −1.0 / −0.5 / −0.25 on the fitted factors).
+
+metasmooth = empirical metasmoothness (Chang et al. 2024, Def. 2; h=0.1, direction_seed 0),
+measured at each row's exact training config. 
+
+`epochs` = training epochs of that config. 
+
+All SmolLM2 size banks are epochs=2 (`runs/ekfac_vs_n/configs/N{4,8,16,32}k.yaml`); muon banks epochs=4.
+The two adam epochs=4 rows (no Method/LDS) are metasmoothness-only measurements of the adam config
+at epochs=4 — no bank was trained there.
 
 ## Appendix — invalid banks (`chunk_length ≠ 0`)
 
