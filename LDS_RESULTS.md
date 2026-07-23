@@ -6,19 +6,13 @@ We use GPT-2 for most experiments. We use Olmo-2 for pre-training experiments be
 
 We produce leave-k-out banks containing re-trained models over 100 subsets @1% held out (50 for Muon SmolLM2 banks). We compute CIs with a 10k-resample bootstrap.
 
-## Information for Coding Agents
-
-Some invalid banks trained with `chunk_length = 512` are listed in the [Appendix](#appendix--invalid-banks-chunk_length--0), so coding agents don't accidentally pull invalid related data.
-
 ## Results
 
-### Metasmoothness ↔ EK-FAC LDS grid (all models / knobs)
+### Empirical metasmoothness ↔ EK-FAC LDS grid (all models / knobs)
 
-Consolidated view: metasmoothness predicts EK-FAC LDS across **model, optimizer, eps_root, training
-steps, and batch size**. Sorted by metasmoothness. Detailed per-axis sweeps are in the sub-sections
+Consolidated view, sorted by metasmoothness. Detailed per-axis sweeps are in the sub-sections
 below. `shuffle` = data-order-per-epoch implementation (see note): **rep** = shuffle-once-then-repeat
-(same order every epoch, checkout `feat/magic-grad-accum`); all runs to date are **rep**. epochs=1
-rows are identical under a per-epoch-shuffle implementation.
+(same order every epoch, now an unsupported setup). Of course, epochs=1 rows are comparable.
 
 | model | opt | eps_root | N | bs | epochs | steps | empirical metasmooth | EK-FAC LDS | shuffle |
 |-------|-----|----------|-----|-----|--------|-------|-----------|-----------|---------|
@@ -27,17 +21,12 @@ rows are identical under a per-epoch-shuffle implementation.
 | GPT-2 ft | adam | 0 | 8k | 64 | 2 | 250 | 0.615 | 0.1410 | rep |
 | GPT-2 ft | adam | 0 | 4k | 64 | 2 | 125 | 0.766 | 0.1740 | rep |
 | GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 125 | 0.781 | 0.2097 | rep |
-| GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | 0.1781 | rep* |
+| GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | 0.1781 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3033 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 125 | 0.982 | _(building)_ | rep |
 | GPT-2 ft | adam | 1e-6 | 4k | 64 | 2 | 125 | 0.991 | 0.3173 | rep |
 | GPT-2 ft | muon | 0 | 4k | 64 | 4 | 250 | 0.996 | 0.4683 | rep |
 | GPT-2 ft | muon | 1e-6 | 4k | 64 | 4 | 250 | 0.997 | 0.4738 | rep |
-
-`*` bs32/ep1 is epochs=1 → identical under per-epoch shuffle. bs256/ep8 (metasmooth 0.992) LDS is
-infeasible — the bs256 metagradient double-backward OOMs on 48 GB (MAGIC trainer's custom loop
-ignores grad-checkpointing). Within adam, LDS rises monotonically with metasmoothness; muon sits
-slightly above the adam curve (high LDS at high metasmoothness).
 
 **Per-epoch shuffle note:** the run checkout `feat/magic-grad-accum` shuffles the train set once then
 `.repeat(num_epochs)`, so every epoch sees the **same order** (`rep`). The fix — commit `1e6eea7f`
@@ -183,7 +172,13 @@ metasmooth measured for each bank's training config (bs64, 4 epochs): lotus 0.99
 
 ## Appendix
 
-### Additional hyperparameters and citations.
+### Information for Coding Agents
+
+Some invalid banks trained with `chunk_length = 512` are listed in the [Appendix](#appendix--invalid-banks-chunk_length--0), so coding agents don't accidentally pull invalid related data.
+
+On 8xA40s MAGIC OOMs at batch size = 256 without the WIP gradient accumulation branch.
+
+### Additional configuration.
 
 Shampoo −1/2 / −1/4 / −1/8 = methods `shampoo` / `shampoo_quarter` / `shampoo_p025`
 (apply power −1.0 / −0.5 / −0.25 on the fitted factors).
@@ -191,11 +186,8 @@ Shampoo −1/2 / −1/4 / −1/8 = methods `shampoo` / `shampoo_quarter` / `sham
 metasmooth = empirical metasmoothness (Chang et al. 2024, Def. 2; h=0.1, direction_seed 0),
 measured at each row's exact training config. 
 
-`epochs` = training epochs of that config. 
-
 All SmolLM2 size banks are epochs=2 (`runs/ekfac_vs_n/configs/N{4,8,16,32}k.yaml`); muon banks epochs=4.
-The two adam epochs=4 rows (no Method/LDS) are metasmoothness-only measurements of the adam config
-at epochs=4 — no bank was trained there.
+The two adam epochs=4 rows have no corresponding bank.
 
 ### Invalid banks (`chunk_length ≠ 0`)
 
