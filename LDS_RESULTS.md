@@ -29,7 +29,7 @@ rows are identical under a per-epoch-shuffle implementation.
 | GPT-2 ft | adam | 0 | 8k | 64 | 2 | 250 | 0.615 | 0.1410 | rep |
 | GPT-2 ft | adam | 0 | 4k | 64 | 2 | 125 | 0.766 | 0.1740 | rep |
 | GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 125 | 0.781 | 0.2097 | rep |
-| GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | _(building)_ | rep* |
+| GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | 0.1781 | rep* |
 | GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3033 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 125 | 0.982 | _(building)_ | rep |
 | GPT-2 ft | adam | 1e-6 | 4k | 64 | 2 | 125 | 0.991 | 0.3173 | rep |
