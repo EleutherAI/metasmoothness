@@ -25,16 +25,18 @@ parameter-update L1, ‖θ_final−θ_init‖₁ / ‖θ_init‖₁ (init = gpt2
 | GPT-2 ft | adam | 0 | 4k | 64 | 2 | 125 | 0.766 | 0.1740 | — | 2.61 | 0.051 | 0.053 | rep |
 | GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 125 | 0.781 | 0.2097 | −0.08 (n=20) | 2.71 | 0.029 | 0.029 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | 0.1781 | 0.099 (n=20) | 3.07 | 0.009 | 0.010 | rep |
-| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3033 | 0.28 (n=20) | 3.02 | 0.008 | 0.009 | rep |
+| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3033 | 0.17 (n=20) | 3.02 | 0.008 | 0.009 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 125 | 0.982 | 0.3369 | 0.43 (n=20) | 2.98 | 0.0074 | 0.009 | rep |
 | GPT-2 ft | adam | 1e-6 | 4k | 64 | 2 | 125 | 0.991 | 0.3173 | — | 3.18 | 0.0016 | 0.002 | rep |
 | GPT-2 ft | muon | 0 | 4k | 64 | 4 | 250 | 0.996 | 0.4683 | — | 3.08 | 0.0057 | 0.006 | rep |
-| GPT-2 ft | muon | 1e-6 | 4k | 64 | 4 | 250 | 0.997 | 0.4738 | — | 3.08 | 0.0057 | 0.006 | rep |
+| GPT-2 ft | muon | 1e-6 | 4k | 64 | 4 | 250 | 0.997 | 0.4738 | 0.76 (n=20) | 3.08 | 0.0057 | 0.006 | rep |
 
 **Per-epoch shuffle note:** the run checkout `feat/magic-grad-accum` shuffles the train set once then
 `.repeat(num_epochs)`, so every epoch sees the **same order** (`rep`). The fix — commit `1e6eea7f`
 "Shuffle each training epoch independently" (#352), on `origin/main` — reshuffles each epoch. Not yet
 rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows are shuffle-agnostic.
+
+**MAGIC trainer-version note:** MAGIC values are sensitive to a `trainer.py` edit made 2026-07-24 — eps1e-8 MAGIC = 0.37 (pre-edit) vs 0.17 (post-edit). Post-edit (current): eps1e-8, bs128, muon. Pre-edit (to be recomputed): eps1e-10 (−0.08), bs32 (0.099).
 
 ### SmolLM2 (`bergson-smollm2-lds-chunks`, `train_{4k,8k,16k,32k}.hf`)
 
