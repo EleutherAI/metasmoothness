@@ -38,37 +38,37 @@ rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows
 
 ### SmolLM2 (`bergson-smollm2-lds-chunks`, `train_{4k,8k,16k,32k}.hf`)
 
-| Optimizer | eps_root | lr | N | epochs | metasmooth | Method | LDS | 95% CI | n | shuffle |
-|-----------|----------|-----|-----|--------|-----------|--------|-----|--------|---|--------|
-| adam | 1e-6 | 8e-4 | 4k | 2 | 0.991 | EK-FAC | 0.3173 | [0.285, 0.348] | 50 | rep |
-| adam | 1e-6 | 8e-4 | 8k | 2 | 0.978 | EK-FAC | 0.3019 | [0.267, 0.338] | 50 | rep |
-| adam | 1e-6 | 8e-4 | 16k | 2 | 0.995 | EK-FAC | 0.3815 | [0.352, 0.412] | 50 | rep |
-| adam | 1e-6 | 8e-4 | 32k | 2 | 0.998 | EK-FAC | 0.3575 | [0.325, 0.394] | 50 | rep |
-| adam | 1e-6 | 8e-4 | 4k | 2 | 0.991 | Shampoo −1/2 | 0.3071 | [0.270, 0.342] | 50 | rep |
-| adam | 1e-6 | 8e-4 | 4k | 2 | 0.991 | Shampoo −1/4 | 0.3264 | [0.294, 0.358] | 50 | rep |
-| adam | 1e-8 | 8e-4 | 4k | 2 | 0.876 | EK-FAC | 0.3033 | [0.274, 0.334] | 50 | rep |
-| adam | 1e-10 | 8e-4 | 4k | 2 | 0.781 | EK-FAC | 0.2097 | [0.182, 0.239] | 50 | rep |
-| adam | 0 | 8e-4 | 4k | 2 | 0.766 | EK-FAC | 0.1740 | [0.140, 0.208] | 50 | rep |
-| adam | 0 | 8e-4 | 8k | 2 | 0.615 | EK-FAC | 0.1410 | [0.113, 0.169] | 50 | rep |
-| adam | 0 | 8e-4 | 16k | 2 | 0.437 | EK-FAC | 0.1097 | [0.084, 0.136] | 50 | rep |
-| adam | 0 | 8e-4 | 4k | 2 | 0.766 | Shampoo −1/2 | 0.2145 | [0.178, 0.249] | 50 | rep |
-| adam | 0 | 8e-4 | 4k | 2 | 0.766 | Shampoo −1/4 | 0.1562 | [0.122, 0.192] | 50 | rep |
-| adam | 0 | 8e-4 | 4k | 2 | 0.766 | Shampoo −1/8 | 0.1111 | [0.076, 0.145] | 50 | rep |
-| muon | 1e-6 | 5e-5 | 4k | 4 | 0.997 | EK-FAC | 0.4738 | [0.432, 0.513] | 50 | rep |
-| muon | 1e-6 | 5e-5 | 4k | 4 | 0.997 | Shampoo −1/2 | 0.5217 | [0.481, 0.561] | 50 | rep |
-| muon | 1e-6 | 5e-5 | 4k | 4 | 0.997 | Shampoo −1/4 | 0.4304 | [0.388, 0.471] | 50 | rep |
-| muon | 1e-6 | 5e-5 | 4k | 4 | 0.997 | Shampoo −1/8 | 0.3026 | [0.260, 0.343] | 50 | rep |
-| muon | 1e-6 | 1e-4 | 4k | 4 | 0.996 | EK-FAC | 0.4514 | [0.416, 0.486] | 50 | rep |
-| muon | 0 | 5e-5 | 4k | 4 | 0.996 | EK-FAC | 0.4683 | [0.427, 0.508] | 50 | rep |
-| muon | 0 | 5e-5 | 4k | 4 | 0.996 | Shampoo −1/2 | 0.5208 | [0.479, 0.561] | 50 | rep |
-| muon | 0 | 5e-5 | 4k | 4 | 0.996 | Shampoo −1/4 | 0.4306 | [0.389, 0.471] | 50 | rep |
-| muon | 0 | 5e-5 | 4k | 4 | 0.996 | Shampoo −1/8 | 0.3010 | [0.260, 0.343] | 50 | rep |
-| muon | 0 | 1e-4 | 4k | 4 | 0.996 | EK-FAC | 0.4544 | [0.419, 0.489] | 50 | rep |
-| muon | 0 | 1e-4 | 4k | 4 | 0.996 | Shampoo −1/2 | 0.5206 | [0.479, 0.560] | 50 | rep |
-| muon | 0 | 1e-4 | 4k | 4 | 0.996 | Shampoo −1/4 | 0.4093 | [0.371, 0.447] | 50 | rep |
-| muon | 0 | 1e-4 | 4k | 4 | 0.996 | Shampoo −1/8 | 0.2682 | [0.229, 0.307] | 50 | rep |
-| adam | 1e-6 | 8e-4 | 4k | 4 | 0.999 | — | — | — | — | rep |
-| adam | 0 | 8e-4 | 4k | 4 | 0.663 | — | — | — | — | rep |
+| Optimizer | eps_root | lr | N | epochs | metasmooth | Method | LDS | 95% CI | n | train loss | ΔL1 | ΔL2 | shuffle |
+|-----------|----------|-----|-----|--------|-----------|--------|-----|--------|---|-----------|------|------|---------|
+| adam | 1e-6 | 8e-4 | 4k | 2 | 0.991 | EK-FAC | 0.3173 | [0.285, 0.348] | 50 | 3.18 | 0.0016 | 0.0021 | rep |
+| adam | 1e-6 | 8e-4 | 8k | 2 | 0.978 | EK-FAC | 0.3019 | [0.267, 0.338] | 50 | — | 0.0024 | 0.0028 | rep |
+| adam | 1e-6 | 8e-4 | 16k | 2 | 0.995 | EK-FAC | 0.3815 | [0.352, 0.412] | 50 | — | 0.0039 | 0.0042 | rep |
+| adam | 1e-6 | 8e-4 | 32k | 2 | 0.998 | EK-FAC | 0.3575 | [0.325, 0.394] | 50 | — | 0.0069 | 0.0072 | rep |
+| adam | 1e-6 | 8e-4 | 4k | 2 | 0.991 | Shampoo −1/2 | 0.3071 | [0.270, 0.342] | 50 | 3.18 | 0.0016 | 0.0021 | rep |
+| adam | 1e-6 | 8e-4 | 4k | 2 | 0.991 | Shampoo −1/4 | 0.3264 | [0.294, 0.358] | 50 | 3.18 | 0.0016 | 0.0021 | rep |
+| adam | 1e-8 | 8e-4 | 4k | 2 | 0.876 | EK-FAC | 0.3033 | [0.274, 0.334] | 50 | 3.02 | 0.0079 | 0.0091 | rep |
+| adam | 1e-10 | 8e-4 | 4k | 2 | 0.781 | EK-FAC | 0.2097 | [0.182, 0.239] | 50 | 2.71 | 0.0293 | 0.0295 | rep |
+| adam | 0 | 8e-4 | 4k | 2 | 0.766 | EK-FAC | 0.1740 | [0.140, 0.208] | 50 | 2.61 | 0.0509 | 0.0528 | rep |
+| adam | 0 | 8e-4 | 8k | 2 | 0.615 | EK-FAC | 0.1410 | [0.113, 0.169] | 50 | 2.61 | 0.0646 | 0.0668 | rep |
+| adam | 0 | 8e-4 | 16k | 2 | 0.437 | EK-FAC | 0.1097 | [0.084, 0.136] | 50 | 2.65 | 0.0855 | 0.0872 | rep |
+| adam | 0 | 8e-4 | 4k | 2 | 0.766 | Shampoo −1/2 | 0.2145 | [0.178, 0.249] | 50 | 2.61 | 0.0509 | 0.0528 | rep |
+| adam | 0 | 8e-4 | 4k | 2 | 0.766 | Shampoo −1/4 | 0.1562 | [0.122, 0.192] | 50 | 2.61 | 0.0509 | 0.0528 | rep |
+| adam | 0 | 8e-4 | 4k | 2 | 0.766 | Shampoo −1/8 | 0.1111 | [0.076, 0.145] | 50 | 2.61 | 0.0509 | 0.0528 | rep |
+| muon | 1e-6 | 5e-5 | 4k | 4 | 0.997 | EK-FAC | 0.4738 | [0.432, 0.513] | 50 | 3.08 | 0.0057 | 0.0061 | rep |
+| muon | 1e-6 | 5e-5 | 4k | 4 | 0.997 | Shampoo −1/2 | 0.5217 | [0.481, 0.561] | 50 | 3.08 | 0.0057 | 0.0061 | rep |
+| muon | 1e-6 | 5e-5 | 4k | 4 | 0.997 | Shampoo −1/4 | 0.4304 | [0.388, 0.471] | 50 | 3.08 | 0.0057 | 0.0061 | rep |
+| muon | 1e-6 | 5e-5 | 4k | 4 | 0.997 | Shampoo −1/8 | 0.3026 | [0.260, 0.343] | 50 | 3.08 | 0.0057 | 0.0061 | rep |
+| muon | 1e-6 | 1e-4 | 4k | 4 | 0.996 | EK-FAC | 0.4514 | [0.416, 0.486] | 50 | — | 0.0110 | 0.0118 | rep |
+| muon | 0 | 5e-5 | 4k | 4 | 0.996 | EK-FAC | 0.4683 | [0.427, 0.508] | 50 | 3.08 | 0.0057 | 0.0061 | rep |
+| muon | 0 | 5e-5 | 4k | 4 | 0.996 | Shampoo −1/2 | 0.5208 | [0.479, 0.561] | 50 | 3.08 | 0.0057 | 0.0061 | rep |
+| muon | 0 | 5e-5 | 4k | 4 | 0.996 | Shampoo −1/4 | 0.4306 | [0.389, 0.471] | 50 | 3.08 | 0.0057 | 0.0061 | rep |
+| muon | 0 | 5e-5 | 4k | 4 | 0.996 | Shampoo −1/8 | 0.3010 | [0.260, 0.343] | 50 | 3.08 | 0.0057 | 0.0061 | rep |
+| muon | 0 | 1e-4 | 4k | 4 | 0.996 | EK-FAC | 0.4544 | [0.419, 0.489] | 50 | — | 0.0110 | 0.0118 | rep |
+| muon | 0 | 1e-4 | 4k | 4 | 0.996 | Shampoo −1/2 | 0.5206 | [0.479, 0.560] | 50 | — | 0.0110 | 0.0118 | rep |
+| muon | 0 | 1e-4 | 4k | 4 | 0.996 | Shampoo −1/4 | 0.4093 | [0.371, 0.447] | 50 | — | 0.0110 | 0.0118 | rep |
+| muon | 0 | 1e-4 | 4k | 4 | 0.996 | Shampoo −1/8 | 0.2682 | [0.229, 0.307] | 50 | — | 0.0110 | 0.0118 | rep |
+| adam | 1e-6 | 8e-4 | 4k | 4 | 0.999 | — | — | — | — | 3.18 | 0.0016 | 0.0021 | rep |
+| adam | 0 | 8e-4 | 4k | 4 | 0.663 | — | — | — | — | 2.61 | 0.0509 | 0.0528 | rep |
 
 - adam eps1e-6 4k EK-FAC row is the original run (0.3173); re-score with the `1ba43f92` scoring code = 0.3156. muon eps1e-6 5e-5 EK-FAC 0.4738 = will's reported 0.474.
 - muon eps_root acts on Muon's AdamW-fallback parameters (embeddings / lm_head / 1D params); the 2D weights use Newton-Schulz, which eps_root does not touch. So muon EK-FAC is nearly flat across eps_root (5e-5: 0.474 @1e-6 vs 0.468 @0; 1e-4: 0.451 @1e-6 vs 0.454 @0), unlike adam (0.317 @1e-6 → 0.174 @0).
@@ -78,26 +78,26 @@ rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows
 
 Sweep between the eps1e-6 (ms 0.991) and eps0 (ms 0.766) endpoints. Single direction_seed, h=0.1 (noisy).
 
-| eps_root | metasmooth | EK-FAC LDS |
-|----------|-----------|-----------|
-| 1e-6 | 0.991 | 0.3173 |
-| 1e-7 | 0.978 | — |
-| 1e-8 | 0.876 | 0.3033 [0.274, 0.334] |
-| 1e-9 | 0.907 | — |
-| 1e-10 | 0.781 | 0.2097 [0.182, 0.239] |
-| 0 | 0.766 | 0.1740 |
+| eps_root | metasmooth | EK-FAC LDS | train loss | ΔL1 | ΔL2 |
+|----------|-----------|-----------|-----------|------|------|
+| 1e-6 | 0.991 | 0.3173 | 3.18 | 0.0016 | 0.0021 |
+| 1e-7 | 0.978 | — | — | — | — |
+| 1e-8 | 0.876 | 0.3033 [0.274, 0.334] | 3.02 | 0.0079 | 0.0091 |
+| 1e-9 | 0.907 | — | — | — | — |
+| 1e-10 | 0.781 | 0.2097 [0.182, 0.239] | 2.71 | 0.0293 | 0.0295 |
+| 0 | 0.766 | 0.1740 | 2.61 | 0.0509 | 0.0528 |
 
 #### adam metasmoothness vs training steps (N-sweep, epochs=2, lr 8e-4, bs64)
 
 Measured at eps_root=0 (un-saturated); eps_root=1e-6 shown for contrast (pinned near the 1.0
 ceiling, hides the trend). Steps = N·epochs/bs.
 
-| N | steps | metasmooth (eps0) | EK-FAC LDS (eps0) | metasmooth (eps1e-6) |
-|-----|-------|-------------------|-------------------|----------------------|
-| 4k | 125 | 0.766 | 0.174 | 0.991 |
-| 8k | 250 | 0.615 | 0.141 | 0.978 |
-| 16k | 500 | 0.437 | 0.110 | 0.995 |
-| 32k | 1000 | — | — | 0.998 |
+| N | steps | metasmooth (eps0) | EK-FAC LDS (eps0) | ΔL1 (eps0) | ΔL2 (eps0) | metasmooth (eps1e-6) |
+|-----|-------|-------------------|-------------------|------------|------------|----------------------|
+| 4k | 125 | 0.766 | 0.174 | 0.0509 | 0.0528 | 0.991 |
+| 8k | 250 | 0.615 | 0.141 | 0.0646 | 0.0668 | 0.978 |
+| 16k | 500 | 0.437 | 0.110 | 0.0855 | 0.0872 | 0.995 |
+| 32k | 1000 | — | — | — | — | 0.998 |
 
 At eps0, LDS falls monotonically with steps, tracking metasmoothness (both ~halve 4k→16k).
 
@@ -117,12 +117,12 @@ consistent with the steps table). Weight decay: no effect over 0–0.3. Output l
 
 **Batch size deconfounded — metasmoothness at FIXED steps=125** (eps1e-8, 4k, epochs = bs/32):
 
-| batch size | epochs | steps | metasmooth |
-|------------|--------|-------|------------|
-| 32 | 1 | 125 | 0.837 |
-| 64 | 2 | 125 | 0.876 |
-| 128 | 4 | 125 | 0.982 |
-| 256 | 8 | 125 | 0.992 |
+| batch size | epochs | steps | metasmooth | EK-FAC LDS | ΔL1 | ΔL2 |
+|------------|--------|-------|------------|-----------|------|------|
+| 32 | 1 | 125 | 0.837 | 0.1781 | 0.0087 | 0.0100 |
+| 64 | 2 | 125 | 0.876 | 0.3033 | 0.0079 | 0.0091 |
+| 128 | 4 | 125 | 0.982 | 0.3369 | 0.0074 | 0.0087 |
+| 256 | 8 | 125 | 0.992 | — | — | — |
 
 Batch size raises metasmoothness even at fixed step count (0.837→0.992) — a genuine effect, not just
 a step-count proxy. (LDS at bs256/ep8 pending — bank build OOMs at bs256, retrying w/ grad checkpointing.)
@@ -133,9 +133,9 @@ Re-initialized OLMo2 (124M; hidden 768, 12 layers) trained **from scratch** (not
 pre-training proxy that motivated this investigation. muon, 6 epochs, bs128, lr 9e-3, eps_root 1e-6,
 betas 0.95/0.975, wd 0.1, 50 subsets.
 
-| N | steps | metasmooth | Method | LDS | 95% CI | n | shuffle |
-|-----|-------|-----------|--------|-----|--------|---|--------|
-| 16k | 750 | 0.010 | EK-FAC | 0.0175 | [−0.036, 0.071] | 50 | rep |
+| N | steps | metasmooth | Method | LDS | 95% CI | n | train loss | ΔL1 | ΔL2 | shuffle |
+|-----|-------|-----------|--------|-----|--------|---|-----------|------|------|--------|
+| 16k | 750 | 0.010 | EK-FAC | 0.0175 | [−0.036, 0.071] | 50 | 2.92 | 4.56 | 4.10 | rep |
 
 Both metasmoothness (0.010) and LDS (0.018) ≈ 0 — the extreme low-metasmoothness endpoint of the
 grid, consistent with the mechanism. (N32k paused at 4/50 subsets.)
@@ -146,23 +146,23 @@ Two banks, both adamw, 4 epochs, betas 0.95/0.975.
 
 metasmooth measured for each bank's training config (bs64, 4 epochs): lotus 0.998, epsroot0 0.609.
 
-| Bank | eps_root | metasmooth | Method | Variant | LDS | n | Run dir | shuffle |
-|------|----------|-----------|--------|---------|-----|---|---------|--------|
-| lotus | 1e-6 | 0.998 | MAGIC | full q01–50 | 0.9681 | 50 | `runs/lotus_final_q01_50` | rep |
-| lotus | 1e-6 | 0.998 | MAGIC | bwd eval | 0.9688 | 50 | `runs/lotus_bwd_eval` | rep |
-| lotus | 1e-6 | 0.998 | SOURCE | damp0 | 0.3902 | 50 | `runs/lotus_source_q50_damp0_validate` | rep |
-| lotus | 1e-6 | 0.998 | SOURCE | adam | 0.2068 | 50 | `runs/lotus_source_adam_q50_validate` | rep |
-| lotus | 1e-6 | 0.998 | SOURCE | default | −0.3871 | 50 | `runs/lotus_source_q50_validate` | rep |
-| lotus | 1e-6 | 0.998 | EK-FAC | docspace | 0.2588 | 50 | `runs/lotus_ekfac50q_docspace_vs_lotus_bank` | rep |
-| lotus | 1e-6 | 0.998 | EK-FAC | allium-0 | 0.0543 | 50 | `runs/lotus_scores_ekfac50q_allium-0_validate` | rep |
-| lotus | 1e-6 | 0.998 | Trackstar | docs p32 noopt | 0.2002 | 50 | `runs/gpt2_lotus_trackstar50q_docs_p32_noopt_vs_lotus_bank` | rep |
-| lotus | 1e-6 | 0.998 | Trackstar | docs | 0.1838 | 50 | `runs/gpt2_lotus_trackstar50q_docs_vs_lotus_bank` | rep |
-| lotus | 1e-6 | 0.998 | Trackstar | default | 0.1767 | 50 | `runs/lotus_trackstar_q50_validate` | rep |
-| epsroot0 | 0 | 0.609 | SOURCE | source2 | 0.1531 | 50 | `runs/epsroot0_source2_q50_validate` | rep |
-| epsroot0 | 0 | 0.609 | SOURCE | source2 adam hybrid | 0.1446 | 50 | `runs/epsroot0_source2_adam_hybrid_validate` | rep |
-| epsroot0 | 0 | 0.609 | SOURCE | source2 adam | 0.0811 | 50 | `runs/epsroot0_source2_adam_q50_validate` | rep |
-| epsroot0 | 0 | 0.609 | EK-FAC | allium-0 | −0.0109 | 50 | `runs/epsroot0_scores_ekfac50q_allium-0_validate` | rep |
-| epsroot0 | 0 | 0.609 | MAGIC | spotcheck | NaN | 1 | `runs/epsroot0_bank` | rep |
+| Bank | eps_root | metasmooth | Method | Variant | LDS | n | ΔL1 | ΔL2 | Run dir | shuffle |
+|------|----------|-----------|--------|---------|-----|---|------|------|---------|--------|
+| lotus | 1e-6 | 0.998 | MAGIC | full q01–50 | 0.9681 | 50 | 0.0033 | 0.0040 | `runs/lotus_final_q01_50` | rep |
+| lotus | 1e-6 | 0.998 | MAGIC | bwd eval | 0.9688 | 50 | 0.0033 | 0.0040 | `runs/lotus_bwd_eval` | rep |
+| lotus | 1e-6 | 0.998 | SOURCE | damp0 | 0.3902 | 50 | 0.0033 | 0.0040 | `runs/lotus_source_q50_damp0_validate` | rep |
+| lotus | 1e-6 | 0.998 | SOURCE | adam | 0.2068 | 50 | 0.0033 | 0.0040 | `runs/lotus_source_adam_q50_validate` | rep |
+| lotus | 1e-6 | 0.998 | SOURCE | default | −0.3871 | 50 | 0.0033 | 0.0040 | `runs/lotus_source_q50_validate` | rep |
+| lotus | 1e-6 | 0.998 | EK-FAC | docspace | 0.2588 | 50 | 0.0033 | 0.0040 | `runs/lotus_ekfac50q_docspace_vs_lotus_bank` | rep |
+| lotus | 1e-6 | 0.998 | EK-FAC | allium-0 | 0.0543 | 50 | 0.0033 | 0.0040 | `runs/lotus_scores_ekfac50q_allium-0_validate` | rep |
+| lotus | 1e-6 | 0.998 | Trackstar | docs p32 noopt | 0.2002 | 50 | 0.0033 | 0.0040 | `runs/gpt2_lotus_trackstar50q_docs_p32_noopt_vs_lotus_bank` | rep |
+| lotus | 1e-6 | 0.998 | Trackstar | docs | 0.1838 | 50 | 0.0033 | 0.0040 | `runs/gpt2_lotus_trackstar50q_docs_vs_lotus_bank` | rep |
+| lotus | 1e-6 | 0.998 | Trackstar | default | 0.1767 | 50 | 0.0033 | 0.0040 | `runs/lotus_trackstar_q50_validate` | rep |
+| epsroot0 | 0 | 0.609 | SOURCE | source2 | 0.1531 | 50 | 0.0834 | 0.0848 | `runs/epsroot0_source2_q50_validate` | rep |
+| epsroot0 | 0 | 0.609 | SOURCE | source2 adam hybrid | 0.1446 | 50 | 0.0834 | 0.0848 | `runs/epsroot0_source2_adam_hybrid_validate` | rep |
+| epsroot0 | 0 | 0.609 | SOURCE | source2 adam | 0.0811 | 50 | 0.0834 | 0.0848 | `runs/epsroot0_source2_adam_q50_validate` | rep |
+| epsroot0 | 0 | 0.609 | EK-FAC | allium-0 | −0.0109 | 50 | 0.0834 | 0.0848 | `runs/epsroot0_scores_ekfac50q_allium-0_validate` | rep |
+| epsroot0 | 0 | 0.609 | MAGIC | spotcheck | NaN | 1 | 0.0834 | 0.0848 | `runs/epsroot0_bank` | rep |
 
 - Excluded (n=1 spotchecks): lotus MAGIC `lotus_mq_eval` 0.9893, `lotus_q01_spotcheck` 0.9818, `lotus` 0.9177, `lotus_mq_eval_prefix_backup` 0.9665; and `lotus_interim_q01_08` (n=8, 0.9675).
 - The `gpt2_epsroot0_trackstar50q*` runs are excluded: their config has `retrained_dir=runs/lotus`, so they score epsroot0 gradients against the lotus bank.
