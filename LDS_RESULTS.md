@@ -131,6 +131,19 @@ consistent with the steps table). Weight decay: no effect over 0–0.3. Output l
 Batch size raises metasmoothness even at fixed step count (0.837→0.992) — a genuine effect, not just
 a step-count proxy. (LDS at bs256/ep8 pending — bank build OOMs at bs256, retrying w/ grad checkpointing.)
 
+#### Non-eps ms-knobs — LDS + update magnitude (eps1e-8, 4k, steps=125, dropout 0.1)
+
+Built banks for the fixed-steps ms-knobs to test the confounder analysis: does a knob vary metasmoothness *without* changing update magnitude (ΔL2)?
+
+| knob | metasmooth | EK-FAC LDS | ΔL1 | ΔL2 |
+|------|-----------|-----------|------|------|
+| output scale 1.0 (ref) | 0.876 | 0.303 | 0.008 | 0.009 |
+| output scale 0.5 | 0.840 | 0.220 | 0.013 | 0.016 |
+| output scale 0.25 | 0.609 | 0.169 | 0.016 | 0.019 |
+| gradient clip 1.0 | _(pending)_ | 0.307 | 0.006 | 0.007 |
+
+Output-scale lowers metasmoothness and EK-FAC LDS but **raises** ΔL2 (0.009→0.019) — so it is NOT a clean isolate-metasmoothness knob (update magnitude moves too, opposite direction to the eps_root case). Gradient clipping (max_grad_norm 1.0) barely changes EK-FAC LDS (0.307 vs 0.303) and slightly lowers ΔL2.
+
 ### OLMo2 from-scratch (`olmo2_reinit` 124M, SmolLM2 corpus)
 
 Re-initialized OLMo2 (124M; hidden 768, 12 layers) trained **from scratch** (not fine-tuned) — the
