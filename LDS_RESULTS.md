@@ -23,8 +23,8 @@ parameter-update L1, ‖θ_final−θ_init‖₁ / ‖θ_init‖₁ (init = gpt2
 | GPT-2 ft | adam | 0 | 16k | 64 | 2 | 500 | 0.437 | 0.1097 | — | 2.65 | 0.086 | 0.087 | 0.1 | rep |
 | GPT-2 ft | adam | 0 | 8k | 64 | 2 | 250 | 0.615 | 0.1410 | — | 2.61 | 0.065 | 0.067 | 0.1 | rep |
 | GPT-2 ft | adam | 0 | 4k | 64 | 2 | 125 | 0.766 | 0.1740 | — | 2.61 | 0.051 | 0.053 | 0.1 | rep |
-| GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 125 | 0.781 | 0.2097 | −0.08 (n=20) | 2.71 | 0.029 | 0.029 | 0.1 | rep |
-| GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | 0.1781 | 0.099 (n=20) | 3.07 | 0.009 | 0.010 | 0.1 | rep |
+| GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 125 | 0.781 | 0.2097 | −0.02 (n=20) | 2.71 | 0.029 | 0.029 | 0.1 | rep |
+| GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | 0.1781 | 0.05 (n=20) | 3.07 | 0.009 | 0.010 | 0.1 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3033 | 0.17 (n=20) | 3.02 | 0.008 | 0.009 | 0.1 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3203 | 0.18 (n=20) | — | 0.008 | 0.009 | 0.0 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 125 | 0.982 | 0.3369 | 0.43 (n=20) | 2.98 | 0.0074 | 0.009 | 0.1 | rep |
@@ -37,7 +37,7 @@ parameter-update L1, ‖θ_final−θ_init‖₁ / ‖θ_init‖₁ (init = gpt2
 "Shuffle each training epoch independently" (#352), on `origin/main` — reshuffles each epoch. Not yet
 rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows are shuffle-agnostic.
 
-**MAGIC code-version note:** MAGIC values depend on the metagradient code, which changed via a rebase on 2026-07-24 ~08:00 that landed `c0f11ba8 "Fix metagrad replay correctness under CUDA dropout and DDP"` (+ grad_accum). eps1e-8 MAGIC = 0.37 on the pre-fix code (07-23) vs 0.17 on the fixed code (07-24). On the FIXED code: eps1e-8 (0.17), bs128 (0.43), muon (0.76). Pre-fix, being recomputed on the fixed code: eps1e-10 (−0.08), bs32 (0.099).
+**MAGIC code-version note:** MAGIC values depend on the metagradient code, which changed via a rebase on 2026-07-24 ~08:00 that landed `c0f11ba8 "Fix metagrad replay correctness under CUDA dropout and DDP"` (+ grad_accum). eps1e-8 MAGIC = 0.37 on the pre-fix code (07-23) vs 0.17 on the fixed code (07-24). **All MAGIC values in the grid are now on the FIXED code:** eps1e-8 (0.17), eps1e-8 dropout0 (0.18), bs128 (0.43), muon (0.76), and — recomputed on the fixed code (were −0.08 / 0.099 pre-fix) — eps1e-10 (−0.02 [−0.065, 0.023], n=20) and bs32 (0.05 [−0.054, 0.145], n=20). eps1e-10 and bs32 sit at ≈0 with CIs spanning zero.
 
 **Dropout:** all GPT-2 runs use dropout **0.1** (gpt2 default; `model_kwargs` empty); OLMo2 from-scratch uses **0.0** (`attention_dropout: 0.0`). Dropout is why the metagrad replay needed the fix (RNG-mask reproduction). Disable via `model_kwargs="resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0"`. **Dropout is neutral on every axis** for eps1e-8 4k bs64 (the two adjacent rows above): metasmoothness 0.876→0.8758, ΔL2 0.009→0.0091, EK-FAC 0.3033→0.3203, MAGIC 0.17→0.1822 (all within bootstrap CI). So dropout on/off does not move metasmoothness or LDS.
 
