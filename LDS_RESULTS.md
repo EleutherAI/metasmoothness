@@ -26,6 +26,7 @@ parameter-update L1, ‖θ_final−θ_init‖₁ / ‖θ_init‖₁ (init = gpt2
 | GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 125 | 0.781 | 0.2097 | −0.08 (n=20) | 2.71 | 0.029 | 0.029 | 0.1 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | 0.1781 | 0.099 (n=20) | 3.07 | 0.009 | 0.010 | 0.1 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3033 | 0.17 (n=20) | 3.02 | 0.008 | 0.009 | 0.1 | rep |
+| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3203 | 0.18 (n=20) | — | 0.008 | 0.009 | 0.0 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 125 | 0.982 | 0.3369 | 0.43 (n=20) | 2.98 | 0.0074 | 0.009 | 0.1 | rep |
 | GPT-2 ft | adam | 1e-6 | 4k | 64 | 2 | 125 | 0.991 | 0.3173 | — | 3.18 | 0.0016 | 0.002 | 0.1 | rep |
 | GPT-2 ft | muon | 0 | 4k | 64 | 4 | 250 | 0.996 | 0.4683 | — | 3.08 | 0.0057 | 0.006 | 0.1 | rep |
@@ -38,7 +39,7 @@ rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows
 
 **MAGIC code-version note:** MAGIC values depend on the metagradient code, which changed via a rebase on 2026-07-24 ~08:00 that landed `c0f11ba8 "Fix metagrad replay correctness under CUDA dropout and DDP"` (+ grad_accum). eps1e-8 MAGIC = 0.37 on the pre-fix code (07-23) vs 0.17 on the fixed code (07-24). On the FIXED code: eps1e-8 (0.17), bs128 (0.43), muon (0.76). Pre-fix, being recomputed on the fixed code: eps1e-10 (−0.08), bs32 (0.099).
 
-**Dropout:** all GPT-2 runs use dropout **0.1** (gpt2 default; `model_kwargs` empty); OLMo2 from-scratch uses **0.0** (`attention_dropout: 0.0`). Dropout is why the metagrad replay needed the fix (RNG-mask reproduction). Disable via `model_kwargs="resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0"`. With/without-dropout MAGIC comparison is pending (dropout=0 banks not yet built).
+**Dropout:** all GPT-2 runs use dropout **0.1** (gpt2 default; `model_kwargs` empty); OLMo2 from-scratch uses **0.0** (`attention_dropout: 0.0`). Dropout is why the metagrad replay needed the fix (RNG-mask reproduction). Disable via `model_kwargs="resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0"`. **Dropout is neutral on every axis** for eps1e-8 4k bs64 (the two adjacent rows above): metasmoothness 0.876→0.8758, ΔL2 0.009→0.0091, EK-FAC 0.3033→0.3203, MAGIC 0.17→0.1822 (all within bootstrap CI). So dropout on/off does not move metasmoothness or LDS.
 
 ### SmolLM2 (`bergson-smollm2-lds-chunks`, `train_{4k,8k,16k,32k}.hf`)
 
