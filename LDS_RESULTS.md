@@ -36,7 +36,7 @@ parameter-update L1, ‖θ_final−θ_init‖₁ / ‖θ_init‖₁ (init = gpt2
 "Shuffle each training epoch independently" (#352), on `origin/main` — reshuffles each epoch. Not yet
 rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows are shuffle-agnostic.
 
-**MAGIC reproducibility note:** MAGIC LDS has large run-to-run variance (NOT a trainer/config difference — verified identical cfg + query). The same eps1e-8 config/queries gave 0.37 and 0.17 on two runs; per-query score vectors are ~uncorrelated (pearson −0.10 to +0.90, magnitudes 3–10× apart). Cause: each query retrains the base at nproc=8 with non-deterministic NCCL all-reduce (seed is set but `use_deterministic_algorithms` is not) and the `create_graph` double-backward is ill-conditioned at small eps_root, amplifying it. So MAGIC values are single noisy draws — treat with caution; averaging over seeds (or enabling determinism) is needed for stable numbers.
+**MAGIC code-version note:** MAGIC values depend on the metagradient code, which changed via a rebase on 2026-07-24 ~08:00 that landed `c0f11ba8 "Fix metagrad replay correctness under CUDA dropout and DDP"` (+ grad_accum). eps1e-8 MAGIC = 0.37 on the pre-fix code (07-23) vs 0.17 on the fixed code (07-24). On the FIXED code: eps1e-8 (0.17), bs128 (0.43), muon (0.76). Pre-fix, being recomputed on the fixed code: eps1e-10 (−0.08), bs32 (0.099).
 
 ### SmolLM2 (`bergson-smollm2-lds-chunks`, `train_{4k,8k,16k,32k}.hf`)
 
