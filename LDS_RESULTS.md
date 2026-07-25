@@ -36,7 +36,7 @@ parameter-update L1, ‖θ_final−θ_init‖₁ / ‖θ_init‖₁ (init = gpt2
 "Shuffle each training epoch independently" (#352), on `origin/main` — reshuffles each epoch. Not yet
 rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows are shuffle-agnostic.
 
-**MAGIC trainer-version note:** MAGIC values are sensitive to a `trainer.py` edit made 2026-07-24 — eps1e-8 MAGIC = 0.37 (pre-edit) vs 0.17 (post-edit). Post-edit (current): eps1e-8, bs128, muon. Pre-edit (to be recomputed): eps1e-10 (−0.08), bs32 (0.099).
+**MAGIC reproducibility note:** MAGIC LDS has large run-to-run variance (NOT a trainer/config difference — verified identical cfg + query). The same eps1e-8 config/queries gave 0.37 and 0.17 on two runs; per-query score vectors are ~uncorrelated (pearson −0.10 to +0.90, magnitudes 3–10× apart). Cause: each query retrains the base at nproc=8 with non-deterministic NCCL all-reduce (seed is set but `use_deterministic_algorithms` is not) and the `create_graph` double-backward is ill-conditioned at small eps_root, amplifying it. So MAGIC values are single noisy draws — treat with caution; averaging over seeds (or enabling determinism) is needed for stable numbers.
 
 ### SmolLM2 (`bergson-smollm2-lds-chunks`, `train_{4k,8k,16k,32k}.hf`)
 
