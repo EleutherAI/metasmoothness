@@ -130,7 +130,12 @@ consistent with the steps table). Weight decay: no effect over 0–0.3. Output l
 | 256 | 8 | 125 | 0.992 | — | — | — |
 
 Batch size raises metasmoothness even at fixed step count (0.837→0.992) — a genuine effect, not just
-a step-count proxy. (LDS at bs256/ep8 pending — bank build OOMs at bs256, retrying w/ grad checkpointing.)
+a step-count proxy. (LDS at bs256/ep8 is **infeasible on the current code**: the leave-k-out bank build
+OOMs on the 47.5 GiB A40s — the fp32 LM-head logits for 256×512 tokens alone are ~26 GB, and grad
+checkpointing doesn't touch that. Effective-batch-256 needs micro-batching via `grad_accum_steps`, which
+is not a field on the current `Magic`/trainer (it lives only on the unmerged `feat/magic-grad-accum`
+branch). Switching to it would change the metagradient code and break MAGIC-value comparability across
+the grid, so bs256 LDS is left out. The bs32→128 rows already establish the fixed-steps trend.)
 
 #### Non-eps ms-knobs — LDS + update magnitude (eps1e-8, 4k, steps=125, dropout 0.1)
 
