@@ -141,9 +141,9 @@ Built banks for the fixed-steps ms-knobs to test the confounder analysis: does a
 | output scale 1.0 (ref) | 0.876 | 0.303 | 0.008 | 0.009 |
 | output scale 0.5 | 0.840 | 0.220 | 0.013 | 0.016 |
 | output scale 0.25 | 0.609 | 0.169 | 0.016 | 0.019 |
-| gradient clip 1.0 | _(pending)_ | 0.307 | 0.006 | 0.007 |
+| gradient clip 1.0 | 0.876 | 0.307 | 0.006 | 0.007 |
 
-Output-scale lowers metasmoothness and EK-FAC LDS but **raises** ΔL2 (0.009→0.019) — so it is NOT a clean isolate-metasmoothness knob (update magnitude moves too, opposite direction to the eps_root case). Gradient clipping (max_grad_norm 1.0) barely changes EK-FAC LDS (0.307 vs 0.303) and slightly lowers ΔL2.
+Output-scale lowers metasmoothness and EK-FAC LDS but **raises** ΔL2 (0.009→0.019) — so it is NOT a clean isolate-metasmoothness knob (update magnitude moves too, opposite direction to the eps_root case). Gradient clipping (max_grad_norm 1.0) is effectively a **no-op** at these settings: metasmoothness is unchanged (0.876, identical to ref) and EK-FAC LDS barely moves (0.307 vs 0.303) — grad norms rarely exceed 1.0, so clipping almost never fires.
 
 ### OLMo2 from-scratch (`olmo2_reinit` 124M, SmolLM2 corpus)
 
