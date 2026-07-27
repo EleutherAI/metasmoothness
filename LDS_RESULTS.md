@@ -2,7 +2,7 @@
 
 We use GPT-2 for most experiments. We use Olmo-2 for pre-training experiments because it has a modern architecture similar to the GPT-Nano speedrun competition winner that lets us achieve reasonable pre-training losses quickly. We also use it to test QK-norm, an architectural feature it implements that's rumored to improve metasmoothness.
 
-## Evaluation
+## LDS Evaluation
 
 We produce leave-k-out banks containing re-trained models over 100 subsets @1% held out (50 for Muon SmolLM2 banks). We compute CIs with a 10k-resample bootstrap.
 
@@ -18,7 +18,7 @@ below. `shuffle` = data-order-per-epoch implementation (see note): **rep** = shu
 parameter-update L1, ‖θ_final−θ_init‖₁ / ‖θ_init‖₁ (init = gpt2, or the OLMo2 reinit for scratch).
 
 | model | opt | eps_root | N | bs | epochs | steps | empirical metasmooth | EK-FAC LDS | MAGIC LDS | train loss | ΔL1 | ΔL2 | dropout | shuffle |
-|-------|-----|----------|-----|-----|--------|-------|-----------|-----------|-----------|-----------|------|------|---------|
+|-------|-----|----------|-----|-----|--------|-------|-----------|-----------|-----------|-----------|------|------|---------|---------|
 | OLMo2 scratch | muon | 1e-6 | 16k | 128 | 6 | 750 | 0.010 | 0.0175 | — | 2.92 | 4.56 | 4.10 | 0.0 | rep |
 | GPT-2 ft | adam | 0 | 16k | 64 | 2 | 500 | 0.437 | 0.1097 | — | 2.65 | 0.086 | 0.087 | 0.1 | rep |
 | GPT-2 ft | adam | 0 | 8k | 64 | 2 | 250 | 0.615 | 0.1410 | — | 2.61 | 0.065 | 0.067 | 0.1 | rep |
@@ -43,8 +43,8 @@ rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows
 
 ### SmolLM2 (`bergson-smollm2-lds-chunks`, `train_{4k,8k,16k,32k}.hf`)
 
-| Optimizer | eps_root | lr | N | epochs | metasmooth | Method | LDS | 95% CI | n | train loss | ΔL1 | ΔL2 | shuffle |
-|-----------|----------|-----|-----|--------|-----------|--------|-----|--------|---|-----------|------|------|---------|
+| Optimizer | eps_root | lr | N | epochs | metasmooth | Method | LDS | 95% CI | n | train loss | ΔL1 | ΔL2 | dropout | shuffle |
+|-----------|----------|-----|-----|--------|-----------|--------|-----|--------|---|-----------|------|------|---------|---------|
 | adam | 1e-6 | 8e-4 | 4k | 2 | 0.991 | EK-FAC | 0.3173 | [0.285, 0.348] | 50 | 3.18 | 0.0016 | 0.0021 | 0.1 | rep |
 | adam | 1e-6 | 8e-4 | 8k | 2 | 0.978 | EK-FAC | 0.3019 | [0.267, 0.338] | 50 | 3.18 | 0.0024 | 0.0028 | 0.1 | rep |
 | adam | 1e-6 | 8e-4 | 16k | 2 | 0.995 | EK-FAC | 0.3815 | [0.352, 0.412] | 50 | 3.17 | 0.0039 | 0.0042 | 0.1 | rep |
@@ -156,8 +156,8 @@ Re-initialized OLMo2 (124M; hidden 768, 12 layers) trained **from scratch** (not
 pre-training proxy that motivated this investigation. muon, 6 epochs, bs128, lr 9e-3, eps_root 1e-6,
 betas 0.95/0.975, wd 0.1, 50 subsets.
 
-| N | steps | metasmooth | Method | LDS | 95% CI | n | train loss | ΔL1 | ΔL2 | shuffle |
-|-----|-------|-----------|--------|-----|--------|---|-----------|------|------|--------|
+| N | steps | metasmooth | Method | LDS | 95% CI | n | train loss | ΔL1 | ΔL2 | dropout | shuffle |
+|-----|-------|-----------|--------|-----|--------|---|-----------|------|------|---------|--------|
 | 16k | 750 | 0.010 | EK-FAC | 0.0175 | [−0.036, 0.071] | 50 | 2.92 | 4.56 | 4.10 | 0.1 | rep |
 
 Both metasmoothness (0.010) and LDS (0.018) ≈ 0 — the extreme low-metasmoothness endpoint of the
@@ -169,8 +169,8 @@ Two banks, both adamw, 4 epochs, betas 0.95/0.975.
 
 metasmooth measured for each bank's training config (bs64, 4 epochs): lotus 0.998, epsroot0 0.609.
 
-| Bank | eps_root | metasmooth | Method | Variant | LDS | n | ΔL1 | ΔL2 | Run dir | shuffle |
-|------|----------|-----------|--------|---------|-----|---|------|------|---------|--------|
+| Bank | eps_root | metasmooth | Method | Variant | LDS | n | ΔL1 | ΔL2 | Run dir | dropout | shuffle |
+|------|----------|-----------|--------|---------|-----|---|------|------|---------|---------|--------|
 | lotus | 1e-6 | 0.998 | MAGIC | full q01–50 | 0.9681 | 50 | 0.0033 | 0.0040 | `runs/lotus_final_q01_50` | 0.1 | rep |
 | lotus | 1e-6 | 0.998 | MAGIC | bwd eval | 0.9688 | 50 | 0.0033 | 0.0040 | `runs/lotus_bwd_eval` | 0.1 | rep |
 | lotus | 1e-6 | 0.998 | SOURCE | damp0 | 0.3902 | 50 | 0.0033 | 0.0040 | `runs/lotus_source_q50_damp0_validate` | 0.1 | rep |
