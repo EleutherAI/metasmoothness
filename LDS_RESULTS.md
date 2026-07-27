@@ -27,6 +27,7 @@ parameter-update L1, ‖θ_final−θ_init‖₁ / ‖θ_init‖₁ (init = gpt2
 | GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | 0.1781 | 0.05 (n=20) | 3.07 | 0.009 | 0.010 | 0.1 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3033 | 0.17 (n=20) | 3.02 | 0.008 | 0.009 | 0.1 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3203 | 0.18 (n=20) | 3.01 | 0.008 | 0.009 | 0.0 | rep |
+| GPT-2 ft | adam | 1e-6 | 8k | 64 | 2 | 250 | 0.978 | 0.3019 | 0.98 (n=20) | 3.18 | 0.0024 | 0.003 | 0.1 | rep |
 | GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 125 | 0.982 | 0.3369 | 0.43 (n=20) | 2.98 | 0.0074 | 0.009 | 0.1 | rep |
 | GPT-2 ft | adam | 1e-6 | 4k | 64 | 2 | 125 | 0.991 | 0.3173 | 0.86 (n=20) | 3.18 | 0.0016 | 0.002 | 0.1 | rep |
 | GPT-2 ft | muon | 0 | 4k | 64 | 4 | 250 | 0.996 | 0.4683 | — | 3.08 | 0.0057 | 0.006 | 0.1 | rep |
@@ -37,9 +38,9 @@ parameter-update L1, ‖θ_final−θ_init‖₁ / ‖θ_init‖₁ (init = gpt2
 "Shuffle each training epoch independently" (#352), on `origin/main` — reshuffles each epoch. Not yet
 rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows are shuffle-agnostic.
 
-**MAGIC code-version note:** MAGIC values depend on the metagradient code, which changed via a rebase on 2026-07-24 ~08:00 that landed `c0f11ba8 "Fix metagrad replay correctness under CUDA dropout and DDP"` (+ grad_accum). eps1e-8 MAGIC = 0.37 on the pre-fix code (07-23) vs 0.17 on the fixed code (07-24). **All MAGIC values in the grid are now on the FIXED code:** eps1e-8 (0.17), eps1e-8 dropout0 (0.18), bs128 (0.43), eps1e-6 (0.86 [0.844, 0.877], n=20), muon (0.76), and — recomputed on the fixed code (were −0.08 / 0.099 pre-fix) — eps1e-10 (−0.02 [−0.065, 0.023], n=20) and bs32 (0.05 [−0.054, 0.145], n=20). eps1e-10 and bs32 sit at ≈0 with CIs spanning zero.
+**MAGIC code-version note:** MAGIC values depend on the metagradient code, which changed via a rebase on 2026-07-24 ~08:00 that landed `c0f11ba8 "Fix metagrad replay correctness under CUDA dropout and DDP"` (+ grad_accum). eps1e-8 MAGIC = 0.37 on the pre-fix code (07-23) vs 0.17 on the fixed code (07-24). **All MAGIC values in the grid are now on the FIXED code:** eps1e-8 (0.17), eps1e-8 dropout0 (0.18), bs128 (0.43), eps1e-6 4k (0.86 [0.844, 0.877], n=20), eps1e-6 8k (0.98 [0.980, 0.987], n=20), muon (0.76), and — recomputed on the fixed code (were −0.08 / 0.099 pre-fix) — eps1e-10 (−0.02 [−0.065, 0.023], n=20) and bs32 (0.05 [−0.054, 0.145], n=20). eps1e-10 and bs32 sit at ≈0 with CIs spanning zero.
 
-**Dropout:** all GPT-2 runs use dropout **0.1** (gpt2 default; `model_kwargs` empty); OLMo2 from-scratch uses **0.0** (`attention_dropout: 0.0`). Dropout is why the metagrad replay needed the fix (RNG-mask reproduction). Disable via `model_kwargs="resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0"`. **Dropout is neutral on every axis** for eps1e-8 4k bs64 (the two adjacent rows above): metasmoothness 0.876→0.8758, ΔL2 0.009→0.0091, EK-FAC 0.3033→0.3203, MAGIC 0.17→0.1822 (all within bootstrap CI). So dropout on/off does not move metasmoothness or LDS.
+**Dropout:** all GPT-2 runs use dropout **0.1** (gpt2 default; `model_kwargs` empty); OLMo2 from-scratch uses **0.0** (`attention_dropout: 0.0`). Dropout is why the metagrad replay needed the fix (RNG-mask reproduction). Disable via `model_kwargs="resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0"`. For eps1e-8 4k bs64 (the two adjacent rows above): metasmoothness 0.876→0.8758, ΔL2 0.009→0.0091, EK-FAC 0.3033→0.3203 (within bootstrap CI). **The MAGIC leg of this comparison is void:** the two MAGIC runs (`magicroll_eps1e8_4k` vs `magicroll_eps1e8_drop0`) produce **bit-identical** score tensors — all 20 queries, max abs difference exactly 0 — because the trainer ran `model.eval()` in both arms, so dropout was inactive regardless of the configured rate (`train_mode` defaulted False at `7b223e31` and was rejected outright for metagradient runs). The 0.17 vs 0.1822 difference comes from scoring identical scores against two different retrain banks, not from dropout. Dropout's effect on MAGIC is **untested**; `334fcead` later removed the guard (RNG restore reproduces the masks) and PR #359 re-adds opt-in `train_mode`, so it is testable now.
 
 ### SmolLM2 (`bergson-smollm2-lds-chunks`, `train_{4k,8k,16k,32k}.hf`)
 
@@ -108,28 +109,114 @@ At eps0, LDS falls monotonically with steps, tracking metasmoothness (both ~halv
 
 Same direction with data held fixed (4k, eps0, epochs 2→4 = 125→250 steps): 0.766 → 0.663.
 
-#### muon metasmoothness vs training steps (N-sweep, epochs=4, lr 5e-5 poly, bs64, eps_root 1e-6)
+#### muon metasmoothness vs training steps and eps_root (N-sweep, epochs=4, lr 5e-5 poly, bs64)
 
-Same config as the muon eps1e-6 4k bank row (betas 0.95/0.975, wd 0.01, seed 42, fd_step 0.1,
-direction_seed 0); only `data.dataset` changes. Steps = N·epochs/bs = N·4/64. Metasmoothness only —
-no leave-k-out banks were built, so the LDS/loss columns are unfilled for the new points.
+Extends the muon 4k bank rows along two axes. Steps = N·epochs/bs = N·4/64. Metasmoothness only —
+no leave-k-out banks were built for the new points.
 
-| optimizer | N | steps | metasmooth | EK-FAC LDS | train loss | ΔL1 | ΔL2 |
-|-----------|-----|-------|------------|-----------|-----------|------|------|
-| muon | 4k | 250 | 0.9965 | 0.4738 [0.432, 0.513] | 3.08 | 0.0057 | 0.0061 |
-| muon | 8k | 500 | 0.9957 | — | — | — | — |
-| muon | 16k | 1000 | 0.9952 | — | — | — | — |
-| muon | 32k | 2000 | 0.9947 | — | — | — | — |
+**N × eps_root grid.** Every cell is muon, lr 5e-5 poly, bs64, ep4, betas 0.95/0.975, wd 0.01,
+seed 42, fd_step 0.1, direction_seed 0 — only `data.dataset` and `eps_root` vary.
 
-Muon metasmoothness is flat across the steps axis: over an 8× increase in steps (250→2000) it moves
-0.9965→0.9947, a drift of 0.0018 (4th decimal, within single-direction_seed fd_step=0.1 noise). For
-comparison, adam at eps0 roughly halves over the same kind of range (0.766→0.437, 125→500 steps),
-while adam at eps1e-6 is also flat (0.991→0.998).
+| N | steps | metasmooth (eps0) | metasmooth (eps1e-8) | metasmooth (eps1e-6) | EK-FAC LDS (eps1e-6) | train loss | ΔL1 | ΔL2 |
+|-----|-------|-------------------|----------------------|----------------------|----------------------|-----------|------|------|
+| 4k | 250 | 0.996 | 0.9961 | 0.9965 | 0.4738 [0.432, 0.513] | 3.08 | 0.0057 | 0.0061 |
+| 8k | 500 | 0.9956 | — | 0.9957 | — | — | — | — |
+| 16k | 1000 | 0.9951 | — | 0.9952 | — | — | — | — |
+| 32k | 2000 | — | — | 0.9947 | — | — | — | — |
 
-Caveat: these points sit at ~0.995, so they do **not** distinguish "muon is robust to run length"
-from "the metric has no headroom left to fall". The muon eps0 4k point is also 0.996, so eps_root
-does not un-saturate muon (eps_root only touches Muon's AdamW-fallback params). No LDS was measured
-for the 8k/16k/32k points.
+Unfilled cells are not-yet-run, not failures: eps0 32k was cancelled mid-run to free GPUs; eps1e-8
+was only run at 4k. Resume with `run_muon_ms_eps.sh 0 eps0 32` / `run_muon_ms_eps.sh 1e-8 eps1e8 8 16 32`
+(both skip any point that already has `metasmoothness.json`). No leave-k-out banks were built for the
+new points, so their LDS/loss columns are empty.
+
+**Muon is flat on BOTH axes.** Across steps: 0.9965→0.9947 over an 8× step increase (250→2000), a
+drift of 0.0018. Across eps_root at 4k: 0.996 / 0.9961 / 0.9965 for eps 0 / 1e-8 / 1e-6 — a 0.0005
+spread over six orders of magnitude. The eps0 and eps1e-6 columns agree to ~1e-4 at every N where
+both were measured. All of this is within single-direction_seed fd_step=0.1 noise.
+
+Muon's split is on `param.ndim` (`optim.py`): `ndim == 2` → Newton-Schulz, everything else → an
+AdamW branch, and `adamw_eps_root` appears only inside that AdamW branch. For GPT-2 as the trainer
+builds it (`lm_head` untied from `wte`, so both are separate 2D tensors), that is 162,915,840 params
+on the Newton-Schulz path and 121,344 (98 tensors: LayerNorm weights/biases, Linear biases) on the
+AdamW path — eps_root reaches 0.07% of parameters. **Note:** embeddings and `lm_head` are 2D and go
+through Newton-Schulz, *not* the AdamW branch. muon EK-FAC LDS is likewise near-flat across eps_root
+(0.468 @eps0 vs 0.474 @eps1e-6; 1e-4 lr: 0.454 vs 0.451).
+
+Caveat: every muon point sits at ~0.995, so these do **not** distinguish "muon is robust to run
+length" from "the metric has no headroom left to fall". eps_root is *not* the knob that un-saturates
+muon — the whole axis is pinned. Batch size does not un-saturate it either: muon eps0 at bs16 is
+0.9932 (vs 0.996 at bs64), where adam at eps1e-8 collapses to 0.500 over the same bs64→bs16 change.
+The knob that still moves the metric elsewhere in the grid is output logit scale (0.609 at 0.25).
+Contrast adam at eps0, which roughly halves over a comparable steps range (0.766→0.437, 125→500).
+
+#### MAGIC score finiteness vs eps_root (GPT-2 4k)
+
+Checked every MAGIC score tensor on disk under `/mnt/ssd-2/lucia/muon4k`. 560,000 score elements
+across 8 runs: **100% finite (0 NaN, 0 Inf) everywhere except the single eps_root=0 run**, which is
+100% NaN (all 4000 scores; `magic_eps0.log:1038` — `minmax=(nan, nan), mean=nan`).
+
+| run dir | optimizer | eps_root | bs | NaN | finite | score range |
+|---------|-----------|----------|----|-----|--------|-------------|
+| magicroll_eps1e6_4k | adamw | 1e-6 | 64 | 0 | 100% | ±0.0083 |
+| magicroll_eps1e8_4k | adamw | 1e-8 | 64 | 0 | 100% | ±2.59 |
+| magicroll_eps1e10_4k | adamw | 1e-10 | 64 | 0 | 100% | −3.43 … 3.92 |
+| magicroll_eps1e8_drop0 | adamw | 1e-8 | 64 | 0 | 100% | ±2.59 |
+| magic_eps1e8_4k | adamw | 1e-8 | 64 | 0 | 100% | −0.59 … 0.19 |
+| magicroll_bs32 | adamw | 1e-8 | 32 | 0 | 100% | −2.22 … 2.96 |
+| magicroll_bs128 | adamw | 1e-8 | 128 | 0 | 100% | −0.123 … 0.099 |
+| magicroll_muon_eps1e6_5e5 | muon | 1e-6 | 64 | 0 | 100% | −0.0084 … 0.0024 |
+| **magic_eps0_muon_5e-5** | **muon** | **0** | **16** | **4000/4000** | **0%** | **NaN** |
+
+Score magnitude grows monotonically as eps_root falls (adamw, bs64): ±0.0083 @1e-6 → ±2.59 @1e-8
+(~300×) → 3.92 @1e-10. The eps0 point is a different optimizer (muon) and batch size (16), so it does
+not extend that series — it is reported as NaN, not as a magnitude.
+
+**EK-FAC is unaffected at the same eps_root.** The muon eps0 EK-FAC score matrix
+(`ekfac_eps0_muon_5e-5/scores/scores/scores.bin`) is 4000×50 with **0 NaN, all `written` flags True**,
+range [−1090, 1902], mean 0.52 — and yields LDS 0.4683. So eps_root=0 breaks the metagradient path
+specifically, not attribution in general: EK-FAC never forms the unregularized second-moment
+reciprocal that MAGIC's replay divides by.
+
+**Confound — do not attribute the NaN to eps_root alone.** The only eps0 MAGIC run is also the only
+bs16 run, so eps_root and batch size vary together (n=1 each). Batch size independently drives
+magnitude the same direction at fixed eps1e-8: bs128 ±0.12 → bs64 ±2.59 → bs32 ±2.96, extrapolating
+larger at bs16. The clean experiment that separates them is a MAGIC run at **muon / eps0 / bs64**
+(the missing cell) — NaN there would implicate eps_root, finite would implicate batch size.
+
+**Metasmoothness does not predict MAGIC finiteness — measured at matched config.** Metasmoothness
+was run at the *exact* config of the all-NaN MAGIC run (muon, eps_root 0, lr 5e-5, 4k, **bs16**, ep4
+→ 1000 steps; `muon_ms_steps/eps0_bs16/`):
+
+| config | metasmooth | MAGIC scores |
+|--------|-----------|--------------|
+| muon, eps0, 4k, **bs16**, ep4 (1000 steps) | **0.9932** | **100% NaN** (4000/4000) |
+| muon, eps0, 4k, bs64, ep4 (250 steps) | 0.996 | not run |
+| muon, eps1e-6, 4k, bs64, ep4 (250 steps) | 0.9965 | finite, LDS 0.76 |
+
+So **high metasmoothness co-occurs with completely NaN MAGIC scores**: 0.9932 is near-ceiling, and
+the very same training configuration yields no usable metagradient scores. On this config,
+metasmoothness gave no warning of the metagradient failure. This is one config (n=1) and establishes
+co-occurrence, not a general rule about when MAGIC breaks.
+
+**Per-parameter-group split (same config).** `metasmoothness.json` now carries a `groups` breakdown
+for muon runs, scoring the Newton-Schulz and AdamW paths separately; the decomposition is exact
+(`score = Σ share·score`, verified to 1e-9):
+
+| group | score | movement share | numel |
+|-------|-------|----------------|-------|
+| muon_2d (Newton-Schulz) | 0.9932 | 0.99960 | 162,915,840 |
+| adamw_1d (eps_root's only reach) | 0.9867 | 0.00040 | 121,344 |
+
+The 1D group carries 0.04% of total L1 movement, so it could have scored −1.0 and moved the
+aggregate only to ~0.992 — i.e. the aggregate *could* have masked a non-smooth AdamW subspace. It
+does not: at eps_root=0 that group scores 0.9867 on its own normalization. Per-coordinate movement is
+also smaller for the 1D group (1.13e-4 vs 2.11e-4). So the NaN is not explained by a non-smooth
+eps_root-affected subspace being hidden by movement weighting.
+
+Batch size does not explain the high metasmoothness either: bs16 barely
+moves muon (0.996 at bs64 → 0.9932 at bs16, −0.003), unlike adam at eps1e-8 where bs16 collapses the
+metric to 0.500. Muon is flat on the batch-size axis too. Note this does *not* resolve which knob
+causes the NaN itself — that still needs the muon/eps0/bs64 MAGIC run described above.
 
 #### adam metasmoothness — other knobs (eps_root=1e-8, N=4k, epochs=2; baseline bs64/wd0.01/scale1.0 = 0.876)
 
@@ -344,10 +431,27 @@ metasmooth measured for each bank's training config (bs64, 4 epochs): lotus 0.99
 - SmolLM2 eps_root=1e-6 4k adam bank: HF `EleutherAI/bergson-smollm2-lds-4k` (+ `run_config.yaml`, `subsets.json`). Size-scaling banks: `runs/ekfac_vs_n/N{4,8,16,32}k`. adam eps_root=0 bank: `/mnt/ssd-2/lucia-adam-shampoo/epsroot0_4k_bank/` (code `b3790ba9`). muon banks: `/mnt/ssd-2/lucia/muon4k/{run,run_1e-4,run_eps0_5e-5,run_eps0_1e-4}/N4k` (differ only in eps_root and lr).
 - SmolLM2 scoring summary.csv under `/mnt/ssd-2/lucia-adam-shampoo/*/validate/` and `/mnt/ssd-2/lucia/muon4k/**/validate/`; scoring code `1ba43f92` worktree (+ `feat/shampoo-quarter-power` for the Shampoo power variants). WikiText run dirs under `runs/`.
 - All banks above: `data.chunk_length = 0`.
+- muon N × eps_root metasmoothness sweep (2026-07-27): `/mnt/ssd-2/lucia/muon_ms_steps/` — driver
+  `run_muon_ms_eps.sh <eps_root> <tag> [sizes...]`, per-point dirs `{eps1e6→msmuon_*k, eps0/, eps1e8/}`,
+  each holding the generated `ms.yaml`, `ms.log` and `metasmoothness.json` (`["score"]`). The
+  eps1e-6 column is under the top-level `msmuon_{8,16,32}k/` (driver `run_muon_ms_steps.sh`).
+  Run from `/mnt/ssd-1/lucia/bergson-damping`; **requires `PYTHONPATH=<repo>`** — the `bergson`
+  console script puts its own bin dir on `sys.path`, not the cwd, so it raises
+  `ModuleNotFoundError: No module named 'bergson'` on every rank even from the repo root.
+- MAGIC finiteness audit: score tensors read from `/mnt/ssd-2/lucia/muon4k/{magicroll_*,magic_*}/q*/scores.pt`;
+  the eps0 NaN evidence is `magic_eps0.log:1038` (that run wrote no scores at all, only checkpoints).
+  EK-FAC score matrices are `scores/scores/scores.bin` + `info.json` — a structured dtype with
+  explicit `offsets`/`itemsize` (float32 `score_i` + bool `written_i`, 8-byte stride); reading it
+  without the offsets silently mis-strides and fabricates NaNs.
+- Reading muon eps0 configs: `muon4k/ekfac_eps0_muon_{5e-5,1e-4}/validate/config.yaml` report
+  `optimizer: adamw, eps_root: 1.0e-08`. Those are unused defaults on the *validate* step — the bank
+  was pre-built and supplied via `retrained_dir: muon4k/run_eps0_5e-5/N4k`, whose config is the real
+  one (`optimizer: muon`, `eps_root: 0.0`, lr 5e-5, bs64, ep4). Grepping the scoring configs by
+  directory name gives the wrong optimizer/eps_root.
 
 ## Appendix
 
-### Appendix — aggregate-query numbers (DO NOT CITE)
+### Appendix — aggregate-query numbers (do not cite)
 
 **Aggregate-query metrics are non-standard and must not be used** (see the CLAUDE.md rule: LDS is
 per-query only). They are recorded here, out of the main results, purely so a value already computed
