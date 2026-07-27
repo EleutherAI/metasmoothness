@@ -83,26 +83,26 @@ rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows
 
 Sweep between the eps1e-6 (ms 0.991) and eps0 (ms 0.766) endpoints. Single direction_seed, h=0.1 (noisy).
 
-| eps_root | metasmooth | EK-FAC LDS | train loss | ΔL1 | ΔL2 |
-|----------|-----------|-----------|-----------|------|------|
-| 1e-6 | 0.991 | 0.3173 | 3.18 | 0.0016 | 0.0021 |
-| 1e-7 | 0.978 | — | — | — | — |
-| 1e-8 | 0.876 | 0.3033 [0.274, 0.334] | 3.02 | 0.0079 | 0.0091 |
-| 1e-9 | 0.907 | — | — | — | — |
-| 1e-10 | 0.781 | 0.2097 [0.182, 0.239] | 2.71 | 0.0293 | 0.0295 |
-| 0 | 0.766 | 0.1740 | 2.61 | 0.0509 | 0.0528 |
+| optimizer | eps_root | metasmooth | EK-FAC LDS | train loss | ΔL1 | ΔL2 |
+|-----------|----------|-----------|-----------|-----------|------|------|
+| adam | 1e-6 | 0.991 | 0.3173 | 3.18 | 0.0016 | 0.0021 |
+| adam | 1e-7 | 0.978 | — | — | — | — |
+| adam | 1e-8 | 0.876 | 0.3033 [0.274, 0.334] | 3.02 | 0.0079 | 0.0091 |
+| adam | 1e-9 | 0.907 | — | — | — | — |
+| adam | 1e-10 | 0.781 | 0.2097 [0.182, 0.239] | 2.71 | 0.0293 | 0.0295 |
+| adam | 0 | 0.766 | 0.1740 | 2.61 | 0.0509 | 0.0528 |
 
 #### adam metasmoothness vs training steps (N-sweep, epochs=2, lr 8e-4, bs64)
 
 Measured at eps_root=0 (un-saturated); eps_root=1e-6 shown for contrast (pinned near the 1.0
 ceiling, hides the trend). Steps = N·epochs/bs.
 
-| N | steps | metasmooth (eps0) | EK-FAC LDS (eps0) | ΔL1 (eps0) | ΔL2 (eps0) | metasmooth (eps1e-6) |
-|-----|-------|-------------------|-------------------|------------|------------|----------------------|
-| 4k | 125 | 0.766 | 0.174 | 0.0509 | 0.0528 | 0.991 |
-| 8k | 250 | 0.615 | 0.141 | 0.0646 | 0.0668 | 0.978 |
-| 16k | 500 | 0.437 | 0.110 | 0.0855 | 0.0872 | 0.995 |
-| 32k | 1000 | — | — | — | — | 0.998 |
+| optimizer | N | steps | metasmooth (eps0) | EK-FAC LDS (eps0) | train loss (eps0) | ΔL1 (eps0) | ΔL2 (eps0) | metasmooth (eps1e-6) |
+|-----------|-----|-------|-------------------|-------------------|-------------------|------------|------------|----------------------|
+| adam | 4k | 125 | 0.766 | 0.174 | 2.61 | 0.0509 | 0.0528 | 0.991 |
+| adam | 8k | 250 | 0.615 | 0.141 | 2.61 | 0.0646 | 0.0668 | 0.978 |
+| adam | 16k | 500 | 0.437 | 0.110 | 2.65 | 0.0855 | 0.0872 | 0.995 |
+| adam | 32k | 1000 | — | — | — | — | — | 0.998 |
 
 At eps0, LDS falls monotonically with steps, tracking metasmoothness (both ~halve 4k→16k).
 
@@ -122,12 +122,12 @@ consistent with the steps table). Weight decay: no effect over 0–0.3. Output l
 
 **Batch size deconfounded — metasmoothness at FIXED steps=125** (eps1e-8, 4k, epochs = bs/32):
 
-| batch size | epochs | steps | metasmooth | EK-FAC LDS | ΔL1 | ΔL2 |
-|------------|--------|-------|------------|-----------|------|------|
-| 32 | 1 | 125 | 0.837 | 0.1781 | 0.0087 | 0.0100 |
-| 64 | 2 | 125 | 0.876 | 0.3033 | 0.0079 | 0.0091 |
-| 128 | 4 | 125 | 0.982 | 0.3369 | 0.0074 | 0.0087 |
-| 256 | 8 | 125 | 0.992 | — | — | — |
+| optimizer | batch size | epochs | steps | metasmooth | EK-FAC LDS | train loss | ΔL1 | ΔL2 |
+|-----------|------------|--------|-------|------------|-----------|-----------|------|------|
+| adam | 32 | 1 | 125 | 0.837 | 0.1781 | 3.07 | 0.0087 | 0.0100 |
+| adam | 64 | 2 | 125 | 0.876 | 0.3033 | 3.02 | 0.0079 | 0.0091 |
+| adam | 128 | 4 | 125 | 0.982 | 0.3369 | 2.98 | 0.0074 | 0.0087 |
+| adam | 256 | 8 | 125 | 0.992 | — | — | — | — |
 
 Batch size raises metasmoothness even at fixed step count (0.837→0.992) — a genuine effect, not just
 a step-count proxy. (LDS at bs256/ep8 is **infeasible on the current code**: the leave-k-out bank build
@@ -141,12 +141,12 @@ the grid, so bs256 LDS is left out. The bs32→128 rows already establish the fi
 
 Built banks for the fixed-steps ms-knobs to test the confounder analysis: does a knob vary metasmoothness *without* changing update magnitude (ΔL2)?
 
-| knob | metasmooth | EK-FAC LDS | ΔL1 | ΔL2 |
-|------|-----------|-----------|------|------|
-| output scale 1.0 (ref) | 0.876 | 0.303 | 0.008 | 0.009 |
-| output scale 0.5 | 0.840 | 0.220 | 0.013 | 0.016 |
-| output scale 0.25 | 0.609 | 0.169 | 0.016 | 0.019 |
-| gradient clip 1.0 | 0.876 | 0.307 | 0.006 | 0.007 |
+| optimizer | knob | metasmooth | EK-FAC LDS | train loss | ΔL1 | ΔL2 |
+|-----------|------|-----------|-----------|-----------|------|------|
+| adam | output scale 1.0 (ref) | 0.876 | 0.303 | 3.02 | 0.008 | 0.009 |
+| adam | output scale 0.5 | 0.840 | 0.220 | 3.10 | 0.013 | 0.016 |
+| adam | output scale 0.25 | 0.609 | 0.169 | 3.36 | 0.016 | 0.019 |
+| adam | gradient clip 1.0 | 0.876 | 0.307 | 3.03 | 0.006 | 0.007 |
 
 Output-scale lowers metasmoothness and EK-FAC LDS but **raises** ΔL2 (0.009→0.019) — so it is NOT a clean isolate-metasmoothness knob (update magnitude moves too, opposite direction to the eps_root case). Gradient clipping (max_grad_norm 1.0) is effectively a **no-op** at these settings: metasmoothness is unchanged (0.876, identical to ref) and EK-FAC LDS barely moves (0.307 vs 0.303) — grad norms rarely exceed 1.0, so clipping almost never fires.
 
@@ -156,9 +156,9 @@ Re-initialized OLMo2 (124M; hidden 768, 12 layers) trained **from scratch** (not
 pre-training proxy that motivated this investigation. muon, 6 epochs, bs128, lr 9e-3, eps_root 1e-6,
 betas 0.95/0.975, wd 0.1, 50 subsets.
 
-| N | steps | metasmooth | Method | LDS | 95% CI | n | train loss | ΔL1 | ΔL2 | dropout | shuffle |
-|-----|-------|-----------|--------|-----|--------|---|-----------|------|------|---------|--------|
-| 16k | 750 | 0.010 | EK-FAC | 0.0175 | [−0.036, 0.071] | 50 | 2.92 | 4.56 | 4.10 | 0.1 | rep |
+| optimizer | N | steps | metasmooth | Method | LDS | 95% CI | n | train loss | ΔL1 | ΔL2 | dropout | shuffle |
+|-----------|-----|-------|-----------|--------|-----|--------|---|-----------|------|------|---------|--------|
+| muon | 16k | 750 | 0.010 | EK-FAC | 0.0175 | [−0.036, 0.071] | 50 | 2.92 | 4.56 | 4.10 | 0.1 | rep |
 
 Both metasmoothness (0.010) and LDS (0.018) ≈ 0 — the extreme low-metasmoothness endpoint of the
 grid, consistent with the mechanism.
@@ -288,23 +288,23 @@ Two banks, both adamw, 4 epochs, betas 0.95/0.975.
 
 metasmooth measured for each bank's training config (bs64, 4 epochs): lotus 0.998, epsroot0 0.609.
 
-| Bank | eps_root | metasmooth | Method | Variant | LDS | n | ΔL1 | ΔL2 | Run dir | dropout | shuffle |
-|------|----------|-----------|--------|---------|-----|---|------|------|---------|---------|--------|
-| lotus | 1e-6 | 0.998 | MAGIC | full q01–50 | 0.9681 | 50 | 0.0033 | 0.0040 | `runs/lotus_final_q01_50` | 0.1 | rep |
-| lotus | 1e-6 | 0.998 | MAGIC | bwd eval | 0.9688 | 50 | 0.0033 | 0.0040 | `runs/lotus_bwd_eval` | 0.1 | rep |
-| lotus | 1e-6 | 0.998 | SOURCE | damp0 | 0.3902 | 50 | 0.0033 | 0.0040 | `runs/lotus_source_q50_damp0_validate` | 0.1 | rep |
-| lotus | 1e-6 | 0.998 | SOURCE | adam | 0.2068 | 50 | 0.0033 | 0.0040 | `runs/lotus_source_adam_q50_validate` | 0.1 | rep |
-| lotus | 1e-6 | 0.998 | SOURCE | default | −0.3871 | 50 | 0.0033 | 0.0040 | `runs/lotus_source_q50_validate` | 0.1 | rep |
-| lotus | 1e-6 | 0.998 | EK-FAC | docspace | 0.2588 | 50 | 0.0033 | 0.0040 | `runs/lotus_ekfac50q_docspace_vs_lotus_bank` | 0.1 | rep |
-| lotus | 1e-6 | 0.998 | EK-FAC | allium-0 | 0.0543 | 50 | 0.0033 | 0.0040 | `runs/lotus_scores_ekfac50q_allium-0_validate` | 0.1 | rep |
-| lotus | 1e-6 | 0.998 | Trackstar | docs p32 noopt | 0.2002 | 50 | 0.0033 | 0.0040 | `runs/gpt2_lotus_trackstar50q_docs_p32_noopt_vs_lotus_bank` | 0.1 | rep |
-| lotus | 1e-6 | 0.998 | Trackstar | docs | 0.1838 | 50 | 0.0033 | 0.0040 | `runs/gpt2_lotus_trackstar50q_docs_vs_lotus_bank` | 0.1 | rep |
-| lotus | 1e-6 | 0.998 | Trackstar | default | 0.1767 | 50 | 0.0033 | 0.0040 | `runs/lotus_trackstar_q50_validate` | 0.1 | rep |
-| epsroot0 | 0 | 0.609 | SOURCE | source2 | 0.1531 | 50 | 0.0834 | 0.0848 | `runs/epsroot0_source2_q50_validate` | 0.1 | rep |
-| epsroot0 | 0 | 0.609 | SOURCE | source2 adam hybrid | 0.1446 | 50 | 0.0834 | 0.0848 | `runs/epsroot0_source2_adam_hybrid_validate` | 0.1 | rep |
-| epsroot0 | 0 | 0.609 | SOURCE | source2 adam | 0.0811 | 50 | 0.0834 | 0.0848 | `runs/epsroot0_source2_adam_q50_validate` | 0.1 | rep |
-| epsroot0 | 0 | 0.609 | EK-FAC | allium-0 | −0.0109 | 50 | 0.0834 | 0.0848 | `runs/epsroot0_scores_ekfac50q_allium-0_validate` | 0.1 | rep |
-| epsroot0 | 0 | 0.609 | MAGIC | spotcheck | NaN | 1 | 0.0834 | 0.0848 | `runs/epsroot0_bank` | 0.1 | rep |
+| optimizer | Bank | eps_root | metasmooth | Method | Variant | LDS | n | train loss | ΔL1 | ΔL2 | Run dir | dropout | shuffle |
+|-----------|------|----------|-----------|--------|---------|-----|---|-----------|------|------|---------|---------|--------|
+| adam | lotus | 1e-6 | 0.998 | MAGIC | full q01–50 | 0.9681 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_final_q01_50` | 0.1 | rep |
+| adam | lotus | 1e-6 | 0.998 | MAGIC | bwd eval | 0.9688 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_bwd_eval` | 0.1 | rep |
+| adam | lotus | 1e-6 | 0.998 | SOURCE | damp0 | 0.3902 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_source_q50_damp0_validate` | 0.1 | rep |
+| adam | lotus | 1e-6 | 0.998 | SOURCE | adam | 0.2068 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_source_adam_q50_validate` | 0.1 | rep |
+| adam | lotus | 1e-6 | 0.998 | SOURCE | default | −0.3871 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_source_q50_validate` | 0.1 | rep |
+| adam | lotus | 1e-6 | 0.998 | EK-FAC | docspace | 0.2588 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_ekfac50q_docspace_vs_lotus_bank` | 0.1 | rep |
+| adam | lotus | 1e-6 | 0.998 | EK-FAC | allium-0 | 0.0543 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_scores_ekfac50q_allium-0_validate` | 0.1 | rep |
+| adam | lotus | 1e-6 | 0.998 | Trackstar | docs p32 noopt | 0.2002 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/gpt2_lotus_trackstar50q_docs_p32_noopt_vs_lotus_bank` | 0.1 | rep |
+| adam | lotus | 1e-6 | 0.998 | Trackstar | docs | 0.1838 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/gpt2_lotus_trackstar50q_docs_vs_lotus_bank` | 0.1 | rep |
+| adam | lotus | 1e-6 | 0.998 | Trackstar | default | 0.1767 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_trackstar_q50_validate` | 0.1 | rep |
+| adam | epsroot0 | 0 | 0.609 | SOURCE | source2 | 0.1531 | 50 | 1.86 | 0.0834 | 0.0848 | `runs/epsroot0_source2_q50_validate` | 0.1 | rep |
+| adam | epsroot0 | 0 | 0.609 | SOURCE | source2 adam hybrid | 0.1446 | 50 | 1.86 | 0.0834 | 0.0848 | `runs/epsroot0_source2_adam_hybrid_validate` | 0.1 | rep |
+| adam | epsroot0 | 0 | 0.609 | SOURCE | source2 adam | 0.0811 | 50 | 1.86 | 0.0834 | 0.0848 | `runs/epsroot0_source2_adam_q50_validate` | 0.1 | rep |
+| adam | epsroot0 | 0 | 0.609 | EK-FAC | allium-0 | −0.0109 | 50 | 1.86 | 0.0834 | 0.0848 | `runs/epsroot0_scores_ekfac50q_allium-0_validate` | 0.1 | rep |
+| adam | epsroot0 | 0 | 0.609 | MAGIC | spotcheck | NaN | 1 | 1.86 | 0.0834 | 0.0848 | `runs/epsroot0_bank` | 0.1 | rep |
 
 - Excluded (n=1 spotchecks): lotus MAGIC `lotus_mq_eval` 0.9893, `lotus_q01_spotcheck` 0.9818, `lotus` 0.9177, `lotus_mq_eval_prefix_backup` 0.9665; and `lotus_interim_q01_08` (n=8, 0.9675).
 - The `gpt2_epsroot0_trackstar50q*` runs are excluded: their config has `retrained_dir=runs/lotus`, so they score epsroot0 gradients against the lotus bank.
