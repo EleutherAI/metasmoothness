@@ -167,21 +167,39 @@ grid, consistent with the mechanism.
 
 A from-scratch pre-training run is unscoreable over its **full** trajectory, but the **last epoch**
 is metasmooth. Attributing only over the tail — and evaluating against a leave-k-out bank that drops
-each subset's docs only in that tail — turns LDS from ~0 to 0.7, at the model's **full 3.23-nats
-loss** (the trained model is unchanged; only the attribution window moves).
+each subset's docs only in that tail — makes it attributable, at the model's **full 3.23-nats loss**
+(the trained model is unchanged; only the attribution window moves).
+
+**Headline — same scorer (EK-FAC), same aggregation (per-query mean), window off → on:**
 
 | attribution window | frac | metasmooth | Method | LDS | 95% CI | n | train loss | shuffle |
 |---|---|---|---|---|---|---|---|---|
-| full run (0–749) | 0.0 | 0.010 | EK-FAC | 0.0175 | [−0.036, 0.071] | 50 | 2.92 | rep |
-| full run (0–749) | 0.0 | −0.000 | EK-FAC | 0.0175 | [−0.036, 0.071] | 50 | 3.23 | per-epoch |
-| **last epoch (624–749)** | **0.833** | **0.984** | **MAGIC** | **0.705** | **[0.521, 0.824]** | 50 | 3.23 | per-epoch |
-| last epoch (624–749) | 0.833 | 0.984 | EK-FAC | _(running)_ | | 50 | 3.23 | per-epoch |
+| full run (0–749) | 0.0 | 0.010 | EK-FAC (per-query) | 0.0175 | [−0.036, 0.071] | 28×50 | 2.92 | rep |
+| **last epoch (624–749)** | **0.833** | **0.984** | **EK-FAC (per-query)** | **0.161** | **[0.123, 0.198]** | 50×50 | 3.23 | per-epoch |
 
-- MAGIC LDS 0.705 (Spearman, 10k-bootstrap; Pearson 0.664; sign-agreement 37/50; p=1.1e-8). Disjoint
-  CI from the full-run EK-FAC 0.0175 — a clean, ~40× separation.
-- The full-run row is repeated at both shuffles: the original bank is `rep` (metasmooth 0.010); the
-  per-epoch full run is metasmooth −0.000 (both ≈ 0, so the shuffle change does not move the dead
-  endpoint). The tail rows are per-epoch (the merged `#352` behaviour).
+EK-FAC uses no metagradient, so this comparison is immune to the MAGIC code-version issue below, and
+both rows are the mean-across-50-queries Spearman with a query-bootstrap CI. The CIs are **disjoint**
+(full-run ≤ 0.071 < tail ≥ 0.123): a ~9× gain from excluding the early steps, with the *same*
+trajectory-agnostic scorer. 46/50 queries have positive tail rho. The full-run row is the original
+`rep` bank (metasmooth 0.010); the per-epoch full run is metasmooth −0.000 — both ≈ 0, so the shuffle
+change does not move the dead endpoint.
+
+**MAGIC — matched tail-metagradient, but read the two caveats.** On the *aggregate-query* statistic
+(single Spearman over the 50 subsets after averaging the 50 query gradients):
+
+| window | Method | aggregation | LDS | 95% CI | n |
+|---|---|---|---|---|---|
+| last epoch (0.833) | EK-FAC | aggregate-query | 0.054 | [−0.246, 0.357] | 50 |
+| last epoch (0.833) | **MAGIC** | aggregate-query | **0.705** | [0.521, 0.824] | 50 |
+
+The matched tail-metagradient (MAGIC) massively out-predicts the trajectory-agnostic EK-FAC on the
+tail bank (0.705 vs 0.054). **Caveats: (1)** these are aggregate-query, *not* comparable to the
+per-query 0.0175/0.161 above — aggregate-query over 50 subsets is a noisy statistic (note EK-FAC's CI
+spanning zero). **(2)** MAGIC 0.705 was computed on `feat/ms-pretrain`, which is **off
+`fix/per-epoch-shuffle` and does _not_ contain the metagrad-replay fix `c0f11ba8`** (see the MAGIC
+code-version note above). OLMo2 has dropout 0.0 so the dropout half of that fix does not apply, but
+the run was DDP (6 GPUs) so the DDP-replay half might; **this MAGIC value should be recomputed on the
+fixed code before it is trusted.** MAGIC Pearson 0.664, sign-agreement 37/50, p=1.1e-8.
 - **Intervention** — `weight_start_frac` / `weight_start_step`, following arXiv 2503.13751 App. C.3
   (data weights enter the loss only from step *k*, chosen to maximize metasmoothness; DataComp *k* =
   2800/3125, IFT *k* = "150 steps from the end"). `DataStream` pins weights to a constant 1 before
