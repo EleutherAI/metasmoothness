@@ -193,13 +193,19 @@ change does not move the dead endpoint.
 | last epoch (0.833) | **MAGIC** | aggregate-query | **0.705** | [0.521, 0.824] | 50 |
 
 The matched tail-metagradient (MAGIC) massively out-predicts the trajectory-agnostic EK-FAC on the
-tail bank (0.705 vs 0.054). **Caveats: (1)** these are aggregate-query, *not* comparable to the
-per-query 0.0175/0.161 above — aggregate-query over 50 subsets is a noisy statistic (note EK-FAC's CI
-spanning zero). **(2)** MAGIC 0.705 was computed on `feat/ms-pretrain`, which is **off
-`fix/per-epoch-shuffle` and does _not_ contain the metagrad-replay fix `c0f11ba8`** (see the MAGIC
-code-version note above). OLMo2 has dropout 0.0 so the dropout half of that fix does not apply, but
-the run was DDP (6 GPUs) so the DDP-replay half might; **this MAGIC value should be recomputed on the
-fixed code before it is trusted.** MAGIC Pearson 0.664, sign-agreement 37/50, p=1.1e-8.
+tail bank (0.705 vs 0.054). **Caveat:** these are aggregate-query, *not* comparable to the per-query
+0.0175/0.161 above — aggregate-query over 50 subsets is a noisy statistic (note EK-FAC's CI spanning
+zero). What it does isolate, at fixed aggregation, is the scorer: the exact tail metagradient (0.705)
+vs the trajectory-agnostic proxy (0.054). MAGIC Pearson 0.664, sign-agreement 37/50, p=1.1e-8.
+
+**On the MAGIC code-version note above — verified not to apply to this run.** `c0f11ba8` fixes the
+*grad-accum* metagradient path (`metagrad_step`): a CUDA-dropout RNG-replay bug and a 1/world_size
+weight-cotangent correction. This run hits neither: (1) `feat/ms-pretrain` has **no `metagrad_step`
+/grad-accum path** — it uses only the single-shot `backward()`, which **already carries** the
+1/world_size correction (`trainer.py:869`); (2) OLMo2 runs **dropout 0.0**, so the RNG-replay bug (a
+GPU-dropout issue — the reason the GPT-2 eps1e-8 value moved 0.37→0.17) cannot fire; the forward is
+deterministic and rematerializes exactly. So the fix would leave this number unchanged; a recompute
+on the fixed code was judged redundant (and would risk introducing unrelated branch-surgery diffs).
 - **Intervention** — `weight_start_frac` / `weight_start_step`, following arXiv 2503.13751 App. C.3
   (data weights enter the loss only from step *k*, chosen to maximize metasmoothness; DataComp *k* =
   2800/3125, IFT *k* = "150 steps from the end"). `DataStream` pins weights to a constant 1 before
