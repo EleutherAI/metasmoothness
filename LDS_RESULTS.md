@@ -14,7 +14,7 @@ Consolidated view, sorted by metasmoothness. Detailed per-axis sweeps are in the
 below. `shuffle` = data-order-per-epoch implementation (see note): **rep** = shuffle-once-then-repeat
 (same order every epoch, now an unsupported setup). Of course, epochs=1 rows are comparable.
 
-`train loss` = final base-model loss on its training set (pending GPU eval). `ΔL1` = relative
+`train loss` = final base-model loss on its training set (mean per-token CE, ≤2000-doc sample). `ΔL1` = relative
 parameter-update L1, ‖θ_final−θ_init‖₁ / ‖θ_init‖₁ (init = gpt2, or the OLMo2 reinit for scratch).
 
 | model | opt | eps_root | N | bs | epochs | steps | empirical metasmooth | EK-FAC LDS | MAGIC LDS | train loss | ΔL1 | ΔL2 | dropout | shuffle |
