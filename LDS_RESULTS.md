@@ -108,6 +108,29 @@ At eps0, LDS falls monotonically with steps, tracking metasmoothness (both ~halv
 
 Same direction with data held fixed (4k, eps0, epochs 2→4 = 125→250 steps): 0.766 → 0.663.
 
+#### muon metasmoothness vs training steps (N-sweep, epochs=4, lr 5e-5 poly, bs64, eps_root 1e-6)
+
+Same config as the muon eps1e-6 4k bank row (betas 0.95/0.975, wd 0.01, seed 42, fd_step 0.1,
+direction_seed 0); only `data.dataset` changes. Steps = N·epochs/bs = N·4/64. Metasmoothness only —
+no leave-k-out banks were built, so the LDS/loss columns are unfilled for the new points.
+
+| optimizer | N | steps | metasmooth | EK-FAC LDS | train loss | ΔL1 | ΔL2 |
+|-----------|-----|-------|------------|-----------|-----------|------|------|
+| muon | 4k | 250 | 0.9965 | 0.4738 [0.432, 0.513] | 3.08 | 0.0057 | 0.0061 |
+| muon | 8k | 500 | 0.9957 | — | — | — | — |
+| muon | 16k | 1000 | 0.9952 | — | — | — | — |
+| muon | 32k | 2000 | 0.9947 | — | — | — | — |
+
+Muon metasmoothness is flat across the steps axis: over an 8× increase in steps (250→2000) it moves
+0.9965→0.9947, a drift of 0.0018 (4th decimal, within single-direction_seed fd_step=0.1 noise). For
+comparison, adam at eps0 roughly halves over the same kind of range (0.766→0.437, 125→500 steps),
+while adam at eps1e-6 is also flat (0.991→0.998).
+
+Caveat: these points sit at ~0.995, so they do **not** distinguish "muon is robust to run length"
+from "the metric has no headroom left to fall". The muon eps0 4k point is also 0.996, so eps_root
+does not un-saturate muon (eps_root only touches Muon's AdamW-fallback params). No LDS was measured
+for the 8k/16k/32k points.
+
 #### adam metasmoothness — other knobs (eps_root=1e-8, N=4k, epochs=2; baseline bs64/wd0.01/scale1.0 = 0.876)
 
 | knob | values → metasmooth |
