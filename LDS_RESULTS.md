@@ -207,28 +207,11 @@ trajectory-agnostic scorer. 46/50 queries have positive tail rho. The full-run r
 `rep` bank (metasmooth 0.010); the per-epoch full run is metasmooth −0.000 — both ≈ 0, so the shuffle
 change does not move the dead endpoint.
 
-**MAGIC — matched tail-metagradient, but read the two caveats.** On the *aggregate-query* statistic
-(single Spearman over the 50 subsets after averaging the 50 query gradients):
-
-| window | Method | aggregation | LDS | 95% CI | n |
-|---|---|---|---|---|---|
-| last epoch (0.833) | EK-FAC | aggregate-query | 0.054 | [−0.246, 0.357] | 50 |
-| last epoch (0.833) | **MAGIC** | aggregate-query | **0.705** | [0.521, 0.824] | 50 |
-
-The matched tail-metagradient (MAGIC) massively out-predicts the trajectory-agnostic EK-FAC on the
-tail bank (0.705 vs 0.054). **Caveat:** these are aggregate-query, *not* comparable to the per-query
-0.0175/0.161 above — aggregate-query over 50 subsets is a noisy statistic (note EK-FAC's CI spanning
-zero). What it does isolate, at fixed aggregation, is the scorer: the exact tail metagradient (0.705)
-vs the trajectory-agnostic proxy (0.054). MAGIC Pearson 0.664, sign-agreement 37/50, p=1.1e-8.
-
-**On the MAGIC code-version note above — verified not to apply to this run.** `c0f11ba8` fixes the
-*grad-accum* metagradient path (`metagrad_step`): a CUDA-dropout RNG-replay bug and a 1/world_size
-weight-cotangent correction. This run hits neither: (1) `feat/ms-pretrain` has **no `metagrad_step`
-/grad-accum path** — it uses only the single-shot `backward()`, which **already carries** the
-1/world_size correction (`trainer.py:869`); (2) OLMo2 runs **dropout 0.0**, so the RNG-replay bug (a
-GPU-dropout issue — the reason the GPT-2 eps1e-8 value moved 0.37→0.17) cannot fire; the forward is
-deterministic and rematerializes exactly. So the fix would leave this number unchanged; a recompute
-on the fixed code was judged redundant (and would risk introducing unrelated branch-surgery diffs).
+**MAGIC (matched tail-metagradient) — per-query run in progress.** MAGIC is the exact tail
+metagradient, so it should predict the tail bank better than the trajectory-agnostic EK-FAC. The
+per-query MAGIC LDS (matched to the 0.161 EK-FAC number above) is being computed — one backward per
+query. _(An earlier aggregate-query MAGIC number is **not** used here; aggregate-query metrics are
+non-standard and quarantined in [the appendix](#appendix--aggregate-query-numbers-do-not-cite).)_
 - **Intervention** — `weight_start_frac` / `weight_start_step`, following arXiv 2503.13751 App. C.3
   (data weights enter the loss only from step *k*, chosen to maximize metasmoothness; DataComp *k* =
   2800/3125, IFT *k* = "150 steps from the end"). `DataStream` pins weights to a constant 1 before
@@ -363,6 +346,27 @@ metasmooth measured for each bank's training config (bs64, 4 epochs): lotus 0.99
 - All banks above: `data.chunk_length = 0`.
 
 ## Appendix
+
+### Appendix — aggregate-query numbers (DO NOT CITE)
+
+**Aggregate-query metrics are non-standard and must not be used** (see the CLAUDE.md rule: LDS is
+per-query only). They are recorded here, out of the main results, purely so a value already computed
+is not silently lost or mistaken for a headline number. An aggregate-query LDS averages the query
+gradients into one query and then correlates over subsets — a single, noisy correlation over few
+points, **not comparable** to the per-query means in the main tables.
+
+OLMo2 tail-only bank (frac=0.833), aggregate-query:
+
+| window | Method | aggregation | LDS | 95% CI | n |
+|---|---|---|---|---|---|
+| last epoch (0.833) | EK-FAC | aggregate-query | 0.054 | [−0.246, 0.357] | 50 |
+| last epoch (0.833) | MAGIC | aggregate-query | 0.705 | [0.521, 0.824] | 50 |
+
+The per-query EK-FAC number for the same bank is 0.161 (main table); the per-query MAGIC number is
+being computed to replace the 0.705 here. The 0.705 was verified unaffected by the `c0f11ba8`
+metagrad fix (OLMo2 dropout 0.0; single-shot `backward()` already carries the 1/world_size
+correction; no grad-accum path on `feat/ms-pretrain`), so it is a valid *aggregate-query* number —
+it is quarantined for being aggregate-query, not for being wrong.
 
 ### Information for Coding Agents
 
