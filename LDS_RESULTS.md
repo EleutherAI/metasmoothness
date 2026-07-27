@@ -161,7 +161,126 @@ betas 0.95/0.975, wd 0.1, 50 subsets.
 | 16k | 750 | 0.010 | EK-FAC | 0.0175 | [−0.036, 0.071] | 50 | 2.92 | 4.56 | 4.10 | 0.1 | rep |
 
 Both metasmoothness (0.010) and LDS (0.018) ≈ 0 — the extreme low-metasmoothness endpoint of the
-grid, consistent with the mechanism. (N32k paused at 4/50 subsets.)
+grid, consistent with the mechanism.
+
+#### Pre-training is metasmooth only in its *tail* — exclude the early steps (main result)
+
+A from-scratch pre-training run is unscoreable over its **full** trajectory, but the **last epoch**
+is metasmooth. Attributing only over the tail — and evaluating against a leave-k-out bank that drops
+each subset's docs only in that tail — turns LDS from ~0 to 0.7, at the model's **full 3.23-nats
+loss** (the trained model is unchanged; only the attribution window moves).
+
+| attribution window | frac | metasmooth | Method | LDS | 95% CI | n | train loss | shuffle |
+|---|---|---|---|---|---|---|---|---|
+| full run (0–749) | 0.0 | 0.010 | EK-FAC | 0.0175 | [−0.036, 0.071] | 50 | 2.92 | rep |
+| full run (0–749) | 0.0 | −0.000 | EK-FAC | 0.0175 | [−0.036, 0.071] | 50 | 3.23 | per-epoch |
+| **last epoch (624–749)** | **0.833** | **0.984** | **MAGIC** | **0.705** | **[0.521, 0.824]** | 50 | 3.23 | per-epoch |
+| last epoch (624–749) | 0.833 | 0.984 | EK-FAC | _(running)_ | | 50 | 3.23 | per-epoch |
+
+- MAGIC LDS 0.705 (Spearman, 10k-bootstrap; Pearson 0.664; sign-agreement 37/50; p=1.1e-8). Disjoint
+  CI from the full-run EK-FAC 0.0175 — a clean, ~40× separation.
+- The full-run row is repeated at both shuffles: the original bank is `rep` (metasmooth 0.010); the
+  per-epoch full run is metasmooth −0.000 (both ≈ 0, so the shuffle change does not move the dead
+  endpoint). The tail rows are per-epoch (the merged `#352` behaviour).
+- **Intervention** — `weight_start_frac` / `weight_start_step`, following arXiv 2503.13751 App. C.3
+  (data weights enter the loss only from step *k*, chosen to maximize metasmoothness; DataComp *k* =
+  2800/3125, IFT *k* = "150 steps from the end"). `DataStream` pins weights to a constant 1 before
+  *k*, so the forward trajectory — and the loss — are identical across the window; only the backward
+  and the bank's leave-out window change. Branch `feat/ms-pretrain` (off `fix/per-epoch-shuffle`),
+  commit `5833a9b3`, 13 regression tests. MAGIC backward over the tail unrolls only the last epoch
+  (~6× cheaper) and is numerically clean, where a full-run backward NaNs on the chaotic trajectory.
+
+#### metasmoothness vs attribution window (16k, fixed model, loss 3.23 throughout)
+
+Moving the attribution start forward, on the one fixed 16k/750-step run. `predicted LDS` applies the
+`LDS = 0.284·ms^0.637` law (spearman 0.98 over the 11 both-measured configs above). Coverage =
+whether every doc still appears in the window (needed for a valid bank): the tail spans (1−frac)×6
+epochs, so full coverage requires frac ≤ 0.833.
+
+| frac | window (steps) | epochs in window | metasmooth | predicted LDS | coverage |
+|---|---|---|---|---|---|
+| 0.0 | 0–749 | 6.00 | −0.000 | 0.00 | full |
+| 0.25 | 187–749 | 4.50 | 0.025 | 0.03 | full |
+| 0.5 | 375–749 | 3.00 | 0.355 | 0.15 | full |
+| 0.6 | 450–749 | 2.40 | 0.669 | 0.22 | full |
+| 0.75 | 562–749 | 1.50 | 0.793 | 0.24 | full |
+| **0.833** | **624–749** | **1.00** | **0.984** | **0.28** | **full (boundary)** |
+| 0.896 | 672–749 | 0.62 | 0.986 | 0.28 | 38% docs unseen |
+| 0.95 | 712–749 | 0.30 | 0.993 | 0.28 | 70% unseen |
+| 0.99 | 742–749 | 0.06 | 0.990 | 0.28 | 94% unseen |
+
+`frac=0.833` (exactly the last epoch) is the operating point: near-ceiling metasmoothness at the
+largest window with full coverage. Confirmed at a second `direction_seed`: `window_0.75` scores 0.793
+(seed 0) / 0.838 (seed 1), `total_movement_l1` 0.24% apart — a real effect, not the sign-statistic
+noise that dominates near zero.
+
+#### The driver is epochs-in-window, not run length or distance from init (control)
+
+The `window4k` control repeats the window sweep on a 188-step (N=4k) run. Matched by **epochs in the
+window** — both runs are 6 epochs — the two lengths nearly coincide, so run length / absolute step
+count is not what matters; the fraction of the trajectory (≈ number of epochs) in the window is.
+
+| epochs in window | frac | 4k (188-step) ms | 16k (750-step) ms |
+|---|---|---|---|
+| 4.50 | 0.25 | 0.154 | 0.025 |
+| 3.00 | 0.50 | 0.147 | 0.355 |
+| 2.40 | 0.60 | 0.512 | 0.669 |
+| 1.50 | 0.75 | 0.971 | 0.793 |
+| 1.00 | 0.833 | 0.993 | 0.984 |
+| 0.30 | 0.95 | 0.995 | 0.993 |
+
+Cleanest single isolation, within one run (no cross-run confound): the **same** 188-step 4k model
+(loss 4.98) scores **0.0095** over its full 6-epoch window and **0.993** over its last 1-epoch
+window. Mechanism: each doc's weight perturbation compounds once per epoch it is in the window, and
+that cross-epoch compounding is what goes nonlinear — one epoch ≈ one application ≈ nearly linear.
+
+#### metasmoothness vs pre-training length (steps axis) — flat at ~0
+
+Full-run attribution, muon eps_root 1e-6, per-epoch shuffle, `direction_seed=0`. Shortening the run
+does **not** help — every full run is 6 epochs, so all sit at ~0 while loss ranges over 1.9 nats.
+
+| N | steps | metasmooth | final-epoch loss |
+|---|---|---|---|
+| 4k | 188 | 0.0095 | 4.98 |
+| 8k | 375 | 0.0177 | 3.95 |
+| 16k | 750 | −0.0002 | 3.23 |
+| 32k | 1500 | 0.0051 | 3.09 |
+
+#### Optimizer / architecture knobs (full-run) — nothing helps without wrecking loss
+
+One-factor from the 16k baseline (muon, eps_root 1e-6, lr 9e-3, wd 0.1, bs128, 6ep). `opt_adamw`'s
+0.647 is the metasmoothness/performance artefact — at loss 6.18 the model barely trained, so its
+response is trivially linear and useless. Every knob at a usable loss stays ~0.
+
+| knob | metasmooth | final-epoch loss |
+|---|---|---|
+| baseline | −0.0002 | 3.23 |
+| optimizer → adamw (lr 8e-4) | 0.647 | 6.18 |
+| lr → 3e-3 | 0.019 | 2.69 |
+| weight_decay → 0 | 0.003 | 3.27 |
+| eps_root → 1e-4 | 0.004 | 3.34 |
+| batch_size 64 (3ep) | 0.005 | 4.31 |
+| batch_size 256 (12ep) | 0.006 | 1.34 |
+
+#### Caveats / reproduction
+
+- **Def. 2 is ill-conditioned near zero.** The score is a movement-weighted average of ±1 sign
+  agreements; when its true value is ~0 the signs are near coin flips, so a tiny numerical change
+  flips the score's sign while `total_movement_l1` barely moves. Concretely the 16k full run scored
+  0.0101 (bergson 0.10.0, `rep`) vs −0.000165 (0.13.1+, per-epoch) with movement agreeing to 0.12%.
+  So: differences below ~0.02 carry no information; confirm any promising cell at a second
+  `direction_seed`; quote `total_movement_l1` alongside. `use_tf32_matmuls` was verified bit-identical
+  here (not the cause of that gap) but is kept off as a precaution — all rows here are fp32.
+- The full-run OLMo2 bank's leave-out signal is real but chaotic: per-query Δloss sd 0.066 (vs
+  ~0.001 for GPT-2 fine-tuning banks) — trajectory divergence, not stronger influence, which is why
+  no scorer can predict it. Re-scoring the surviving index (`/mnt/ssd-2/lucia/scratch_olmo/N16k_scores`)
+  with different damping/SOURCE/Trackstar cannot rescue it; the fix is to change what is attributed
+  over, hence the tail-only bank.
+- **Code / configs (branch `feat/ms-pretrain` @ `/mnt/ssd-1/lucia/bergson-ms-pretrain`):** window
+  sweep + analysis `experiments/pretrain_metasmoothness/{run_sweep,analyze}.py`; tail-only bank
+  generator `gen_tail_bank.py` (frac=0.833, single `magic` step → tail MAGIC scores + tail-only 50-
+  subset bank + inline LDS). Tail bank + models: `runs/tail_bank_083_full/` (reusable). Full narrative
+  writeup: `experiments/pretrain_metasmoothness/RESULTS.md`.
 
 ### WikiText (`bergson-wikitext-512-chunks`)
 
