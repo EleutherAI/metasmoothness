@@ -40,7 +40,7 @@ rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows
 
 **MAGIC code-version note:** MAGIC values depend on the metagradient code, which changed via a rebase on 2026-07-24 ~08:00 that landed `c0f11ba8 "Fix metagrad replay correctness under CUDA dropout and DDP"` (+ grad_accum). eps1e-8 MAGIC = 0.37 on the pre-fix code (07-23) vs 0.17 on the fixed code (07-24). **All MAGIC values in the grid are now on the FIXED code:** eps1e-8 (0.17), eps1e-8 dropout0 (0.18), bs128 (0.43), eps1e-6 4k (0.86 [0.844, 0.877], n=20), eps1e-6 8k (0.98 [0.980, 0.987], n=20), muon (0.76), and — recomputed on the fixed code (were −0.08 / 0.099 pre-fix) — eps1e-10 (−0.02 [−0.065, 0.023], n=20) and bs32 (0.05 [−0.054, 0.145], n=20). eps1e-10 and bs32 sit at ≈0 with CIs spanning zero.
 
-**Dropout:** all GPT-2 runs use dropout **0.1** (gpt2 default; `model_kwargs` empty); OLMo2 from-scratch uses **0.0** (`attention_dropout: 0.0`). Dropout is why the metagrad replay needed the fix (RNG-mask reproduction). Disable via `model_kwargs="resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0"`. For eps1e-8 4k bs64 (the two adjacent rows above): metasmoothness 0.876→0.8758, ΔL2 0.009→0.0091, EK-FAC 0.3033→0.3203 (within bootstrap CI). **The MAGIC leg of this comparison is void:** the two MAGIC runs (`magicroll_eps1e8_4k` vs `magicroll_eps1e8_drop0`) produce **bit-identical** score tensors — all 20 queries, max abs difference exactly 0 — because the trainer ran `model.eval()` in both arms, so dropout was inactive regardless of the configured rate (`train_mode` defaulted False at `7b223e31` and was rejected outright for metagradient runs). The 0.17 vs 0.1822 difference comes from scoring identical scores against two different retrain banks, not from dropout. Dropout's effect on MAGIC is **untested**; `334fcead` later removed the guard (RNG restore reproduces the masks) and PR #359 re-adds opt-in `train_mode`, so it is testable now.
+**Dropout:** all GPT-2 runs use dropout **0.1** (gpt2 default; `model_kwargs` empty); OLMo2 from-scratch uses **0.0** (`attention_dropout: 0.0`). Dropout is why the metagrad replay needed the fix (RNG-mask reproduction). Disable via `model_kwargs="resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0"`. For eps1e-8 4k bs64 (the two adjacent rows above): metasmoothness 0.876→0.8758, ΔL2 0.009→0.0091, EK-FAC 0.3033→0.3203 (within bootstrap CI). **The MAGIC leg of this comparison is void:** the two MAGIC runs (`magicroll_eps1e8_4k` vs `magicroll_eps1e8_drop0`) produce **bit-identical** score tensors — all 20 queries, max abs difference exactly 0 — because the trainer ran `model.eval()` in both arms, so dropout was inactive regardless of the configured rate (`train_mode` defaulted False at `7b223e31` and was rejected outright for metagradient runs). The 0.17 vs 0.1822 difference comes from scoring identical scores against two different retrain banks, not from dropout. `334fcead` later removed the guard (RNG restore reproduces the masks) and PR #359 re-adds opt-in `train_mode`. **Measured on WikiText with dropout actually active** (`train_mode: true`, gpt2 default 0.1) — see the WikiText table below: MAGIC LDS ≈ 0 with dropout vs 0.9681 without. Note dropout is only active when `train_mode: true`; with the default the trainer calls `model.eval()` and the configured rate is inert.
 
 ### SmolLM2 (`bergson-smollm2-lds-chunks`, `train_{4k,8k,16k,32k}.hf`)
 
@@ -405,9 +405,27 @@ Two banks, both adamw, 4 epochs, betas 0.95/0.975.
 
 metasmooth measured for each bank's training config (bs64, 4 epochs): lotus 0.998, epsroot0 0.609.
 
+**Dropout collapses MAGIC LDS on this dataset.** The `dropout*` rows use `train_mode: true` (PR #359,
+`334fcead`) so gpt2's default 0.1 dropout is actually active during training and the metagradient
+replay; every other row has dropout configured but inert (`model.eval()`). Same model / dataset /
+lr 8e-4 / bs64 / ep4 / eps_root 1e-6 as lotus. Both dropout runs are statistically indistinguishable
+from zero, against lotus's 0.9681 (per-query 0.92–0.99, p ~1e-250). The two dropout runs share
+bit-identical MAGIC scores — they differ only in bank construction, so subset construction is not
+what drives the result: ragged subsets (2–47 docs) gave 0.1862 and fixed 46-doc subsets gave −0.2286.
+
+Caveats: the dropout rows are **1 query** and 15/99 subsets, vs lotus's 50 queries and 400 subsets.
+At N=15 the 95% CI on −0.2286 is roughly [−0.7, +0.35] — wide enough that its sign is meaningless,
+but narrow enough to exclude ~0.9. MAGIC scores themselves are finite under dropout (4608 scores,
+0 NaN), so this is a prediction-quality collapse, not a numerical failure.
+
+`chunk_length` is **not** a factor here: re-running `lotus_final_q01_50` with `chunk_length: 0`
+instead of 512 reproduces 0.9681 exactly (mean 0.9681, median 0.9815, min 0.5977 vs 0.5976).
+
 | optimizer | Bank | eps_root | metasmooth | Method | Variant | LDS | n | train loss | ΔL1 | ΔL2 | Run dir | dropout | shuffle |
 |-----------|------|----------|-----------|--------|---------|-----|---|-----------|------|------|---------|---------|--------|
-| adam | lotus | 1e-6 | 0.998 | MAGIC | full q01–50 | 0.9681 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_final_q01_50` | 0.1 | rep |
+| adam | lotus | 1e-6 | 0.998 | MAGIC | full q01–50 | 0.9681 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_final_q01_50` | 0.1 (inert) | rep |
+| adam | dropout_s15 | 1e-6 | — | MAGIC | q0, 15 subsets @46 | −0.2286 (p=0.41) | 1 | 3.00 | — | — | `runs/gpt2_wikitext_dropout_s15` | 0.1 **active** | rep |
+| adam | dropout | 1e-6 | — | MAGIC | q0, 99 ragged subsets | 0.1862 (p=0.065) | 1 | 3.00 | — | — | `runs/gpt2_wikitext_dropout` | 0.1 **active** | rep |
 | adam | lotus | 1e-6 | 0.998 | MAGIC | bwd eval | 0.9688 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_bwd_eval` | 0.1 | rep |
 | adam | lotus | 1e-6 | 0.998 | SOURCE | damp0 | 0.3902 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_source_q50_damp0_validate` | 0.1 | rep |
 | adam | lotus | 1e-6 | 0.998 | SOURCE | adam | 0.2068 | 50 | 3.06 | 0.0033 | 0.0040 | `runs/lotus_source_adam_q50_validate` | 0.1 | rep |
