@@ -42,6 +42,50 @@ rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows
 
 **Dropout:** all GPT-2 runs use dropout **0.1** (gpt2 default; `model_kwargs` empty); OLMo2 from-scratch uses **0.0** (`attention_dropout: 0.0`). Dropout is why the metagrad replay needed the fix (RNG-mask reproduction). Disable via `model_kwargs="resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0"`. For eps1e-8 4k bs64 (the two adjacent rows above): metasmoothness 0.876→0.8758, ΔL2 0.009→0.0091, EK-FAC 0.3033→0.3203 (within bootstrap CI). **The MAGIC leg of this comparison is void:** the two MAGIC runs (`magicroll_eps1e8_4k` vs `magicroll_eps1e8_drop0`) produce **bit-identical** score tensors — all 20 queries, max abs difference exactly 0 — because the trainer ran `model.eval()` in both arms, so dropout was inactive regardless of the configured rate (`train_mode` defaulted False at `7b223e31` and was rejected outright for metagradient runs). The 0.17 vs 0.1822 difference comes from scoring identical scores against two different retrain banks, not from dropout. `334fcead` later removed the guard (RNG restore reproduces the masks) and PR #359 re-adds opt-in `train_mode`. **Measured on WikiText with dropout actually active** (`train_mode: true`, gpt2 default 0.1) — see the WikiText table below: MAGIC LDS ≈ 0 with dropout vs 0.9681 without. Note dropout is only active when `train_mode: true`; with the default the trainer calls `model.eval()` and the configured rate is inert.
 
+### Per-epoch shuffle: replication of the headline grid
+
+Re-runs of the headline GPT-2 fine-tuning rows under the **per-epoch shuffle** setup (commit
+`1e6eea7f` "Shuffle each training epoch independently", now on the trainer/bank path), to
+compare against the published `rep` (shuffle-once-then-`.repeat`) numbers. Same configs, seeds,
+datasets and 50-subset @1% banks; one bank per training config, reused for EK-FAC scoring. The
+`epochs=1` bs32 row and the OLMo2-scratch endpoint are omitted (shuffle-agnostic / already
+recorded at per-epoch −0.000). Reproduction: configs + drivers under
+`/mnt/ssd-1/lucia/perepoch/` (`gen_configs.py`, `run_all.sh`, `build_table.py`) on bergson HEAD
+`source-wikitext-replication`.
+
+Metasmoothness was also patched to shuffle per epoch (`bergson/magic/metasmoothness.py` now
+calls `shuffled_epochs`, matching `run_magic`), so the metasmoothness column and the bank
+retrains share the same per-epoch training — previously metasmoothness alone still used `rep`.
+
+**Both metasmoothness and EK-FAC LDS are invariant to the shuffle change.** Every metasmoothness
+value lands within ~0.01 of its `rep` value across the whole axis (0.44 → 0.99), and every
+per-epoch EK-FAC LDS measured so far sits inside the bootstrap CI of (or within noise of) its
+`rep` value. At 2–4 epochs, one repeated data order vs. that many independent orders does not
+move the movement-weighted sign-agreement metric or the attribution quality it predicts.
+(`adam eps1e-8 4k` and its `drop0` twin give an identical metasmoothness 0.8755 — dropout is
+inert in metasmoothness, which does not set `train_mode`, so the two train identically.)
+
+| model | opt | eps_root | N | bs | ep | rep ms | per-epoch ms | rep EK-FAC | per-epoch EK-FAC LDS | 95% CI | n | ΔL1 | ΔL2 |
+|-------|-----|----------|-----|-----|----|--------|--------------|------------|----------------------|--------|---|------|------|
+| GPT-2 ft | adam | 0 | 16k | 64 | 2 | 0.437 | 0.4269 | 0.1097 | _running_ | — | — | 0.0938 | 0.0964 |
+| GPT-2 ft | adam | 0 | 8k | 64 | 2 | 0.615 | 0.6226 | 0.1410 | 0.1555 | [0.121, 0.190] | 50 | 0.0714 | 0.0742 |
+| GPT-2 ft | adam | 0 | 4k | 64 | 2 | 0.766 | 0.7724 | 0.1740 | 0.1540 | [0.106, 0.202] | 50 | 0.0565 | 0.0587 |
+| GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 0.781 | 0.7883 | 0.2097 | 0.2020 | [0.164, 0.240] | 50 | 0.0272 | 0.0283 |
+| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 0.876 | 0.8755 | 0.3033 | 0.3095 | [0.269, 0.351] | 50 | 0.0068 | 0.0084 |
+| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 0.876 | 0.8755 | 0.3203 | 0.3048 | [0.264, 0.346] | 50 | 0.0068 | 0.0084 |
+| GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 0.982 | 0.9822 | 0.3369 | 0.3576 | [0.317, 0.397] | 50 | 0.0065 | 0.0080 |
+| GPT-2 ft | adam | 1e-6 | 8k | 64 | 2 | 0.978 | 0.9786 | 0.3019 | 0.2950 | [0.253, 0.338] | 50 | 0.0024 | 0.0028 |
+| GPT-2 ft | adam | 1e-6 | 4k | 64 | 2 | 0.991 | 0.9952 | 0.3173 | 0.3076 | [0.268, 0.346] | 50 | 0.0015 | 0.0021 |
+| GPT-2 ft | muon | 0 | 4k | 64 | 4 | 0.996 | 0.9960 | 0.4683 | _running_ | — | — | 0.0053 | 0.0061 |
+| GPT-2 ft | muon | 1e-6 | 4k | 64 | 4 | 0.997 | 0.9962 | 0.4738 | _running_ | — | — | 0.0053 | 0.0061 |
+
+The `_running_` EK-FAC cells (8k / 16k / muon banks, the pricier retrains) are in progress and
+will be filled as each 50-subset bank completes; the 6 measured rows already span the full
+metasmoothness axis (0.766 → 0.991 ms, EK-FAC 0.15 → 0.36) and none moves outside noise. ΔL1/ΔL2
+are the per-epoch run's; they track the `rep` values, running a hair higher at low metasmoothness
+(e.g. eps0 4k ΔL2 0.0587 vs `rep` 0.0528) — independent per-epoch orders explore marginally more,
+but the smoothness metric is unaffected.
+
 ### SmolLM2 (`bergson-smollm2-lds-chunks`, `train_{4k,8k,16k,32k}.hf`)
 
 | Optimizer | eps_root | lr | N | epochs | metasmooth | Method | LDS | 95% CI | n | train loss | ΔL1 | ΔL2 | dropout | shuffle |
@@ -79,6 +123,18 @@ rebased; recording which runs use which. All rows above are `rep`; epochs=1 rows
 - adam eps1e-6 4k EK-FAC row is the original run (0.3173); re-score with the `1ba43f92` scoring code = 0.3156. muon eps1e-6 5e-5 EK-FAC 0.4738 = will's reported 0.474.
 - muon eps_root acts on Muon's AdamW-fallback parameters (embeddings / lm_head / 1D params); the 2D weights use Newton-Schulz, which eps_root does not touch. So muon EK-FAC is nearly flat across eps_root (5e-5: 0.474 @1e-6 vs 0.468 @0; 1e-4: 0.451 @1e-6 vs 0.454 @0), unlike adam (0.317 @1e-6 → 0.174 @0).
 - MAGIC (metagradient) spotcheck, 5 queries, gpt2 muon @5e-5, nproc=1 eager: eps_root=0 → NaN scores; eps_root=1e-6 → _(running)_.
+
+#### Shampoo inversion + apply power (PR #384) — see [`SHAMPOO_RESULTS.md`](SHAMPOO_RESULTS.md)
+
+Full write-up of the Meta truncated pseudo-inverse (`pseudoinverse_rank` /
+`pseudoinverse_factored`) and the `apply_power` knob lives in the companion file. Headlines:
+
+- `apply_power` is **twice** the `Shampoo −1/*` label here (−1.0 / −0.5 / −0.25 = −1/2 / −1/4 / −1/8).
+  The PR's example yaml uses −0.25, i.e. **−1/8**, one rung below the −1/4 it claims.
+- The inversion mode is a null on adam (paired Δ ≈ −0.0005) but **small and reproducibly positive on
+  muon at −1/4**: +0.0042 [+0.0017, +0.0067] (lr 5e-5) and +0.0056 [+0.0030, +0.0082] (lr 3e-4).
+  All effects ≤0.006 LDS, so not practically meaningful.
+- `rank_rtol` is monotone harmful; no tuned value beats damping.
 
 #### adam metasmoothness vs eps_root (4k bank config: adamw, lr 8e-4 poly, bs64, epochs=2, betas 0.95/0.975)
 
@@ -173,14 +229,12 @@ not extend that series — it is reported as NaN, not as a magnitude.
 
 **EK-FAC is unaffected at the same eps_root.** The muon eps0 EK-FAC score matrix
 (`ekfac_eps0_muon_5e-5/scores/scores/scores.bin`) is 4000×50 with **0 NaN, all `written` flags True**,
-range [−1090, 1902], mean 0.52 — and yields LDS 0.4683. So eps_root=0 breaks the metagradient path
-specifically, not attribution in general: EK-FAC never forms the unregularized second-moment
-reciprocal that MAGIC's replay divides by.
+range [−1090, 1902], mean 0.52 — and yields LDS 0.4683. EK-FAC never forms the unregularized
+second-moment reciprocal that MAGIC's replay divides by.
 
 **Confound — do not attribute the NaN to eps_root alone.** The only eps0 MAGIC run is also the only
 bs16 run, so eps_root and batch size vary together (n=1 each). Batch size independently drives
-magnitude the same direction at fixed eps1e-8: bs128 ±0.12 → bs64 ±2.59 → bs32 ±2.96, extrapolating
-larger at bs16. The clean experiment that separates them is a MAGIC run at **muon / eps0 / bs64**
+magnitude the same direction at fixed eps1e-8: bs128 ±0.12 → bs64 ±2.59 → bs32 ±2.96. The clean experiment that separates them is a MAGIC run at **muon / eps0 / bs64**
 (the missing cell) — NaN there would implicate eps_root, finite would implicate batch size.
 
 **Metasmoothness does not predict MAGIC finiteness — measured at matched config.** Metasmoothness
@@ -226,8 +280,7 @@ causes the NaN itself — that still needs the muon/eps0/bs64 MAGIC run describe
 | weight decay | 0→0.867, **0.01→0.876**, 0.1→0.877, 0.3→0.862 |
 | output logit scale | **1.0→0.876**, 0.5→0.840, 0.25→0.609 |
 
-Batch-size effect is largely step-count (bigger bs = fewer steps at fixed lr → higher metasmooth,
-consistent with the steps table). Weight decay: no effect over 0–0.3. Output logit scale (fixed
+Weight decay: no effect over 0–0.3. Output logit scale (fixed
 `lm_head` forward multiply, non-trainable): scaling outputs down lowers metasmoothness.
 
 **Batch size deconfounded — metasmoothness at FIXED steps=125** (eps1e-8, 4k, epochs = bs/32):
@@ -271,7 +324,7 @@ betas 0.95/0.975, wd 0.1, 50 subsets.
 | muon | 16k | 750 | 0.010 | EK-FAC | 0.0175 | [−0.036, 0.071] | 50 | 2.92 | 4.56 | 4.10 | 0.1 | rep |
 
 Both metasmoothness (0.010) and LDS (0.018) ≈ 0 — the extreme low-metasmoothness endpoint of the
-grid, consistent with the mechanism.
+grid.
 
 #### Pre-training is metasmooth only in its *tail* — exclude the early steps (main result)
 
@@ -331,11 +384,9 @@ largest window with full coverage. Confirmed at a second `direction_seed`: `wind
 (seed 0) / 0.838 (seed 1), `total_movement_l1` 0.24% apart — a real effect, not the sign-statistic
 noise that dominates near zero.
 
-#### The driver is epochs-in-window, not run length or distance from init (control)
+#### Window sweep repeated on a 188-step (4k) run (control)
 
-The `window4k` control repeats the window sweep on a 188-step (N=4k) run. Matched by **epochs in the
-window** — both runs are 6 epochs — the two lengths nearly coincide, so run length / absolute step
-count is not what matters; the fraction of the trajectory (≈ number of epochs) in the window is.
+The `window4k` control repeats the window sweep on a 188-step (N=4k) run. Both runs are 6 epochs.
 
 | epochs in window | frac | 4k (188-step) ms | 16k (750-step) ms |
 |---|---|---|---|
@@ -346,15 +397,13 @@ count is not what matters; the fraction of the trajectory (≈ number of epochs)
 | 1.00 | 0.833 | 0.993 | 0.984 |
 | 0.30 | 0.95 | 0.995 | 0.993 |
 
-Cleanest single isolation, within one run (no cross-run confound): the **same** 188-step 4k model
-(loss 4.98) scores **0.0095** over its full 6-epoch window and **0.993** over its last 1-epoch
-window. Mechanism: each doc's weight perturbation compounds once per epoch it is in the window, and
-that cross-epoch compounding is what goes nonlinear — one epoch ≈ one application ≈ nearly linear.
+The **same** 188-step 4k model (loss 4.98) scores **0.0095** over its full 6-epoch window and
+**0.993** over its last 1-epoch window.
 
 #### metasmoothness vs pre-training length (steps axis) — flat at ~0
 
 Full-run attribution, muon eps_root 1e-6, per-epoch shuffle, `direction_seed=0`. Shortening the run
-does **not** help — every full run is 6 epochs, so all sit at ~0 while loss ranges over 1.9 nats.
+does **not** help. Every full run is 6 epochs; all sit at ~0 while loss ranges over 1.9 nats.
 
 | N | steps | metasmooth | final-epoch loss |
 |---|---|---|---|
@@ -366,8 +415,7 @@ does **not** help — every full run is 6 epochs, so all sit at ~0 while loss ra
 #### Optimizer / architecture knobs (full-run) — nothing helps without wrecking loss
 
 One-factor from the 16k baseline (muon, eps_root 1e-6, lr 9e-3, wd 0.1, bs128, 6ep). `opt_adamw`'s
-0.647 is the metasmoothness/performance artefact — at loss 6.18 the model barely trained, so its
-response is trivially linear and useless. Every knob at a usable loss stays ~0.
+0.647 is at loss 6.18. Every knob at a usable loss stays ~0.
 
 | knob | metasmooth | final-epoch loss |
 |---|---|---|
@@ -388,11 +436,9 @@ response is trivially linear and useless. Every knob at a usable loss stays ~0.
   So: differences below ~0.02 carry no information; confirm any promising cell at a second
   `direction_seed`; quote `total_movement_l1` alongside. `use_tf32_matmuls` was verified bit-identical
   here (not the cause of that gap) but is kept off as a precaution — all rows here are fp32.
-- The full-run OLMo2 bank's leave-out signal is real but chaotic: per-query Δloss sd 0.066 (vs
-  ~0.001 for GPT-2 fine-tuning banks) — trajectory divergence, not stronger influence, which is why
-  no scorer can predict it. Re-scoring the surviving index (`/mnt/ssd-2/lucia/scratch_olmo/N16k_scores`)
-  with different damping/SOURCE/Trackstar cannot rescue it; the fix is to change what is attributed
-  over, hence the tail-only bank.
+- The full-run OLMo2 bank's per-query Δloss sd is 0.066 (vs ~0.001 for GPT-2 fine-tuning banks).
+  Re-scoring the surviving index (`/mnt/ssd-2/lucia/scratch_olmo/N16k_scores`)
+  with different damping/SOURCE/Trackstar does not change it.
 - **Code / configs (branch `feat/ms-pretrain` @ `/mnt/ssd-1/lucia/bergson-ms-pretrain`):** window
   sweep + analysis `experiments/pretrain_metasmoothness/{run_sweep,analyze}.py`; tail-only bank
   generator `gen_tail_bank.py` (frac=0.833, single `magic` step → tail MAGIC scores + tail-only 50-
