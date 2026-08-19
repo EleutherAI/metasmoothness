@@ -1,0 +1,20 @@
+steps:
+- hessian:
+    hessian_cfg:
+      method: kfac
+      ev_correction: true
+    index_cfg:
+      run_path: /mnt/ssd-2/lucia/muon4k/bighessian_300k/hessian_fit/kfac
+      model: /mnt/ssd-2/lucia/muon4k/run_eps0_5e-5/N4k/retrained/base
+      overwrite: true
+      projection_dim: 0
+      token_batch_size: 1024
+      max_batch_size: 64
+      filter_modules: lm_head
+      distributed:
+        nproc_per_node: 6
+        nnode: 1
+      data:
+        dataset: /mnt/ssd-2/lucia/muon4k/bighessian_data/smollm2_300k.hf
+        split: train
+        chunk_length: 0

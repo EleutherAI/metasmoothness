@@ -1,0 +1,87 @@
+steps:
+- magic:
+    run_path: runs/bs_eps1e8/bs192_q5
+    overwrite: true
+    model: gpt2
+    precision: fp32
+    revision: null
+    distributed:
+      nnode: 1
+      nproc_per_node: 4
+      node_rank: null
+    fsdp: false
+    peft_init_kwargs: ''
+    model_kwargs: ''
+    data:
+      dataset: EleutherAI/bergson-wikitext-512-chunks
+      split: train
+      subset: null
+      prompt_column: text
+      completion_column: ''
+      conversation_column: ''
+      reward_column: ''
+      skip_nan_rewards: false
+      truncation: false
+      format_template: ''
+      data_kwargs: ''
+      chunk_length: 0
+    tokenizer: ''
+    drop_columns: true
+    max_tokens: null
+    use_tf32_matmuls: false
+    debug: false
+    lr_schedule:
+      lr: 0.0008
+      lr_scheduler_type: polynomial
+      lr_start: 1.0e-06
+      lr_end: 8.0e-05
+      warmup_steps: 0.25
+      num_cycles: 0.5
+      power: 1.0
+    batch_size: 192
+    num_epochs: 4
+    seed: 42
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    eps_root: 1.0e-08
+    adam_eps: 1.0e-08
+    loss_reduction: mean
+    optimizer: adamw
+    train_mode: false
+    save_optimizer_state: none
+    weight_decay: 0.01
+    max_grad_norm: null
+    grad_checkpointing: false
+    grad_accum_steps: 3
+    resume: false
+    wandb_project: ''
+    save_models: false
+    query:
+      dataset: EleutherAI/bergson-wikitext-512-chunks
+      split: test[5:6]
+      subset: null
+      prompt_column: text
+      completion_column: ''
+      conversation_column: ''
+      reward_column: ''
+      skip_nan_rewards: false
+      truncation: false
+      format_template: ''
+      data_kwargs: ''
+      chunk_length: 0
+    query_method: mean
+    num_subsets: 0
+    subset_strategy: random
+    exclude_zero_scores: false
+    subset_fraction: 0.0
+    save_mode: sqrt
+    save_interval: 0
+    backward_save_every: 0
+    cleanup_ckpts: true
+    per_token: false
+    skip_validation: true
+    skip_metagradient: false
+metadata:
+  bergson_version: 0.10.1
+  created: '2026-08-03T12:50:49+00:00'
+  git_sha: 37d7b386

@@ -17,21 +17,21 @@ below. `shuffle` = data-order-per-epoch implementation (see note): **rep** = shu
 `train loss` = final base-model loss on its training set (mean per-token CE, ≤2000-doc sample). `ΔL1` = relative
 parameter-update L1, ‖θ_final−θ_init‖₁ / ‖θ_init‖₁ (init = gpt2, or the OLMo2 reinit for scratch).
 
-| model | opt | eps_root | N | bs | epochs | steps | empirical metasmooth | EK-FAC LDS | MAGIC LDS | train loss | ΔL1 | ΔL2 | dropout | shuffle |
-|-------|-----|----------|-----|-----|--------|-------|-----------|-----------|-----------|-----------|------|------|---------|---------|
-| OLMo2 scratch | muon | 1e-6 | 16k | 128 | 6 | 750 | 0.010 | 0.0175 | — | 2.92 | 4.56 | 4.10 | 0.0 | rep |
-| GPT-2 ft | adam | 0 | 16k | 64 | 2 | 500 | 0.437 | 0.1097 | — | 2.65 | 0.086 | 0.087 | 0.1 | rep |
-| GPT-2 ft | adam | 0 | 8k | 64 | 2 | 250 | 0.615 | 0.1410 | — | 2.61 | 0.065 | 0.067 | 0.1 | rep |
-| GPT-2 ft | adam | 0 | 4k | 64 | 2 | 125 | 0.766 | 0.1740 | — | 2.61 | 0.051 | 0.053 | 0.1 | rep |
-| GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 125 | 0.781 | 0.2097 | −0.02 (n=20) | 2.71 | 0.029 | 0.029 | 0.1 | rep |
-| GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | 0.1781 | 0.05 (n=20) | 3.07 | 0.009 | 0.010 | 0.1 | rep |
-| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3033 | 0.17 (n=20) | 3.02 | 0.008 | 0.009 | 0.1 | rep |
-| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.876 | 0.3203 | 0.18 (n=20) | 3.01 | 0.008 | 0.009 | 0.0 | rep |
-| GPT-2 ft | adam | 1e-6 | 8k | 64 | 2 | 250 | 0.978 | 0.3019 | 0.98 (n=20) | 3.18 | 0.0024 | 0.003 | 0.1 | rep |
-| GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 125 | 0.982 | 0.3369 | 0.43 (n=20) | 2.98 | 0.0074 | 0.009 | 0.1 | rep |
-| GPT-2 ft | adam | 1e-6 | 4k | 64 | 2 | 125 | 0.991 | 0.3173 | 0.86 (n=20) | 3.18 | 0.0016 | 0.002 | 0.1 | rep |
-| GPT-2 ft | muon | 0 | 4k | 64 | 4 | 250 | 0.996 | 0.4683 | — | 3.08 | 0.0057 | 0.006 | 0.1 | rep |
-| GPT-2 ft | muon | 1e-6 | 4k | 64 | 4 | 250 | 0.997 | 0.4738 | 0.76 (n=20) | 3.08 | 0.0057 | 0.006 | 0.1 | rep |
+| model | opt | eps_root | N | bs | epochs | steps | empirical metasmooth | EK-FAC LDS | MAGIC LDS | train loss | ΔL1 | ΔL2 | dropout | shuffle | ms shuffle |
+|-------|-----|----------|-----|-----|--------|-------|-----------|-----------|-----------|-----------|------|------|---------|---------|---|
+| OLMo2 scratch | muon | 1e-6 | 16k | 128 | 6 | 750 | −0.000 | 0.0175 | — | 2.92 | 4.56 | 4.10 | 0.0 | rep | per-epoch |
+| GPT-2 ft | adam | 0 | 16k | 64 | 2 | 500 | 0.4269 | 0.1097 | — | 2.65 | 0.086 | 0.087 | 0.1 | rep | per-epoch |
+| GPT-2 ft | adam | 0 | 8k | 64 | 2 | 250 | 0.6226 | 0.1410 | — | 2.61 | 0.065 | 0.067 | 0.1 | rep | per-epoch |
+| GPT-2 ft | adam | 0 | 4k | 64 | 2 | 125 | 0.7724 | 0.1740 | — | 2.61 | 0.051 | 0.053 | 0.1 | rep | per-epoch |
+| GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 125 | 0.7883 | 0.2097 | −0.02 (n=20) | 2.71 | 0.029 | 0.029 | 0.1 | rep | per-epoch |
+| GPT-2 ft | adam | 1e-8 | 4k | 32 | 1 | 125 | 0.837 | 0.1781 | 0.05 (n=20) | 3.07 | 0.009 | 0.010 | 0.1 | rep |  |
+| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.8755 | 0.3033 | 0.17 (n=20) | 3.02 | 0.008 | 0.009 | 0.1 | rep | per-epoch |
+| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 125 | 0.8755 | 0.3203 | 0.18 (n=20) | 3.01 | 0.008 | 0.009 | 0.0 | rep | per-epoch |
+| GPT-2 ft | adam | 1e-6 | 8k | 64 | 2 | 250 | 0.9786 | 0.3019 | 0.98 (n=20) | 3.18 | 0.0024 | 0.003 | 0.1 | rep | per-epoch |
+| GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 125 | 0.9822 | 0.3369 | 0.43 (n=20) | 2.98 | 0.0074 | 0.009 | 0.1 | rep | per-epoch |
+| GPT-2 ft | adam | 1e-6 | 4k | 64 | 2 | 125 | 0.9952 | 0.3173 | 0.86 (n=20) | 3.18 | 0.0016 | 0.002 | 0.1 | rep | per-epoch |
+| GPT-2 ft | muon | 0 | 4k | 64 | 4 | 250 | 0.9960 | 0.4683 | — | 3.08 | 0.0057 | 0.006 | 0.1 | rep | per-epoch |
+| GPT-2 ft | muon | 1e-6 | 4k | 64 | 4 | 250 | 0.9962 | 0.4738 | 0.76 (n=20) | 3.08 | 0.0057 | 0.006 | 0.1 | rep | per-epoch |
 
 **Per-epoch shuffle note:** the run checkout `feat/magic-grad-accum` shuffles the train set once then
 `.repeat(num_epochs)`, so every epoch sees the **same order** (`rep`). The fix — commit `1e6eea7f`
@@ -57,72 +57,76 @@ Metasmoothness was also patched to shuffle per epoch (`bergson/magic/metasmoothn
 calls `shuffled_epochs`, matching `run_magic`), so the metasmoothness column and the bank
 retrains share the same per-epoch training — previously metasmoothness alone still used `rep`.
 
-**Both metasmoothness and EK-FAC LDS are invariant to the shuffle change.** Every metasmoothness
-value lands within ~0.01 of its `rep` value across the whole axis (0.44 → 0.99), and every
-per-epoch EK-FAC LDS measured so far sits inside the bootstrap CI of (or within noise of) its
-`rep` value. At 2–4 epochs, one repeated data order vs. that many independent orders does not
-move the movement-weighted sign-agreement metric or the attribution quality it predicts.
-(`adam eps1e-8 4k` and its `drop0` twin give an identical metasmoothness 0.8755 — dropout is
-inert in metasmoothness, which does not set `train_mode`, so the two train identically.)
+**Both metasmoothness and EK-FAC LDS are invariant to the shuffle change** (all 11 configs
+measured). Every per-epoch metasmoothness lands within ~0.01 of its `rep` value across the whole
+axis (0.44 → 0.99; largest gap is 8k eps0, 0.615 → 0.6226), and every per-epoch EK-FAC LDS sits
+inside the bootstrap CI of its `rep` value — the `rep` point is contained in all 11 CIs, and the
+largest shift is +0.02 (bs128, 0.337 → 0.358). At 2–4 epochs, one repeated data order vs. that
+many independent orders does not move the movement-weighted sign-agreement metric or the
+attribution quality it predicts. (`adam eps1e-8 4k` and its `drop0` twin give an identical
+metasmoothness 0.8755 — dropout is inert in metasmoothness, which does not set `train_mode`, so
+the two train identically.)
 
-| model | opt | eps_root | N | bs | ep | rep ms | per-epoch ms | rep EK-FAC | per-epoch EK-FAC LDS | 95% CI | n | ΔL1 | ΔL2 |
+| model | opt | eps_root | N | bs | ep | rep ms | per-epoch ms | rep EK-FAC | per-epoch EK-FAC LDS | 95% CI | n | ΔL1 | ΔL2|
 |-------|-----|----------|-----|-----|----|--------|--------------|------------|----------------------|--------|---|------|------|
-| GPT-2 ft | adam | 0 | 16k | 64 | 2 | 0.437 | 0.4269 | 0.1097 | _running_ | — | — | 0.0938 | 0.0964 |
-| GPT-2 ft | adam | 0 | 8k | 64 | 2 | 0.615 | 0.6226 | 0.1410 | 0.1555 | [0.121, 0.190] | 50 | 0.0714 | 0.0742 |
-| GPT-2 ft | adam | 0 | 4k | 64 | 2 | 0.766 | 0.7724 | 0.1740 | 0.1540 | [0.106, 0.202] | 50 | 0.0565 | 0.0587 |
-| GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 0.781 | 0.7883 | 0.2097 | 0.2020 | [0.164, 0.240] | 50 | 0.0272 | 0.0283 |
-| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 0.876 | 0.8755 | 0.3033 | 0.3095 | [0.269, 0.351] | 50 | 0.0068 | 0.0084 |
-| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 0.876 | 0.8755 | 0.3203 | 0.3048 | [0.264, 0.346] | 50 | 0.0068 | 0.0084 |
-| GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 0.982 | 0.9822 | 0.3369 | 0.3576 | [0.317, 0.397] | 50 | 0.0065 | 0.0080 |
-| GPT-2 ft | adam | 1e-6 | 8k | 64 | 2 | 0.978 | 0.9786 | 0.3019 | 0.2950 | [0.253, 0.338] | 50 | 0.0024 | 0.0028 |
-| GPT-2 ft | adam | 1e-6 | 4k | 64 | 2 | 0.991 | 0.9952 | 0.3173 | 0.3076 | [0.268, 0.346] | 50 | 0.0015 | 0.0021 |
-| GPT-2 ft | muon | 0 | 4k | 64 | 4 | 0.996 | 0.9960 | 0.4683 | _running_ | — | — | 0.0053 | 0.0061 |
-| GPT-2 ft | muon | 1e-6 | 4k | 64 | 4 | 0.997 | 0.9962 | 0.4738 | _running_ | — | — | 0.0053 | 0.0061 |
+| GPT-2 ft | adam | 0 | 16k | 64 | 2 | 0.437 | 0.4269 | 0.1097 | 0.1186 | [0.074, 0.164] | 50 | 0.0938 | 0.0964|
+| GPT-2 ft | adam | 0 | 8k | 64 | 2 | 0.615 | 0.6226 | 0.1410 | 0.1555 | [0.121, 0.190] | 50 | 0.0714 | 0.0742|
+| GPT-2 ft | adam | 0 | 4k | 64 | 2 | 0.766 | 0.7724 | 0.1740 | 0.1540 | [0.106, 0.202] | 50 | 0.0565 | 0.0587|
+| GPT-2 ft | adam | 1e-10 | 4k | 64 | 2 | 0.781 | 0.7883 | 0.2097 | 0.2020 | [0.164, 0.240] | 50 | 0.0272 | 0.0283|
+| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 0.876 | 0.8755 | 0.3033 | 0.3095 | [0.269, 0.351] | 50 | 0.0068 | 0.0084|
+| GPT-2 ft | adam | 1e-8 | 4k | 64 | 2 | 0.876 | 0.8755 | 0.3203 | 0.3048 | [0.264, 0.346] | 50 | 0.0068 | 0.0084|
+| GPT-2 ft | adam | 1e-8 | 4k | 128 | 4 | 0.982 | 0.9822 | 0.3369 | 0.3576 | [0.317, 0.397] | 50 | 0.0065 | 0.0080|
+| GPT-2 ft | adam | 1e-6 | 8k | 64 | 2 | 0.978 | 0.9786 | 0.3019 | 0.2950 | [0.253, 0.338] | 50 | 0.0024 | 0.0028|
+| GPT-2 ft | adam | 1e-6 | 4k | 64 | 2 | 0.991 | 0.9952 | 0.3173 | 0.3076 | [0.268, 0.346] | 50 | 0.0015 | 0.0021|
+| GPT-2 ft | muon | 0 | 4k | 64 | 4 | 0.996 | 0.9960 | 0.4683 | 0.4648 | [0.422, 0.504] | 50 | 0.0053 | 0.0061|
+| GPT-2 ft | muon | 1e-6 | 4k | 64 | 4 | 0.997 | 0.9962 | 0.4738 | 0.4630 | [0.420, 0.503] | 50 | 0.0053 | 0.0061|
 
-The `_running_` EK-FAC cells (8k / 16k / muon banks, the pricier retrains) are in progress and
-will be filled as each 50-subset bank completes; the 6 measured rows already span the full
-metasmoothness axis (0.766 → 0.991 ms, EK-FAC 0.15 → 0.36) and none moves outside noise. ΔL1/ΔL2
-are the per-epoch run's; they track the `rep` values, running a hair higher at low metasmoothness
-(e.g. eps0 4k ΔL2 0.0587 vs `rep` 0.0528) — independent per-epoch orders explore marginally more,
-but the smoothness metric is unaffected.
+The grid spans the full metasmoothness axis (0.44 → 0.997 ms, EK-FAC 0.11 → 0.47) including the
+lowest-metasmoothness config (16k eps0), which has the most headroom for a shuffle effect and
+still shows none (0.1097 → 0.1186, `rep` inside [0.074, 0.164]). ΔL1/ΔL2 are the per-epoch run's;
+they track the `rep` values, running a hair higher at low metasmoothness (e.g. eps0 4k ΔL2 0.0587
+vs `rep` 0.0528) — independent per-epoch orders explore marginally more, but the smoothness metric
+is unaffected. **Caveat:** this covers GPT-2 fine-tuning at 2–4 epochs only; the shuffle change
+could still matter at more epochs, or for the from-scratch OLMo2 pre-training run (full trajectory),
+where the `rep`→per-epoch metasmoothness was already recorded at ≈0 → −0.000 (a dead endpoint, so
+no headroom to see a difference either way).
 
 ### SmolLM2 (`bergson-smollm2-lds-chunks`, `train_{4k,8k,16k,32k}.hf`)
 
-| Optimizer | eps_root | lr | N | epochs | metasmooth | Method | LDS | 95% CI | n | train loss | ΔL1 | ΔL2 | dropout | shuffle |
-|-----------|----------|-----|-----|--------|-----------|--------|-----|--------|---|-----------|------|------|---------|---------|
-| adam | 1e-6 | 8e-4 | 4k | 2 | 0.991 | EK-FAC | 0.3173 | [0.285, 0.348] | 50 | 3.18 | 0.0016 | 0.0021 | 0.1 | rep |
-| adam | 1e-6 | 8e-4 | 8k | 2 | 0.978 | EK-FAC | 0.3019 | [0.267, 0.338] | 50 | 3.18 | 0.0024 | 0.0028 | 0.1 | rep |
-| adam | 1e-6 | 8e-4 | 16k | 2 | 0.995 | EK-FAC | 0.3815 | [0.352, 0.412] | 50 | 3.17 | 0.0039 | 0.0042 | 0.1 | rep |
-| adam | 1e-6 | 8e-4 | 32k | 2 | 0.998 | EK-FAC | 0.3575 | [0.325, 0.394] | 50 | 3.19 | 0.0069 | 0.0072 | 0.1 | rep |
-| adam | 1e-6 | 8e-4 | 4k | 2 | 0.991 | Shampoo −1/2 | 0.3071 | [0.270, 0.342] | 50 | 3.18 | 0.0016 | 0.0021 | 0.1 | rep |
-| adam | 1e-6 | 8e-4 | 4k | 2 | 0.991 | Shampoo −1/4 | 0.3264 | [0.294, 0.358] | 50 | 3.18 | 0.0016 | 0.0021 | 0.1 | rep |
-| adam | 1e-8 | 8e-4 | 4k | 2 | 0.876 | EK-FAC | 0.3033 | [0.274, 0.334] | 50 | 3.02 | 0.0079 | 0.0091 | 0.1 | rep |
-| adam | 1e-10 | 8e-4 | 4k | 2 | 0.781 | EK-FAC | 0.2097 | [0.182, 0.239] | 50 | 2.71 | 0.0293 | 0.0295 | 0.1 | rep |
-| adam | 0 | 8e-4 | 4k | 2 | 0.766 | EK-FAC | 0.1740 | [0.140, 0.208] | 50 | 2.61 | 0.0509 | 0.0528 | 0.1 | rep |
-| adam | 0 | 8e-4 | 8k | 2 | 0.615 | EK-FAC | 0.1410 | [0.113, 0.169] | 50 | 2.61 | 0.0646 | 0.0668 | 0.1 | rep |
-| adam | 0 | 8e-4 | 16k | 2 | 0.437 | EK-FAC | 0.1097 | [0.084, 0.136] | 50 | 2.65 | 0.0855 | 0.0872 | 0.1 | rep |
-| adam | 0 | 8e-4 | 4k | 2 | 0.766 | Shampoo −1/2 | 0.2145 | [0.178, 0.249] | 50 | 2.61 | 0.0509 | 0.0528 | 0.1 | rep |
-| adam | 0 | 8e-4 | 4k | 2 | 0.766 | Shampoo −1/4 | 0.1562 | [0.122, 0.192] | 50 | 2.61 | 0.0509 | 0.0528 | 0.1 | rep |
-| adam | 0 | 8e-4 | 4k | 2 | 0.766 | Shampoo −1/8 | 0.1111 | [0.076, 0.145] | 50 | 2.61 | 0.0509 | 0.0528 | 0.1 | rep |
-| muon | 1e-6 | 5e-5 | 4k | 4 | 0.997 | EK-FAC | 0.4738 | [0.432, 0.513] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep |
-| muon | 1e-6 | 5e-5 | 4k | 4 | 0.997 | Shampoo −1/2 | 0.5217 | [0.481, 0.561] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep |
-| muon | 1e-6 | 5e-5 | 4k | 4 | 0.997 | Shampoo −1/4 | 0.4304 | [0.388, 0.471] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep |
-| muon | 1e-6 | 5e-5 | 4k | 4 | 0.997 | Shampoo −1/8 | 0.3026 | [0.260, 0.343] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep |
-| muon | 1e-6 | 1e-4 | 4k | 4 | 0.996 | EK-FAC | 0.4514 | [0.416, 0.486] | 50 | 2.94 | 0.0110 | 0.0118 | 0.1 | rep |
-| muon | 0 | 5e-5 | 4k | 4 | 0.996 | EK-FAC | 0.4683 | [0.427, 0.508] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep |
-| muon | 0 | 5e-5 | 4k | 4 | 0.996 | Shampoo −1/2 | 0.5208 | [0.479, 0.561] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep |
-| muon | 0 | 5e-5 | 4k | 4 | 0.996 | Shampoo −1/4 | 0.4306 | [0.389, 0.471] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep |
-| muon | 0 | 5e-5 | 4k | 4 | 0.996 | Shampoo −1/8 | 0.3010 | [0.260, 0.343] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep |
-| muon | 0 | 1e-4 | 4k | 4 | 0.996 | EK-FAC | 0.4544 | [0.419, 0.489] | 50 | 2.94 | 0.0110 | 0.0118 | 0.1 | rep |
-| muon | 0 | 1e-4 | 4k | 4 | 0.996 | Shampoo −1/2 | 0.5206 | [0.479, 0.560] | 50 | 2.94 | 0.0110 | 0.0118 | 0.1 | rep |
-| muon | 0 | 1e-4 | 4k | 4 | 0.996 | Shampoo −1/4 | 0.4093 | [0.371, 0.447] | 50 | 2.94 | 0.0110 | 0.0118 | 0.1 | rep |
-| muon | 0 | 1e-4 | 4k | 4 | 0.996 | Shampoo −1/8 | 0.2682 | [0.229, 0.307] | 50 | 2.94 | 0.0110 | 0.0118 | 0.1 | rep |
-| adam | 1e-6 | 8e-4 | 4k | 4 | 0.999 | — | — | — | — | 3.18 | 0.0016 | 0.0021 | 0.1 | rep |
-| adam | 0 | 8e-4 | 4k | 4 | 0.663 | — | — | — | — | 2.61 | 0.0509 | 0.0528 | 0.1 | rep |
+| Optimizer | eps_root | lr | N | epochs | metasmooth | Method | LDS | 95% CI | n | train loss | ΔL1 | ΔL2 | dropout | shuffle | ms shuffle |
+|-----------|----------|-----|-----|--------|-----------|--------|-----|--------|---|-----------|------|------|---------|---------|---|
+| adam | 1e-6 | 8e-4 | 4k | 2 | 0.9952 | EK-FAC | 0.3173 | [0.285, 0.348] | 50 | 3.18 | 0.0016 | 0.0021 | 0.1 | rep | per-epoch |
+| adam | 1e-6 | 8e-4 | 8k | 2 | 0.9786 | EK-FAC | 0.3019 | [0.267, 0.338] | 50 | 3.18 | 0.0024 | 0.0028 | 0.1 | rep | per-epoch |
+| adam | 1e-6 | 8e-4 | 16k | 2 | 0.9954 | EK-FAC | 0.3815 | [0.352, 0.412] | 50 | 3.17 | 0.0039 | 0.0042 | 0.1 | rep | per-epoch |
+| adam | 1e-6 | 8e-4 | 32k | 2 | 0.9979 | EK-FAC | 0.3575 | [0.325, 0.394] | 50 | 3.19 | 0.0069 | 0.0072 | 0.1 | rep | per-epoch |
+| adam | 1e-6 | 8e-4 | 4k | 2 | 0.9952 | Shampoo −1/2 | 0.3071 | [0.270, 0.342] | 50 | 3.18 | 0.0016 | 0.0021 | 0.1 | rep | per-epoch |
+| adam | 1e-6 | 8e-4 | 4k | 2 | 0.9952 | Shampoo −1/4 | 0.3264 | [0.294, 0.358] | 50 | 3.18 | 0.0016 | 0.0021 | 0.1 | rep | per-epoch |
+| adam | 1e-8 | 8e-4 | 4k | 2 | 0.8755 | EK-FAC | 0.3033 | [0.274, 0.334] | 50 | 3.02 | 0.0079 | 0.0091 | 0.1 | rep | per-epoch |
+| adam | 1e-10 | 8e-4 | 4k | 2 | 0.7883 | EK-FAC | 0.2097 | [0.182, 0.239] | 50 | 2.71 | 0.0293 | 0.0295 | 0.1 | rep | per-epoch |
+| adam | 0 | 8e-4 | 4k | 2 | 0.7724 | EK-FAC | 0.1740 | [0.140, 0.208] | 50 | 2.61 | 0.0509 | 0.0528 | 0.1 | rep | per-epoch |
+| adam | 0 | 8e-4 | 8k | 2 | 0.6226 | EK-FAC | 0.1410 | [0.113, 0.169] | 50 | 2.61 | 0.0646 | 0.0668 | 0.1 | rep | per-epoch |
+| adam | 0 | 8e-4 | 16k | 2 | 0.4269 | EK-FAC | 0.1097 | [0.084, 0.136] | 50 | 2.65 | 0.0855 | 0.0872 | 0.1 | rep | per-epoch |
+| adam | 0 | 8e-4 | 4k | 2 | 0.7724 | Shampoo −1/2 | 0.2145 | [0.178, 0.249] | 50 | 2.61 | 0.0509 | 0.0528 | 0.1 | rep | per-epoch |
+| adam | 0 | 8e-4 | 4k | 2 | 0.7724 | Shampoo −1/4 | 0.1562 | [0.122, 0.192] | 50 | 2.61 | 0.0509 | 0.0528 | 0.1 | rep | per-epoch |
+| adam | 0 | 8e-4 | 4k | 2 | 0.7724 | Shampoo −1/8 | 0.1111 | [0.076, 0.145] | 50 | 2.61 | 0.0509 | 0.0528 | 0.1 | rep | per-epoch |
+| muon | 1e-6 | 5e-5 | 4k | 4 | 0.9962 | EK-FAC | 0.4738 | [0.432, 0.513] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep | per-epoch |
+| muon | 1e-6 | 5e-5 | 4k | 4 | 0.9962 | Shampoo −1/2 | 0.5217 | [0.481, 0.561] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep | per-epoch |
+| muon | 1e-6 | 5e-5 | 4k | 4 | 0.9962 | Shampoo −1/4 | 0.4304 | [0.388, 0.471] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep | per-epoch |
+| muon | 1e-6 | 5e-5 | 4k | 4 | 0.9962 | Shampoo −1/8 | 0.3026 | [0.260, 0.343] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep | per-epoch |
+| muon | 1e-6 | 1e-4 | 4k | 4 | 0.9930 | EK-FAC | 0.4514 | [0.416, 0.486] | 50 | 2.94 | 0.0110 | 0.0118 | 0.1 | rep | per-epoch |
+| muon | 0 | 5e-5 | 4k | 4 | 0.9960 | EK-FAC | 0.4683 | [0.427, 0.508] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep | per-epoch |
+| muon | 0 | 5e-5 | 4k | 4 | 0.9960 | Shampoo −1/2 | 0.5208 | [0.479, 0.561] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep | per-epoch |
+| muon | 0 | 5e-5 | 4k | 4 | 0.9960 | Shampoo −1/4 | 0.4306 | [0.389, 0.471] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep | per-epoch |
+| muon | 0 | 5e-5 | 4k | 4 | 0.9960 | Shampoo −1/8 | 0.3010 | [0.260, 0.343] | 50 | 3.08 | 0.0057 | 0.0061 | 0.1 | rep | per-epoch |
+| muon | 0 | 1e-4 | 4k | 4 | 0.9931 | EK-FAC | 0.4544 | [0.419, 0.489] | 50 | 2.94 | 0.0110 | 0.0118 | 0.1 | rep | per-epoch |
+| muon | 0 | 1e-4 | 4k | 4 | 0.9931 | Shampoo −1/2 | 0.5206 | [0.479, 0.560] | 50 | 2.94 | 0.0110 | 0.0118 | 0.1 | rep | per-epoch |
+| muon | 0 | 1e-4 | 4k | 4 | 0.9931 | Shampoo −1/4 | 0.4093 | [0.371, 0.447] | 50 | 2.94 | 0.0110 | 0.0118 | 0.1 | rep | per-epoch |
+| muon | 0 | 1e-4 | 4k | 4 | 0.9931 | Shampoo −1/8 | 0.2682 | [0.229, 0.307] | 50 | 2.94 | 0.0110 | 0.0118 | 0.1 | rep | per-epoch |
+| adam | 1e-6 | 8e-4 | 4k | 4 | 0.9989 | — | — | — | — | 3.18 | 0.0016 | 0.0021 | 0.1 | rep | per-epoch |
+| adam | 0 | 8e-4 | 4k | 4 | 0.6836 | — | — | — | — | 2.61 | 0.0509 | 0.0528 | 0.1 | rep | per-epoch |
 
 - adam eps1e-6 4k EK-FAC row is the original run (0.3173); re-score with the `1ba43f92` scoring code = 0.3156. muon eps1e-6 5e-5 EK-FAC 0.4738 = will's reported 0.474.
 - muon eps_root acts on Muon's AdamW-fallback parameters (embeddings / lm_head / 1D params); the 2D weights use Newton-Schulz, which eps_root does not touch. So muon EK-FAC is nearly flat across eps_root (5e-5: 0.474 @1e-6 vs 0.468 @0; 1e-4: 0.451 @1e-6 vs 0.454 @0), unlike adam (0.317 @1e-6 → 0.174 @0).
-- MAGIC (metagradient) spotcheck, 5 queries, gpt2 muon @5e-5, nproc=1 eager: eps_root=0 → NaN scores; eps_root=1e-6 → _(running)_.
 
 #### Shampoo inversion + apply power (PR #384) — see [`SHAMPOO_RESULTS.md`](SHAMPOO_RESULTS.md)
 
@@ -205,11 +209,10 @@ muon — the whole axis is pinned. Batch size does not un-saturate it either: mu
 The knob that still moves the metric elsewhere in the grid is output logit scale (0.609 at 0.25).
 Contrast adam at eps0, which roughly halves over a comparable steps range (0.766→0.437, 125→500).
 
-#### MAGIC score finiteness vs eps_root (GPT-2 4k)
+#### MAGIC score finiteness and magnitude vs eps_root (GPT-2 4k)
 
 Checked every MAGIC score tensor on disk under `/mnt/ssd-2/lucia/muon4k`. 560,000 score elements
-across 8 runs: **100% finite (0 NaN, 0 Inf) everywhere except the single eps_root=0 run**, which is
-100% NaN (all 4000 scores; `magic_eps0.log:1038` — `minmax=(nan, nan), mean=nan`).
+across 8 runs: **100% finite (0 NaN, 0 Inf)**.
 
 | run dir | optimizer | eps_root | bs | NaN | finite | score range |
 |---------|-----------|----------|----|-----|--------|-------------|
@@ -221,38 +224,48 @@ across 8 runs: **100% finite (0 NaN, 0 Inf) everywhere except the single eps_roo
 | magicroll_bs32 | adamw | 1e-8 | 32 | 0 | 100% | −2.22 … 2.96 |
 | magicroll_bs128 | adamw | 1e-8 | 128 | 0 | 100% | −0.123 … 0.099 |
 | magicroll_muon_eps1e6_5e5 | muon | 1e-6 | 64 | 0 | 100% | −0.0084 … 0.0024 |
-| **magic_eps0_muon_5e-5** | **muon** | **0** | **16** | **4000/4000** | **0%** | **NaN** |
 
 Score magnitude grows monotonically as eps_root falls (adamw, bs64): ±0.0083 @1e-6 → ±2.59 @1e-8
-(~300×) → 3.92 @1e-10. The eps0 point is a different optimizer (muon) and batch size (16), so it does
-not extend that series — it is reported as NaN, not as a magnitude.
+(~300×) → 3.92 @1e-10.
 
-**EK-FAC is unaffected at the same eps_root.** The muon eps0 EK-FAC score matrix
+**MAGIC at eps_root=0, batch size matched to the bank: 98.4% finite.** The earlier
+`magic_eps0_muon_5e-5` attempt used bs16 while its bank `run_eps0_5e-5/N4k` was trained at bs64, so
+it replayed a trajectory no retrain in that bank took; it wrote no scores and its checkpoints have
+been deleted. Re-run at **bs64**, one variable changed from the known-finite
+`magicroll_muon_eps1e6_5e5/q0` config (`eps_root` 1e-6 → 0.0), same code `6c597de0`:
+
+| run | optimizer | eps_root | bs | NaN | finite | score range |
+|-----|-----------|----------|----|-----|--------|-------------|
+| magic_eps0_bs64_q0 | muon | 0 | 64 | 64/4000 | 98.4% | −6.58e-4 … 5.26e-4 |
+
+The 64 NaN are scattered (indices 122, 175, 192 … 3912, 3963), not one contiguous batch. Finite mean
+−1.40e-7. Magnitude is the same order as the eps1e-6 muon reference (−0.0084 … 0.0024, 0 NaN).
+
+**The `Score summary` log line does not distinguish "some NaN" from "all NaN".** This run logs
+`DescribeResult(nobs=4000, minmax=(nan, nan), mean=nan, ...)` while its saved tensor is 98.4%
+finite — `scipy.stats.describe` propagates a single NaN to every field. The earlier
+"100% NaN, all 4000 scores" reading of `magic_eps0.log:1038` was that same log line, and that run
+saved no tensor, so its NaN fraction was never measured.
+
+Caveats on this row: `nproc_per_node: 4` (the reference used 8), one query (`query_q0.hf`), and
+`num_subsets: 0`, so it establishes finiteness only — no LDS. The run exits non-zero because
+`validate_scores` calls `pearsonr` on fewer than 2 subsets; scores are written before that.
+Run dir `/mnt/ssd-2/lucia/muon4k/magic_eps0_bs64_q0`.
+
+**EK-FAC at eps_root=0.** The muon eps0 EK-FAC score matrix
 (`ekfac_eps0_muon_5e-5/scores/scores/scores.bin`) is 4000×50 with **0 NaN, all `written` flags True**,
 range [−1090, 1902], mean 0.52 — and yields LDS 0.4683. EK-FAC never forms the unregularized
 second-moment reciprocal that MAGIC's replay divides by.
 
-**Confound — do not attribute the NaN to eps_root alone.** The only eps0 MAGIC run is also the only
-bs16 run, so eps_root and batch size vary together (n=1 each). Batch size independently drives
-magnitude the same direction at fixed eps1e-8: bs128 ±0.12 → bs64 ±2.59 → bs32 ±2.96. The clean experiment that separates them is a MAGIC run at **muon / eps0 / bs64**
-(the missing cell) — NaN there would implicate eps_root, finite would implicate batch size.
+**Metasmoothness across the muon eps_root / batch-size cells.**
 
-**Metasmoothness does not predict MAGIC finiteness — measured at matched config.** Metasmoothness
-was run at the *exact* config of the all-NaN MAGIC run (muon, eps_root 0, lr 5e-5, 4k, **bs16**, ep4
-→ 1000 steps; `muon_ms_steps/eps0_bs16/`):
+| config | metasmooth |
+|--------|-----------|
+| muon, eps0, 4k, bs16, ep4 (1000 steps) | 0.9932 |
+| muon, eps0, 4k, bs64, ep4 (250 steps) | 0.996 |
+| muon, eps1e-6, 4k, bs64, ep4 (250 steps) | 0.9965 |
 
-| config | metasmooth | MAGIC scores |
-|--------|-----------|--------------|
-| muon, eps0, 4k, **bs16**, ep4 (1000 steps) | **0.9932** | **100% NaN** (4000/4000) |
-| muon, eps0, 4k, bs64, ep4 (250 steps) | 0.996 | not run |
-| muon, eps1e-6, 4k, bs64, ep4 (250 steps) | 0.9965 | finite, LDS 0.76 |
-
-So **high metasmoothness co-occurs with completely NaN MAGIC scores**: 0.9932 is near-ceiling, and
-the very same training configuration yields no usable metagradient scores. On this config,
-metasmoothness gave no warning of the metagradient failure. This is one config (n=1) and establishes
-co-occurrence, not a general rule about when MAGIC breaks.
-
-**Per-parameter-group split (same config).** `metasmoothness.json` now carries a `groups` breakdown
+**Per-parameter-group split (muon, eps0, bs16).** `metasmoothness.json` carries a `groups` breakdown
 for muon runs, scoring the Newton-Schulz and AdamW paths separately; the decomposition is exact
 (`score = Σ share·score`, verified to 1e-9):
 
@@ -262,15 +275,11 @@ for muon runs, scoring the Newton-Schulz and AdamW paths separately; the decompo
 | adamw_1d (eps_root's only reach) | 0.9867 | 0.00040 | 121,344 |
 
 The 1D group carries 0.04% of total L1 movement, so it could have scored −1.0 and moved the
-aggregate only to ~0.992 — i.e. the aggregate *could* have masked a non-smooth AdamW subspace. It
-does not: at eps_root=0 that group scores 0.9867 on its own normalization. Per-coordinate movement is
-also smaller for the 1D group (1.13e-4 vs 2.11e-4). So the NaN is not explained by a non-smooth
-eps_root-affected subspace being hidden by movement weighting.
+aggregate only to ~0.992. At eps_root=0 that group scores 0.9867 on its own normalization.
+Per-coordinate movement is also smaller for the 1D group (1.13e-4 vs 2.11e-4).
 
-Batch size does not explain the high metasmoothness either: bs16 barely
-moves muon (0.996 at bs64 → 0.9932 at bs16, −0.003), unlike adam at eps1e-8 where bs16 collapses the
-metric to 0.500. Muon is flat on the batch-size axis too. Note this does *not* resolve which knob
-causes the NaN itself — that still needs the muon/eps0/bs64 MAGIC run described above.
+bs16 barely moves muon metasmoothness (0.996 at bs64 → 0.9932 at bs16, −0.003), unlike adam at
+eps1e-8 where bs16 collapses the metric to 0.500.
 
 #### adam metasmoothness — other knobs (eps_root=1e-8, N=4k, epochs=2; baseline bs64/wd0.01/scale1.0 = 0.876)
 
@@ -285,12 +294,12 @@ Weight decay: no effect over 0–0.3. Output logit scale (fixed
 
 **Batch size deconfounded — metasmoothness at FIXED steps=125** (eps1e-8, 4k, epochs = bs/32):
 
-| optimizer | batch size | epochs | steps | metasmooth | EK-FAC LDS | train loss | ΔL1 | ΔL2 |
-|-----------|------------|--------|-------|------------|-----------|-----------|------|------|
-| adam | 32 | 1 | 125 | 0.837 | 0.1781 | 3.07 | 0.0087 | 0.0100 |
-| adam | 64 | 2 | 125 | 0.876 | 0.3033 | 3.02 | 0.0079 | 0.0091 |
-| adam | 128 | 4 | 125 | 0.982 | 0.3369 | 2.98 | 0.0074 | 0.0087 |
-| adam | 256 | 8 | 125 | 0.992 | — | — | — | — |
+| optimizer | batch size | epochs | steps | metasmooth | EK-FAC LDS | train loss | ΔL1 | ΔL2 | ms shuffle |
+|-----------|------------|--------|-------|------------|-----------|-----------|------|------|---|
+| adam | 32 | 1 | 125 | 0.837 | 0.1781 | 3.07 | 0.0087 | 0.0100 |  |
+| adam | 64 | 2 | 125 | 0.8755 | 0.3033 | 3.02 | 0.0079 | 0.0091 | per-epoch |
+| adam | 128 | 4 | 125 | 0.9822 | 0.3369 | 2.98 | 0.0074 | 0.0087 | per-epoch |
+| adam | 256 | 8 | 125 | 0.9984 | — | — | — | — | per-epoch |
 
 Batch size raises metasmoothness even at fixed step count (0.837→0.992) — a genuine effect, not just
 a step-count proxy. (LDS at bs256/ep8 is **infeasible on the current code**: the leave-k-out bank build
@@ -490,6 +499,50 @@ instead of 512 reproduces 0.9681 exactly (mean 0.9681, median 0.9815, min 0.5977
 - Excluded (n=1 spotchecks): lotus MAGIC `lotus_mq_eval` 0.9893, `lotus_q01_spotcheck` 0.9818, `lotus` 0.9177, `lotus_mq_eval_prefix_backup` 0.9665; and `lotus_interim_q01_08` (n=8, 0.9675).
 - The `gpt2_epsroot0_trackstar50q*` runs are excluded: their config has `retrained_dir=runs/lotus`, so they score epsroot0 gradients against the lotus bank.
 
+#### WikiText eps_root=1e-8 batch-size sweep — recovering the MAGIC paper's regime
+
+The MAGIC paper reports WikiText LDS >=0.9 at **eps_root=1e-8** by tuning the batch size (its
+batch size was lost, so `examples/magic/gpt2_wikitext.yaml` had substituted eps_root=1e-6 / bs64).
+Sweeping batch size at eps_root=1e-8 (lotus recipe: adamw, lr 8e-4 poly, betas .95/.975, wd .01,
+ep4 fixed so the data is identical, dropout inert; per-query MAGIC, 30 subsets @1% x 5 queries;
+`grad_accum` used to hold the per-GPU metagradient micro-batch ~16 — see note):
+
+| global bs | steps | metasmooth | per-query MAGIC LDS | 95% CI |
+|-----------|-------|------------|---------------------|--------|
+| 64  | 288 | 0.8947 | 0.169 | [0.02, 0.41] (n=4) |
+| 128 | 144 | — | 0.483 | [0.28, 0.69] |
+| 192 | 96  | — | 0.644 | [0.54, 0.75] |
+| 224 | 83  | — | 0.407 | [0.22, 0.62] |
+| 256 | 72  | — | **0.952** | [0.936, 0.969] |
+
+The bs64 metasmoothness (0.8947; ΔL1 0.0121, ΔL2 0.0144, fd_step 0.1, direction_seed 0, code
+`37d7b386` — the same commit the sweep banks/scores ran on; run dir
+`/mnt/ssd-2/lucia/wikitext_ms_eps1e8_bs64/`) makes this row a measured high-ms/low-MAGIC point:
+ms 0.89 with MAGIC 0.17, right in line with the SmolLM2 eps1e-8 bs64 cell (ms 0.8755, MAGIC 0.17).
+The other batch sizes' metasmoothness is not yet measured.
+
+LDS is low at small batch (bs64 0.17, matching the SmolLM2 bs64 eps1e-8=0.17 grid value) and jumps
+to 0.95 at bs256. The intermediate points (128-224) have wide **overlapping** CIs — estimator noise
+at 30 subsets / 5 queries, not a clean monotonic ramp; the high regime onsets sharply near bs256,
+whose tight per-query spread (0.93-0.98) marks it genuine. num_epochs is fixed at 4, so every batch
+size trains on the same data — the driver is the larger batch, not more/less training.
+
+**bs256 confirmed at scale — definitive: N=100/m=50 = 0.9519 [0.9435, 0.9592]** (per-query
+0.83-0.98, all high). Converges with every smaller estimate: N=30/m=5 = 0.9520, N=82/m=11 =
+0.9501, N=82/m=21 = 0.9520. So eps_root=1e-8 recovers the paper's >=0.9 with batch size as the
+knob, no eps_root=1e-6 substitute. Committed as `examples/magic/gpt2_wikitext.yaml` (bs256,
+grad_accum 2, N=100, subset_fraction 0.01; LDS in header). The N=100 run: bank resumed 82->100
+after a crash, then per-query MAGIC (query_method none) over test[1:51]; all on bergson
+`37d7b386` (0.10.1 — the code the scores/bank were built on, not current main). Sweep
+code/results: `experiments/batchsize_eps1e8/`.
+
+**grad_accum note:** `grad_accum_steps>1` rescales the MAGIC metagradient (ga2 ~= 0.68x ga1,
+Spearman rank corr ga1-vs-ga2 = 0.9995, top-50 movers identical) but preserves rank, so the
+per-query Spearman LDS is unchanged — this is what lets the high-batch metagradient fit few GPUs
+(hold per-GPU micro-batch ~16 = ~50 GB via ga, vary global batch as the science). Raw MAGIC score
+**magnitudes are NOT comparable across ga** — the canonical "grad_accum breaks comparability"
+caveat is about magnitudes, not LDS. Verified bs64 single-doc q1, nproc4, ga1 vs ga2.
+
 # Provenance / reproduction
 
 - SmolLM2 eps_root=1e-6 4k adam bank: HF `EleutherAI/bergson-smollm2-lds-4k` (+ `run_config.yaml`, `subsets.json`). Size-scaling banks: `runs/ekfac_vs_n/N{4,8,16,32}k`. adam eps_root=0 bank: `/mnt/ssd-2/lucia-adam-shampoo/epsroot0_4k_bank/` (code `b3790ba9`). muon banks: `/mnt/ssd-2/lucia/muon4k/{run,run_1e-4,run_eps0_5e-5,run_eps0_1e-4}/N4k` (differ only in eps_root and lr).
@@ -502,8 +555,7 @@ instead of 512 reproduces 0.9681 exactly (mean 0.9681, median 0.9815, min 0.5977
   Run from `/mnt/ssd-1/lucia/bergson-damping`; **requires `PYTHONPATH=<repo>`** — the `bergson`
   console script puts its own bin dir on `sys.path`, not the cwd, so it raises
   `ModuleNotFoundError: No module named 'bergson'` on every rank even from the repo root.
-- MAGIC finiteness audit: score tensors read from `/mnt/ssd-2/lucia/muon4k/{magicroll_*,magic_*}/q*/scores.pt`;
-  the eps0 NaN evidence is `magic_eps0.log:1038` (that run wrote no scores at all, only checkpoints).
+- MAGIC finiteness audit: score tensors read from `/mnt/ssd-2/lucia/muon4k/{magicroll_*,magic_*}/q*/scores.pt`.
   EK-FAC score matrices are `scores/scores/scores.bin` + `info.json` — a structured dtype with
   explicit `offsets`/`itemsize` (float32 `score_i` + bool `written_i`, 8-byte stride); reading it
   without the offsets silently mis-strides and fabricates NaNs.

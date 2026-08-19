@@ -1,0 +1,23 @@
+# Validate step for adam1e8_shampoo_p2, run on bergson-damping HEAD
+# (source-wikitext-replication) which supports retrain_bank + query_loss_cache.
+# Mirrors /mnt/ssd-1/lucia/perepoch/configs/adam_eps1e8_4k_bank.yaml's validate
+# step exactly (cache key: model/query/batch_size/num_subsets) so the bank's
+# readable losses_cadd14f6325cfd2d.pt is reused instead of loading the
+# 0600-perm subset models.
+run_path: /mnt/ssd-2/lucia-adam-shampoo/h2_precond_sim/adam1e8_shampoo_p2/vpipeline
+steps:
+- validate:
+    run_path: /mnt/ssd-2/lucia-adam-shampoo/h2_precond_sim/adam1e8_shampoo_p2/validate
+    model: gpt2
+    overwrite: true
+    scores: /mnt/ssd-2/lucia-adam-shampoo/h2_precond_sim/adam1e8_shampoo_p2/scores/scores
+    retrain_bank: /mnt/ssd-1/lucia/perepoch/runs/adam_eps1e8_4k/bank
+    data:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_4k.hf
+      split: train
+      chunk_length: 0
+    query:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/query_50.hf
+      split: train
+      chunk_length: 0
+    batch_size: 50

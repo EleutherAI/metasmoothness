@@ -1,0 +1,69 @@
+run_path: /mnt/ssd-1/lucia/perepoch/runs/adam_eps1e8_4k/pipeline
+steps:
+- magic:
+    run_path: /mnt/ssd-1/lucia/perepoch/runs/adam_eps1e8_4k/bank
+    model: gpt2
+    overwrite: true
+    cleanup_ckpts: true
+    data: &data
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_4k.hf
+      split: train
+      chunk_length: 0
+    query: &query
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/query_50.hf
+      split: train
+      chunk_length: 0
+    distributed: &dist
+      nproc_per_node: 8
+      nnode: 1
+    eps_root: 1.0e-8
+    optimizer: adamw
+    weight_decay: 0.01
+    batch_size: 64
+    num_epochs: 2
+    seed: 42
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    lr_schedule:
+      lr_scheduler_type: polynomial
+      lr: 8.0e-4
+      lr_start: 1.0e-06
+      lr_end: 8.0e-5
+      warmup_steps: 0.25
+    subset_strategy: random
+    num_subsets: 50
+    subset_fraction: 0.01
+    save_optimizer_state: none
+    save_models: true
+    skip_metagradient: true
+- ekfac:
+    index_cfg:
+      run_path: /mnt/ssd-1/lucia/perepoch/runs/adam_eps1e8_4k/ekfac_scores
+      model: /mnt/ssd-1/lucia/perepoch/runs/adam_eps1e8_4k/bank/retrained/base
+      overwrite: true
+      token_batch_size: 1024
+      max_batch_size: 64
+      filter_modules: lm_head
+      distributed: *dist
+      data: *data
+    hessian_cfg:
+      method: kfac
+      ev_correction: true
+    score_cfg:
+      batch_size: 1024
+    preprocess_cfg:
+      unit_normalize: false
+    hessian_pipeline_cfg:
+      query: *query
+      query_aggregation: none
+      inversion_cfg:
+        damping_factor: 0.1
+- validate:
+    run_path: /mnt/ssd-1/lucia/perepoch/runs/adam_eps1e8_4k/validate
+    model: gpt2
+    overwrite: true
+    scores: /mnt/ssd-1/lucia/perepoch/runs/adam_eps1e8_4k/ekfac_scores/scores
+    retrain_bank: /mnt/ssd-1/lucia/perepoch/runs/adam_eps1e8_4k/bank
+    data: *data
+    query: *query
+    batch_size: 50

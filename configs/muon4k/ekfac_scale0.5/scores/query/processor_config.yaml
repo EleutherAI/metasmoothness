@@ -1,0 +1,5 @@
+projection_dim: null
+reshape_to_square: false
+projection_type: rademacher
+projection_target: per_module
+include_bias: false

@@ -1,0 +1,77 @@
+steps:
+- magic:
+    run_path: /mnt/ssd-2/lucia/muon4k/adam_eps1e10/N4k
+    overwrite: true
+    model: gpt2
+    precision: fp32
+    revision: null
+    distributed:
+      nnode: 1
+      nproc_per_node: 8
+      node_rank: null
+    fsdp: false
+    peft_init_kwargs: ''
+    model_kwargs: ''
+    data:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_4k.hf
+      split: train
+      subset: null
+      prompt_column: text
+      completion_column: ''
+      conversation_column: ''
+      reward_column: ''
+      skip_nan_rewards: false
+      truncation: false
+      format_template: ''
+      data_kwargs: ''
+      chunk_length: 0
+    tokenizer: ''
+    drop_columns: true
+    max_tokens: null
+    use_tf32_matmuls: false
+    debug: false
+    lr_schedule:
+      lr: 0.0008
+      lr_scheduler_type: polynomial
+      lr_start: 1.0e-06
+      lr_end: 8.0e-05
+      warmup_steps: 0.25
+      num_cycles: 0.5
+      power: 1.0
+    batch_size: 64
+    num_epochs: 2
+    seed: 42
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    eps_root: 1.0e-10
+    optimizer: adamw
+    save_optimizer_state: false
+    weight_decay: 0.01
+    max_grad_norm: null
+    grad_checkpointing: false
+    resume: false
+    wandb_project: ''
+    query:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/query_50.hf
+      split: train
+      subset: null
+      prompt_column: text
+      completion_column: ''
+      conversation_column: ''
+      reward_column: ''
+      skip_nan_rewards: false
+      truncation: false
+      format_template: ''
+      data_kwargs: ''
+      chunk_length: 0
+    query_method: mean
+    num_subsets: 100
+    subset_strategy: random
+    exclude_zero_scores: false
+    save_retrained_models: true
+    subset_fraction: 0.01
+    save_mode: sqrt
+    backward_save_every: 0
+    cleanup_ckpts: true
+    per_token: false
+    skip_validation: false

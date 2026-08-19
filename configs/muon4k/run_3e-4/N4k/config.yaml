@@ -1,0 +1,87 @@
+steps:
+- magic:
+    run_path: /mnt/ssd-2/lucia/muon4k/run_3e-4/N4k
+    overwrite: false
+    model: gpt2
+    precision: fp32
+    revision: null
+    distributed:
+      nnode: 1
+      nproc_per_node: 8
+      node_rank: null
+    fsdp: false
+    peft_init_kwargs: ''
+    model_kwargs: ''
+    attn_implementation: eager
+    compile: false
+    data:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_4k.hf
+      split: train
+      subset: null
+      prompt_column: text
+      completion_column: ''
+      conversation_column: ''
+      reward_column: ''
+      skip_nan_rewards: false
+      truncation: false
+      format_template: ''
+      data_kwargs: ''
+      chunk_length: 0
+    tokenizer: ''
+    drop_columns: true
+    max_tokens: null
+    use_tf32_matmuls: false
+    debug: false
+    lr_schedule:
+      lr: 0.0003
+      lr_scheduler_type: polynomial
+      lr_start: 1.0e-06
+      lr_end: 2.9999999999999997e-05
+      warmup_steps: 0.25
+      num_cycles: 0.5
+      power: 1.0
+    batch_size: 64
+    num_epochs: 4
+    seed: 42
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    eps_root: 1.0e-06
+    adam_eps: 1.0e-08
+    loss_reduction: mean
+    optimizer: muon
+    weight_decay: 0.01
+    max_grad_norm: null
+    grad_checkpointing: false
+    resume: true
+    wandb_project: ''
+    save_optimizer_state: false
+    save_retrained_models: true
+    query:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/query_50.hf
+      split: train
+      subset: null
+      prompt_column: text
+      completion_column: ''
+      conversation_column: ''
+      reward_column: ''
+      skip_nan_rewards: false
+      truncation: false
+      format_template: ''
+      data_kwargs: ''
+      chunk_length: 0
+    query_method: mean
+    num_subsets: 50
+    subset_strategy: random
+    exclude_zero_scores: false
+    subset_fraction: 0.01
+    skip_existing_retrained: true
+    save_mode: sqrt
+    backward_save_every: 0
+    cleanup_ckpts: true
+    per_token: false
+    skip_validation: false
+    skip_metagradient: true
+metadata:
+  bergson_version: 0.10.0
+  created: '2026-07-20T14:18:08+00:00'
+  git_sha: 329c4a60

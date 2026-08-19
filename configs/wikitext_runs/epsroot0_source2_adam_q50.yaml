@@ -1,0 +1,58 @@
+steps:
+- approxunrolling:
+    index_cfg:
+      run_path: runs/epsroot0_source2_adam_q50
+      model: runs/epsroot0_bank/retrained/base
+      overwrite: true
+      precision: fp32
+      token_batch_size: 1024
+      filter_modules: lm_head
+      distributed:
+        nproc_per_node: 8
+        nnode: 1
+      data:
+        dataset: EleutherAI/bergson-wikitext-512-chunks
+        split: train
+        chunk_length: 0
+    hessian_cfg:
+      method: kfac
+      hessian_dtype: fp32
+      ev_correction: true
+    approx_unrolling_cfg:
+      checkpoints:
+      - runs/epsroot0_source2/models/step_48
+      - runs/epsroot0_source2/models/step_96
+      - runs/epsroot0_source2/models/step_144
+      - runs/epsroot0_source2/models/step_192
+      - runs/epsroot0_source2/models/step_240
+      - runs/epsroot0_source2/models/step_287
+      segments: 3
+      lr_list:
+      - 0.0004941198
+      - 0.0005583333
+      - 0.0002383333
+      step_size_list:
+      - 96
+      - 96
+      - 96
+      query:
+        dataset: EleutherAI/bergson-wikitext-512-chunks
+        split: test[1:51]
+        chunk_length: 0
+      query_aggregation: none
+      use_adam_preconditioner: true
+- validate:
+    run_path: runs/epsroot0_source2_adam_q50_validate
+    model: gpt2
+    overwrite: true
+    scores: runs/epsroot0_source2_adam_q50/scores
+    retrained_dir: runs/epsroot0_bank
+    data:
+      dataset: EleutherAI/bergson-wikitext-512-chunks
+      split: train
+      chunk_length: 0
+    query:
+      dataset: EleutherAI/bergson-wikitext-512-chunks
+      split: test[1:51]
+      chunk_length: 0
+    batch_size: 64

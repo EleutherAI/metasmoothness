@@ -1,0 +1,46 @@
+steps:
+- magic:
+    run_path: runs/bs_eps1e8/bs256_q29_v
+    overwrite: true
+    model: gpt2
+    precision: fp32
+    distributed:
+      nnode: 1
+      nproc_per_node: 4
+    model_kwargs: ''
+    data:
+      dataset: EleutherAI/bergson-wikitext-512-chunks
+      split: train
+      prompt_column: text
+      chunk_length: 0
+    lr_schedule:
+      lr: 0.0008
+      lr_scheduler_type: polynomial
+      lr_start: 1.0e-06
+      lr_end: 8.0e-05
+      warmup_steps: 0.25
+      power: 1.0
+    batch_size: 256
+    grad_accum_steps: 4
+    num_epochs: 4
+    seed: 42
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    eps_root: 1.0e-08
+    optimizer: adamw
+    weight_decay: 0.01
+    train_mode: false
+    save_optimizer_state: none
+    wandb_project: magic
+    query:
+      dataset: EleutherAI/bergson-wikitext-512-chunks
+      split: test[29:30]
+      prompt_column: text
+      chunk_length: 0
+    query_method: mean
+    num_subsets: 0
+    subset_fraction: 0.0
+    save_models: false
+    cleanup_ckpts: true
+    skip_metagradient: false
+    skip_validation: true

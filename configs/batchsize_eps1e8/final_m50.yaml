@@ -1,0 +1,52 @@
+# Definitive N=100 / m=50 per-query MAGIC LDS for the merged gpt2_wikitext.yaml
+# recipe (eps_root 1e-8, bs256). Current bergson: query_method "none" -> native
+# per-query MAGIC ([train, queries] matrix), save_models -> 100-subset bank,
+# inline validate -> per-query Spearman in summary.csv. Resumable via per_query/.
+#
+# nproc 4 (GPUs 2-5) + grad_accum 4 -> 16 seqs/GPU micro-batch (fp32 ~50GB).
+# Run: PYTHONPATH=$PWD python -m bergson experiments/batchsize_eps1e8/final_m50.yaml
+steps:
+  - magic:
+      run_path: runs/bs_eps1e8/final_m50
+      model: gpt2
+      overwrite: false
+      resume: true
+      cleanup_ckpts: false
+      weight_decay: 0.01
+      adam_eps: 1.0e-8
+      adam_beta1: 0.95
+      adam_beta2: 0.975
+      eps_root: 1.0e-8
+      loss_reduction: mean
+
+      data:
+        dataset: EleutherAI/bergson-wikitext-512-chunks
+        split: "train"
+        chunk_length: 0
+
+      query:
+        dataset: EleutherAI/bergson-wikitext-512-chunks
+        split: "test[1:51]"
+        chunk_length: 0
+
+      distributed:
+        nproc_per_node: 4
+        nnode: 1
+
+      batch_size: 256
+      grad_accum_steps: 4
+      num_epochs: 4
+      lr_schedule:
+        lr_scheduler_type: polynomial
+        lr: 0.0008
+        lr_start: 1e-6
+        lr_end: 0.00008
+        warmup_steps: 0.25
+
+      query_method: none
+      num_subsets: 100
+      subset_fraction: 0.01
+
+      wandb_project: magic
+      save_optimizer_state: none
+      save_models: True

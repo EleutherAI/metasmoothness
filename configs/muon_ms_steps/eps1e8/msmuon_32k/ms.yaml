@@ -1,0 +1,29 @@
+steps:
+- metasmoothness:
+    run_path: /mnt/ssd-2/lucia/muon_ms_steps/eps1e8/msmuon_32k
+    model: gpt2
+    overwrite: true
+    fsdp: false
+    data:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_32k.hf
+      split: train
+      chunk_length: 0
+    distributed:
+      nproc_per_node: 8
+      nnode: 1
+    optimizer: muon
+    weight_decay: 0.01
+    eps_root: 1.0e-08
+    batch_size: 64
+    num_epochs: 4
+    seed: 42
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    lr_schedule:
+      lr_scheduler_type: polynomial
+      lr: 5.0e-05
+      lr_start: 1.0e-06
+      lr_end: 5.0e-06
+      warmup_steps: 0.25
+    fd_step: 0.1
+    direction_seed: 0

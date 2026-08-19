@@ -1,0 +1,20 @@
+run_path: /mnt/ssd-2/lucia/muon4k/magic_eps1e8_4k/validate
+steps:
+- validate:
+    run_path: /mnt/ssd-2/lucia/muon4k/magic_eps1e8_4k/validate
+    model: gpt2
+    overwrite: true
+    scores: /mnt/ssd-2/lucia/muon4k/magic_eps1e8_4k/scores_stack.pt
+    retrained_dir: /mnt/ssd-2/lucia/muon4k/adam_eps1e8/N4k
+    num_subsets: 100
+    data:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_4k.hf
+      split: train
+      prompt_column: text
+      chunk_length: 0
+    query:
+      dataset: /mnt/ssd-2/lucia/muon4k/magic_eps1e8_4k/query_N10.hf
+      split: train
+      prompt_column: text
+      chunk_length: 0
+    batch_size: 10

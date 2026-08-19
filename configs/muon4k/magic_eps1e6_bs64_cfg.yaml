@@ -1,0 +1,49 @@
+run_path: /mnt/ssd-2/lucia/muon4k/magic_eps1e6_muon_5e-5/pipeline
+steps:
+- magic:
+    run_path: /mnt/ssd-2/lucia/muon4k/magic_eps1e6_muon_5e-5/magic
+    model: gpt2
+    overwrite: true
+    data: &id001
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_4k.hf
+      split: train
+      chunk_length: 0
+    query: &id002
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/query_5.hf
+      split: train
+      chunk_length: 0
+    distributed:
+      nproc_per_node: 1
+      nnode: 1
+    batch_size: 64
+    num_epochs: 4
+    seed: 42
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    eps_root: 1.0e-06
+    optimizer: muon
+    weight_decay: 0.01
+    lr_schedule:
+      lr_scheduler_type: polynomial
+      lr: 5.0e-05
+      lr_start: 1.0e-06
+      lr_end: 5.0e-06
+      warmup_steps: 0.25
+    save_mode: sqrt
+    attn_implementation: eager
+    skip_metagradient: false
+    save_retrained_models: false
+    num_subsets: 0
+    save_optimizer_state: false
+    cleanup_ckpts: false
+    backward_save_every: 100
+- validate:
+    run_path: /mnt/ssd-2/lucia/muon4k/magic_eps1e6_muon_5e-5/validate
+    model: gpt2
+    overwrite: true
+    scores: /mnt/ssd-2/lucia/muon4k/magic_eps1e6_muon_5e-5/magic/scores.pt
+    retrained_dir: /mnt/ssd-2/lucia/muon4k/run/N4k
+    num_subsets: 50
+    data: *id001
+    query: *id002
+    batch_size: 5

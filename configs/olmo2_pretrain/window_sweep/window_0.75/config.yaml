@@ -1,0 +1,63 @@
+steps:
+- metasmoothness:
+    run_path: /mnt/ssd-1/lucia/bergson-ms-pretrain/runs/pretrain_metasmoothness/window_0.75
+    overwrite: true
+    model: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/olmo2_reinit
+    precision: fp32
+    revision: null
+    distributed:
+      nnode: 1
+      nproc_per_node: 8
+      node_rank: null
+    fsdp: false
+    peft_init_kwargs: ''
+    model_kwargs: ''
+    data:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_16k.hf
+      split: train
+      subset: null
+      prompt_column: text
+      completion_column: ''
+      conversation_column: ''
+      reward_column: ''
+      skip_nan_rewards: false
+      truncation: false
+      format_template: ''
+      data_kwargs: ''
+      chunk_length: 0
+    tokenizer: ''
+    drop_columns: true
+    max_tokens: null
+    use_tf32_matmuls: false
+    debug: false
+    lr_schedule:
+      lr: 0.009
+      lr_scheduler_type: polynomial
+      lr_start: 1.0e-06
+      lr_end: 0.0009
+      warmup_steps: 0.25
+      num_cycles: 0.5
+      power: 1.0
+    batch_size: 128
+    num_epochs: 6
+    seed: 42
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    eps_root: 1.0e-06
+    adam_eps: 1.0e-08
+    loss_reduction: mean
+    optimizer: muon
+    save_optimizer_state: false
+    weight_decay: 0.1
+    max_grad_norm: null
+    grad_checkpointing: false
+    weight_start_step: 0
+    weight_start_frac: 0.75
+    resume: false
+    wandb_project: ''
+    fd_step: 0.1
+    direction_seed: 0
+metadata:
+  bergson_version: 0.9.1
+  created: '2026-07-24T07:48:18+00:00'
+  git_sha: 861efabe

@@ -1,0 +1,83 @@
+steps:
+- validate:
+    run_path: /mnt/ssd-2/lucia-adam-shampoo/h2_precond_sim/adam1e8_ekfac_p2/validate
+    overwrite: true
+    model: gpt2
+    precision: fp32
+    revision: null
+    distributed:
+      nnode: 1
+      nproc_per_node: 1
+      node_rank: null
+    fsdp: false
+    peft_init_kwargs: ''
+    model_kwargs: ''
+    data:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_4k.hf
+      split: train
+      subset: null
+      prompt_column: text
+      completion_column: ''
+      conversation_column: ''
+      reward_column: ''
+      skip_nan_rewards: false
+      truncation: false
+      format_template: ''
+      data_kwargs: ''
+      chunk_length: 0
+    tokenizer: ''
+    drop_columns: true
+    max_tokens: null
+    use_tf32_matmuls: false
+    debug: false
+    lr_schedule:
+      lr: 1.0e-05
+      lr_scheduler_type: linear
+      lr_start: 0.0
+      lr_end: 0.0
+      warmup_steps: 0
+      num_cycles: 0.5
+      power: 1.0
+    batch_size: 50
+    num_epochs: 1
+    seed: 42
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    eps_root: 1.0e-08
+    adam_eps: 1.0e-08
+    loss_reduction: mean
+    optimizer: adamw
+    train_mode: false
+    save_optimizer_state: none
+    weight_decay: 0.01
+    max_grad_norm: null
+    grad_checkpointing: false
+    grad_accum_steps: 1
+    resume: false
+    wandb_project: ''
+    save_models: false
+    query:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/query_50.hf
+      split: train
+      subset: null
+      prompt_column: text
+      completion_column: ''
+      conversation_column: ''
+      reward_column: ''
+      skip_nan_rewards: false
+      truncation: false
+      format_template: ''
+      data_kwargs: ''
+      chunk_length: 0
+    query_method: mean
+    num_subsets: 100
+    subset_strategy: random
+    exclude_zero_scores: false
+    subset_fraction: 0.0
+    scores: /mnt/ssd-2/lucia-adam-shampoo/h2_precond_sim/adam1e8_ekfac_p2/scores/scores
+    retrain_bank: /mnt/ssd-1/lucia/perepoch/runs/adam_eps1e8_4k/bank
+    subsets: ''
+metadata:
+  bergson_version: 0.10.1
+  created: '2026-08-03T09:49:35+00:00'
+  git_sha: 37d7b386

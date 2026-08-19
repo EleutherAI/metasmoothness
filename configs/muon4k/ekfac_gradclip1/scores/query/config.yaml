@@ -1,0 +1,67 @@
+steps:
+- build:
+    index_cfg:
+      run_path: /mnt/ssd-2/lucia/muon4k/ekfac_gradclip1/scores/query
+      overwrite: true
+      model: /mnt/ssd-2/lucia/muon4k/bank_gradclip1/N/retrained/base
+      precision: fp32
+      revision: null
+      distributed:
+        nnode: 1
+        nproc_per_node: 1
+        node_rank: null
+      fsdp: false
+      peft_init_kwargs: ''
+      model_kwargs: ''
+      data:
+        dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/query_50.hf
+        split: train
+        subset: null
+        prompt_column: text
+        completion_column: ''
+        conversation_column: ''
+        reward_column: ''
+        skip_nan_rewards: false
+        truncation: false
+        format_template: ''
+        data_kwargs: ''
+        chunk_length: 0
+      tokenizer: ''
+      drop_columns: true
+      max_tokens: null
+      use_tf32_matmuls: false
+      debug: false
+      projection_dim: 0
+      include_bias: false
+      reshape_to_square: false
+      projection_type: rademacher
+      projection_target: per_module
+      token_batch_size: 1024
+      max_batch_size: 64
+      auto_batch_size: false
+      optimizer_state: ''
+      loss_fn: ce
+      loss_reduction: sum
+      label_smoothing: 0.0
+      stream_shard_size: 400000
+      split_attention_modules: []
+      attention:
+        num_heads: 0
+        head_size: 0
+        head_dim: 0
+      profile: false
+      filter_modules: lm_head
+      force_math_sdp: false
+      attribute_tokens: false
+      modules: []
+    preprocess_cfg:
+      unit_normalize: false
+      hessian_path: null
+      inversion_cfg:
+        inversion: damped_inverse
+        damping_factor: 0.1
+      aggregation: none
+      normalize_aggregated_grad: false
+metadata:
+  bergson_version: 0.10.0
+  created: '2026-07-25T06:25:18+00:00'
