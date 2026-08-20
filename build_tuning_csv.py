@@ -181,6 +181,17 @@ for mod in ["none", "qk_norm", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_16k_clip1.0_lr0.0001": dict(
+        status="measured", heldout_loss=3.2553,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_clip1.0_lr0.0001_s42"),
+    "tune_adamw_16k_clip1.0_lr0.0002": dict(
+        status="measured", heldout_loss=3.2543,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_clip1.0_lr0.0002_s42",
+        notes="Group complete: interior at the anchor 2e-4 (1e-4 gap 0.0010 is a tie; "
+              "clipping is lr-neutral) — selected for plan_adam_eps1e17_16k_clip1.0."),
+    "tune_adamw_16k_clip1.0_lr0.0004": dict(
+        status="measured", heldout_loss=3.2653,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_clip1.0_lr0.0004_s42"),
     "tune_adamw_16k_ep4_lr0.0002": dict(
         status="measured", heldout_loss=3.2645,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_ep4_lr0.0002_s42"),
