@@ -653,3 +653,9 @@ muon twin (same pipeline, bank `/mnt/ssd-2/lucia/s16k_muon/merged`, scores
 0.4285, diff 0.003 — within every CI and the 0.02 run-to-run bar), while MAGIC
 separates them decisively on the same banks (0.9333 vs 0.8470, paired diff +0.086,
 19/20 query wins). The two methods disagree about whether the optimizer matters.
+
+**Metasmoothness at the anchor (same fill pass):** adamw eps1e-17 16k bs256 ms =
+0.9928 (fd_step 0.1, direction_seed 0, total_movement_l1 34147, code 10874f93, probe
+at `/mnt/ssd-2/lucia/s16k_adamw/ms`). The adamw anchor is now a complete
+three-metric row: **ms 0.9928 / MAGIC 0.9333 / EK-FAC 0.4251**. muon ms probe in
+progress.
