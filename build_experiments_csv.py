@@ -143,10 +143,20 @@ TRAIN_LOSS = {"adam_eps0_16k": 2.6482, "adam_eps0_4k": 2.5846, "adam_eps0_8k": 2
               "adam_eps1e8_4k": 3.0175, "adam_eps1e8_4k_drop0": 3.0175,
               "adam_eps1e8_bs128_4k": 2.9837, "muon_eps0_4k": 3.0901, "muon_eps1e6_4k": 3.0912}
 
+# heldout_loss backfilled the same way against heldout_4k.hf; all beat untrained
+# gpt2 (3.4981; CONTROLS rule 4). Note the memorisation trade-off: eps0/8e-4 rows
+# have the lowest train CE and the worst heldout.
+HELDOUT = {"adam_eps0_16k": 3.3517, "adam_eps0_4k": 3.4230, "adam_eps0_8k": 3.3856,
+           "adam_eps1e10_4k": 3.3833, "adam_eps1e6_4k": 3.2946, "adam_eps1e6_8k": 3.2716,
+           "adam_eps1e8_4k": 3.3065, "adam_eps1e8_4k_drop0": 3.3065,
+           "adam_eps1e8_bs128_4k": 3.3153, "muon_eps0_4k": 3.2796, "muon_eps1e6_4k": 3.2798}
+
 for rid, n, opt, lr, eps, bs, ep, ms, ek, lo, hi, l1, l2, bd in GRID:
     extra = {}
     if bd in TRAIN_LOSS:
         extra["train_loss"] = TRAIN_LOSS[bd]
+    if bd in HELDOUT:
+        extra["heldout_loss"] = HELDOUT[bd]
     if rid == "sm_adam_eps1e8_4k_rep2":
         extra = dict(extra, dropout_cfg=0.0,
                      notes="Replicate of sm_adam_eps1e8_4k: identical effective training "
