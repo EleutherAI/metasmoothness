@@ -142,3 +142,14 @@ needs a fresh ~50-100-retrain bank; `none` = full rebuild. The per-epoch grid ba
 `/mnt/ssd-1/lucia/perepoch/runs/<name>/bank`; the eps1e-17 banks under
 `/mnt/ssd-2/lucia/s16k_{adamw,muon}/merged` (models kept, base-training trajectories deleted —
 EK-FAC cheap, a fresh MAGIC rollout must first retrain, which reproduces deterministically).
+
+## Planned pre-training experiments (not in the current grid)
+
+**Attribution window ("warm start", D1).** Do not run attribution over the first N training
+steps — for example, attribute only the last epoch. The MAGIC authors identified this as a way
+to overcome pre-training attribution instability, and the OLMo2 rows already measure it:
+full-run attribution is dead (~0 metasmoothness) while last-epoch-only attribution reaches
+0.984 metasmoothness / 0.161 EK-FAC LDS at unchanged final loss. The planned pre-training
+study varies the window fraction on a from-scratch run (the `olmo2_muon_16k_window*` rows are
+the measured metasmoothness-only sweep; `weight_start_frac` on branch `feat/ms-pretrain` is
+the implementation). This axis is excluded from the fine-tuning grid.

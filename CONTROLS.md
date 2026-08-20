@@ -99,7 +99,7 @@ protocol, not an afterthought:
 | shuffle | per-epoch (`1e6eea7f`+), training AND bank AND ms probe | admission policy; builder asserts it |
 | seed | 42 (training and subset draw) | subset lists then match across optimizers, enabling paired comparisons |
 | precision | fp32, `use_tf32_matmuls: false` | metasmoothness is ill-conditioned near zero; tf32 kept off as a precaution |
-| checkpoints | `cleanup_ckpts: false`, `save_models: true`, keep base-training checkpoints | checkpoint-averaging axis and window analyses need them (~28 GB/run; budget it) |
+| checkpoints | `cleanup_ckpts: false`, `save_models: true`, `save_optimizer_state: last`, keep base-training checkpoints | checkpoint averaging (last-4, D9) and window analyses need the checkpoints; TrackStar-Adam / SOURCE-Adam need the final optimizer state (D8). ~28 GB/run; budget it |
 
 ## Attribution / estimator (identical in every run)
 
@@ -117,10 +117,10 @@ Every ablation changes exactly one row of the tables above:
 
 | axis | varies | everything else |
 |---|---|---|
-| batch size | bs 16..256 (+ ga to hold micro-batch 16) | fixed; note steps co-vary with bs at fixed epochs — the bs128 rep-era grid held steps fixed by varying epochs; decide per-plot which deconfound to show |
-| tokens | N = 4k..256k (nested) | fixed, incl. epochs=2 |
+| batch size | bs 16..256, both optimizers (D5); ga holds micro-batch 16 | fixed; steps co-vary with bs at fixed epochs — the D2 arms provide the deconfound |
+| tokens | N = 4k..64k (nested; D3) | fixed, incl. epochs=2 |
+| step count | epochs 2 -> 4 at fixed bs; and bs 256 -> 512 at fixed epochs (D2) | fixed; the pair separates steps from batch |
 | optimizer | adamw vs muon | fixed, incl. lr 2e-4 (verified optimal for both) |
-| warm start | `warmup_steps` in absolute steps | fixed; label the axis in steps and keep the 0.25-fraction anchor off that plot |
 | model size | gpt2-medium / gpt2-large | fixed; MAGIC cost scales with params |
 | ckpt averaging | `ckpt_avg_k` 1 -> 4 -> 8 | fixed; eval-side only, same trained model |
 | arch (QK-norm, pre-act norm) | one mod on `gpt2_custom` | compare only against the `gpt2_custom` no-mod control row |

@@ -78,7 +78,7 @@ for (opt, lr), (tl, hl) in ANCHOR.items():
 #    needs its own mini-sweep. ga follows the micro-batch-16 rule at bs256.
 # ---------------------------------------------------------------------------------
 for opt in ["adamw", "muon"]:
-    for n in [4000, 8000, 32000, 64000, 128000, 256000]:
+    for n in [4000, 8000, 32000, 64000]:
         k = f"{n // 1000}k"
         sweep(f"tune_{opt}_{k}", gates=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_{k}_bs256",
               priority=1, optimizer=opt, n_docs=n,
@@ -89,28 +89,41 @@ for opt in ["adamw", "muon"]:
 # 2. Batch-size axis (adam). Steps co-vary with bs at fixed epochs; lr optimum is
 #    expected to shift with bs — this sweep is what makes the axis fair.
 # ---------------------------------------------------------------------------------
-for bs in [16, 32, 64, 128]:
-    sweep(f"tune_adamw_16k_bs{bs}", gates=f"plan_adam_eps1e17_16k_bs{bs}", priority=1,
-          batch_size=bs, grad_accum_steps=max(1, bs // 16))
+CENTER = {16: 5e-5, 32: 5e-5, 64: 1e-4, 128: 1e-4}  # sqrt-batch rule, octave-rounded
+for opt in ["adamw", "muon"]:
+    for bs in [16, 32, 64, 128]:
+        c = CENTER[bs]
+        sweep(f"tune_{opt}_16k_bs{bs}",
+              gates=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_16k_bs{bs}",
+              lrs=[c / 2, c, c * 2], priority=1, optimizer=opt,
+              batch_size=bs, grad_accum_steps=max(1, bs // 16),
+              notes=f"Center {c:g} from the sqrt-batch rule (DECISIONS: sweep centers).")
+# D2 arms
+sweep("tune_adamw_16k_ep4", gates="plan_adam_eps1e17_16k_ep4", priority=1, num_epochs=4,
+      notes="D2 double-epochs arm (250 steps).")
+sweep("tune_adamw_16k_bs512", gates="plan_adam_eps1e17_16k_bs512", priority=1,
+      batch_size=512, grad_accum_steps=32, notes="D2 uncontrolled double-batch arm (63 steps).")
+# D12 eps_root eval-loss control (not an lr sweep: single point per optimizer)
+for opt in ["adamw", "muon"]:
+    sweep(f"tune_{opt}_16k_eps0_control", gates=f"sm_{opt}_eps1e17_16k_bs256",
+          lrs=[2e-4], priority=2, optimizer=opt, eps_root=0,
+          notes="D12: eval-loss check that eps_root 1e-17 vs 0 is a null. Train-only twin "
+                "of the anchor; compare heldout_loss against the measured anchor rows.")
 
 # ---------------------------------------------------------------------------------
 # 3. Model size (adam, 16k). Micro-batch 16 may not fit larger models — record the
 #    ga actually used; ga is heldout-neutral.
 # ---------------------------------------------------------------------------------
 for mdl in ["gpt2-medium", "gpt2-large"]:
-    sweep(f"tune_adamw_16k_{mdl}", gates=f"plan_adam_eps1e17_16k_{mdl}", priority=2,
-          model=mdl, notes="Adjust grad_accum to fit; record what was used.")
+    sweep(f"tune_adamw_16k_{mdl}", gates=f"plan_adam_eps1e17_16k_{mdl}",
+          lrs=[5e-5, 1e-4, 2e-4], status="blocked", priority=2, model=mdl,
+          notes="D11: BLOCKED until the scaling plan is signed off. Center one octave down "
+                "(larger models prefer lower lr). Adjust grad_accum to fit; record it.")
 
 # ---------------------------------------------------------------------------------
 # 4. Warm start (adam, 16k). warmup here is ABSOLUTE steps (>=1 per LRScheduleConfig).
 # ---------------------------------------------------------------------------------
-for w in [100, 200]:
-    sweep(f"tune_adamw_16k_warmup{w}", gates=f"plan_adam_eps1e17_16k_warmup{w}",
-          priority=2, warmup=w)
-sweep("tune_adamw_16k_warmup500", gates="plan_adam_eps1e17_16k_warmup500",
-      status="blocked", priority=2, warmup=500,
-      notes="500 warmup steps exceed the 125-step run; decide extend-epochs vs all-warmup "
-            "before running (CONTROLS: warmup units).")
+# D1 (2026-08-20): warm start = attribution window (pre-training axis); warmup groups removed.
 
 # ---------------------------------------------------------------------------------
 # 5. Logit scale (adam, 16k) — landscape-changing, so it gets a sweep.

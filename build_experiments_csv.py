@@ -270,27 +270,34 @@ for bs in [16, 32, 64, 128]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_bs{bs}", batch_size=bs,
         grad_accum_steps=max(1, bs // 16),
         notes="Batch-size axis. bs256 measured (MAGIC 0.9333).")
-for n in [4000, 8000, 32000, 64000, 128000, 256000]:
+for bs in [16, 32, 64, 128]:
+    add(BASE17, run_id=f"plan_muon_eps1e17_16k_bs{bs}", optimizer="muon", batch_size=bs,
+        grad_accum_steps=max(1, bs // 16),
+        notes="D5: muon twin of the batch-size axis. bs256 measured (MAGIC 0.8470).")
+for n in [4000, 8000, 32000, 64000]:
     add(BASE17, run_id=f"plan_adam_eps1e17_{n//1000}k_bs256", n_docs=n,
         notes="N axis (nested chain, EleutherAI/bergson-smollm2-scaling). 16k measured "
               "(MAGIC 0.9333). lr gated on tuning.csv sweep_group "
               f"tune_adamw_{n//1000}k.")
-for n in [4000, 8000, 32000, 64000, 128000, 256000]:
+for n in [4000, 8000, 32000, 64000]:
     add(BASE17, run_id=f"plan_muon_eps1e17_{n//1000}k_bs256", n_docs=n, optimizer="muon",
         notes="N axis, muon. 16k measured (MAGIC 0.8470). lr gated on tuning.csv "
               f"sweep_group tune_muon_{n//1000}k.")
-for w in [100, 200, 500]:
-    add(BASE17, run_id=f"plan_adam_eps1e17_16k_warmup{w}", warmup=w,
-        notes="ABSOLUTE warmup steps (target axis 100-500), vs the baseline's 0.25 fraction "
-              "(~31 steps of 125). 500 exceeds the 125-step run — extend epochs or treat as "
-              "full-warmup; decide before running, and never plot against fraction rows.")
+# D1 (2026-08-20): "warm start" = attribution window, a pre-training experiment —
+# removed from the fine-tuning grid. See EXPERIMENTS_CSV.md "Planned pre-training experiments".
+add(BASE17, run_id="plan_adam_eps1e17_16k_ep4", num_epochs=4,
+    notes="D2: double epochs (250 steps, batch unchanged) — isolates step count. "
+          "lr gated on tuning.csv sweep_group tune_adamw_16k_ep4.")
+add(BASE17, run_id="plan_adam_eps1e17_16k_bs512", batch_size=512, grad_accum_steps=32,
+    notes="D2: uncontrolled double batch (63 steps). lr gated on tune_adamw_16k_bs512.")
 for mdl, prm in [("gpt2-medium", 355), ("gpt2-large", 774)]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_{mdl}", model=mdl, n_params_m=prm,
         notes="Model-size axis. MAGIC is one reverse pass per query and scales with params.")
-for k in [4, 8]:
-    add(BASE17, run_id=f"plan_adam_eps1e17_16k_ckptavg{k}", ckpt_avg_k=k,
-        notes="Louis: average query loss over k near-final checkpoints. Needs "
-              "cleanup_ckpts=false and the checkpoints kept.")
+add(BASE17, run_id="plan_adam_eps1e17_16k_ckptavg4", ckpt_avg_k=4,
+    notes="D9: average the QUERY GRADIENT over the last 4 checkpoints. Replicate Louis's "
+          "effect on the anchor first (re-train the anchor base with checkpoints kept — "
+          "the originals were deleted; deterministic at seed 42). Eval-side: exempt from "
+          "lr gating.")
 for mod in ["qk_norm", "preact_layernorm", "preact_batchnorm"]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_{mod}", arch_mod=mod, model="gpt2_custom",
         notes="Needs the GPT-2-like custom model. Compare ONLY against "

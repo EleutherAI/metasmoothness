@@ -9,24 +9,24 @@ tune_muon_16k_anchor_lr0.0002,tune_muon_16k_anchor,measured,1,sm_muon_eps1e17_16
 tune_muon_16k_anchor_lr0.0004,tune_muon_16k_anchor,measured,1,sm_muon_eps1e17_16k_bs256,gpt2,none,muon,16000,256,4,2,125,0.25,1.0,0.01,,1e-17,42,0.0004,,3.266,/mnt/ssd-2/lucia/s16k_lrsweep/s16k_muon_lr0.0004,"Anchor sweep, measured 2026-08-20; untrained gpt2 heldout = 3.4981. 2e-4 selected (interior optimum for both optimizers)."
 tune_muon_16k_anchor_lr0.0008,tune_muon_16k_anchor,measured,1,sm_muon_eps1e17_16k_bs256,gpt2,none,muon,16000,256,4,2,125,0.25,1.0,0.01,,1e-17,42,0.0008,,3.3035,/mnt/ssd-2/lucia/s16k_lrsweep/s16k_muon_lr0.0008,"Anchor sweep, measured 2026-08-20; untrained gpt2 heldout = 3.4981. 2e-4 selected (interior optimum for both optimizers)."
 tune_muon_16k_anchor_lr0.002,tune_muon_16k_anchor,measured,1,sm_muon_eps1e17_16k_bs256,gpt2,none,muon,16000,256,4,2,125,0.25,1.0,0.01,,1e-17,42,0.002,,3.4198,/mnt/ssd-2/lucia/s16k_lrsweep/s16k_muon_lr0.002,"Anchor sweep, measured 2026-08-20; untrained gpt2 heldout = 3.4981. 2e-4 selected (interior optimum for both optimizers)."
-tune_adamw_128k_lr0.0001,tune_adamw_128k,empty,1,plan_adam_eps1e17_128k_bs256,gpt2,none,adamw,128000,256,16,2,1000,0.25,1.0,0.01,,1e-17,42,0.0001,,,,
-tune_adamw_128k_lr0.0002,tune_adamw_128k,empty,1,plan_adam_eps1e17_128k_bs256,gpt2,none,adamw,128000,256,16,2,1000,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
-tune_adamw_128k_lr0.0004,tune_adamw_128k,empty,1,plan_adam_eps1e17_128k_bs256,gpt2,none,adamw,128000,256,16,2,1000,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
-tune_adamw_16k_bs128_lr0.0001,tune_adamw_16k_bs128,empty,1,plan_adam_eps1e17_16k_bs128,gpt2,none,adamw,16000,128,8,2,250,0.25,1.0,0.01,,1e-17,42,0.0001,,,,
-tune_adamw_16k_bs128_lr0.0002,tune_adamw_16k_bs128,empty,1,plan_adam_eps1e17_16k_bs128,gpt2,none,adamw,16000,128,8,2,250,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
-tune_adamw_16k_bs128_lr0.0004,tune_adamw_16k_bs128,empty,1,plan_adam_eps1e17_16k_bs128,gpt2,none,adamw,16000,128,8,2,250,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
-tune_adamw_16k_bs16_lr0.0001,tune_adamw_16k_bs16,empty,1,plan_adam_eps1e17_16k_bs16,gpt2,none,adamw,16000,16,1,2,2000,0.25,1.0,0.01,,1e-17,42,0.0001,,,,
-tune_adamw_16k_bs16_lr0.0002,tune_adamw_16k_bs16,empty,1,plan_adam_eps1e17_16k_bs16,gpt2,none,adamw,16000,16,1,2,2000,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
-tune_adamw_16k_bs16_lr0.0004,tune_adamw_16k_bs16,empty,1,plan_adam_eps1e17_16k_bs16,gpt2,none,adamw,16000,16,1,2,2000,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
-tune_adamw_16k_bs32_lr0.0001,tune_adamw_16k_bs32,empty,1,plan_adam_eps1e17_16k_bs32,gpt2,none,adamw,16000,32,2,2,1000,0.25,1.0,0.01,,1e-17,42,0.0001,,,,
-tune_adamw_16k_bs32_lr0.0002,tune_adamw_16k_bs32,empty,1,plan_adam_eps1e17_16k_bs32,gpt2,none,adamw,16000,32,2,2,1000,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
-tune_adamw_16k_bs32_lr0.0004,tune_adamw_16k_bs32,empty,1,plan_adam_eps1e17_16k_bs32,gpt2,none,adamw,16000,32,2,2,1000,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
-tune_adamw_16k_bs64_lr0.0001,tune_adamw_16k_bs64,empty,1,plan_adam_eps1e17_16k_bs64,gpt2,none,adamw,16000,64,4,2,500,0.25,1.0,0.01,,1e-17,42,0.0001,,,,
-tune_adamw_16k_bs64_lr0.0002,tune_adamw_16k_bs64,empty,1,plan_adam_eps1e17_16k_bs64,gpt2,none,adamw,16000,64,4,2,500,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
-tune_adamw_16k_bs64_lr0.0004,tune_adamw_16k_bs64,empty,1,plan_adam_eps1e17_16k_bs64,gpt2,none,adamw,16000,64,4,2,500,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
-tune_adamw_256k_lr0.0001,tune_adamw_256k,empty,1,plan_adam_eps1e17_256k_bs256,gpt2,none,adamw,256000,256,16,2,2000,0.25,1.0,0.01,,1e-17,42,0.0001,,,,
-tune_adamw_256k_lr0.0002,tune_adamw_256k,empty,1,plan_adam_eps1e17_256k_bs256,gpt2,none,adamw,256000,256,16,2,2000,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
-tune_adamw_256k_lr0.0004,tune_adamw_256k,empty,1,plan_adam_eps1e17_256k_bs256,gpt2,none,adamw,256000,256,16,2,2000,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
+tune_adamw_16k_bs128_lr5e-05,tune_adamw_16k_bs128,empty,1,plan_adam_eps1e17_16k_bs128,gpt2,none,adamw,16000,128,8,2,250,0.25,1.0,0.01,,1e-17,42,5e-05,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_adamw_16k_bs128_lr0.0001,tune_adamw_16k_bs128,empty,1,plan_adam_eps1e17_16k_bs128,gpt2,none,adamw,16000,128,8,2,250,0.25,1.0,0.01,,1e-17,42,0.0001,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_adamw_16k_bs128_lr0.0002,tune_adamw_16k_bs128,empty,1,plan_adam_eps1e17_16k_bs128,gpt2,none,adamw,16000,128,8,2,250,0.25,1.0,0.01,,1e-17,42,0.0002,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_adamw_16k_bs16_lr2.5e-05,tune_adamw_16k_bs16,empty,1,plan_adam_eps1e17_16k_bs16,gpt2,none,adamw,16000,16,1,2,2000,0.25,1.0,0.01,,1e-17,42,2.5e-05,,,,Center 5e-05 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_adamw_16k_bs16_lr5e-05,tune_adamw_16k_bs16,empty,1,plan_adam_eps1e17_16k_bs16,gpt2,none,adamw,16000,16,1,2,2000,0.25,1.0,0.01,,1e-17,42,5e-05,,,,Center 5e-05 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_adamw_16k_bs16_lr0.0001,tune_adamw_16k_bs16,empty,1,plan_adam_eps1e17_16k_bs16,gpt2,none,adamw,16000,16,1,2,2000,0.25,1.0,0.01,,1e-17,42,0.0001,,,,Center 5e-05 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_adamw_16k_bs32_lr2.5e-05,tune_adamw_16k_bs32,empty,1,plan_adam_eps1e17_16k_bs32,gpt2,none,adamw,16000,32,2,2,1000,0.25,1.0,0.01,,1e-17,42,2.5e-05,,,,Center 5e-05 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_adamw_16k_bs32_lr5e-05,tune_adamw_16k_bs32,empty,1,plan_adam_eps1e17_16k_bs32,gpt2,none,adamw,16000,32,2,2,1000,0.25,1.0,0.01,,1e-17,42,5e-05,,,,Center 5e-05 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_adamw_16k_bs32_lr0.0001,tune_adamw_16k_bs32,empty,1,plan_adam_eps1e17_16k_bs32,gpt2,none,adamw,16000,32,2,2,1000,0.25,1.0,0.01,,1e-17,42,0.0001,,,,Center 5e-05 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_adamw_16k_bs512_lr0.0001,tune_adamw_16k_bs512,empty,1,plan_adam_eps1e17_16k_bs512,gpt2,none,adamw,16000,512,32,2,62,0.25,1.0,0.01,,1e-17,42,0.0001,,,,D2 uncontrolled double-batch arm (63 steps).
+tune_adamw_16k_bs512_lr0.0002,tune_adamw_16k_bs512,empty,1,plan_adam_eps1e17_16k_bs512,gpt2,none,adamw,16000,512,32,2,62,0.25,1.0,0.01,,1e-17,42,0.0002,,,,D2 uncontrolled double-batch arm (63 steps).
+tune_adamw_16k_bs512_lr0.0004,tune_adamw_16k_bs512,empty,1,plan_adam_eps1e17_16k_bs512,gpt2,none,adamw,16000,512,32,2,62,0.25,1.0,0.01,,1e-17,42,0.0004,,,,D2 uncontrolled double-batch arm (63 steps).
+tune_adamw_16k_bs64_lr5e-05,tune_adamw_16k_bs64,empty,1,plan_adam_eps1e17_16k_bs64,gpt2,none,adamw,16000,64,4,2,500,0.25,1.0,0.01,,1e-17,42,5e-05,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_adamw_16k_bs64_lr0.0001,tune_adamw_16k_bs64,empty,1,plan_adam_eps1e17_16k_bs64,gpt2,none,adamw,16000,64,4,2,500,0.25,1.0,0.01,,1e-17,42,0.0001,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_adamw_16k_bs64_lr0.0002,tune_adamw_16k_bs64,empty,1,plan_adam_eps1e17_16k_bs64,gpt2,none,adamw,16000,64,4,2,500,0.25,1.0,0.01,,1e-17,42,0.0002,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_adamw_16k_ep4_lr0.0001,tune_adamw_16k_ep4,empty,1,plan_adam_eps1e17_16k_ep4,gpt2,none,adamw,16000,256,16,4,250,0.25,1.0,0.01,,1e-17,42,0.0001,,,,D2 double-epochs arm (250 steps).
+tune_adamw_16k_ep4_lr0.0002,tune_adamw_16k_ep4,empty,1,plan_adam_eps1e17_16k_ep4,gpt2,none,adamw,16000,256,16,4,250,0.25,1.0,0.01,,1e-17,42,0.0002,,,,D2 double-epochs arm (250 steps).
+tune_adamw_16k_ep4_lr0.0004,tune_adamw_16k_ep4,empty,1,plan_adam_eps1e17_16k_ep4,gpt2,none,adamw,16000,256,16,4,250,0.25,1.0,0.01,,1e-17,42,0.0004,,,,D2 double-epochs arm (250 steps).
 tune_adamw_32k_lr0.0001,tune_adamw_32k,empty,1,plan_adam_eps1e17_32k_bs256,gpt2,none,adamw,32000,256,16,2,250,0.25,1.0,0.01,,1e-17,42,0.0001,,,,
 tune_adamw_32k_lr0.0002,tune_adamw_32k,empty,1,plan_adam_eps1e17_32k_bs256,gpt2,none,adamw,32000,256,16,2,250,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
 tune_adamw_32k_lr0.0004,tune_adamw_32k,empty,1,plan_adam_eps1e17_32k_bs256,gpt2,none,adamw,32000,256,16,2,250,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
@@ -39,12 +39,18 @@ tune_adamw_64k_lr0.0004,tune_adamw_64k,empty,1,plan_adam_eps1e17_64k_bs256,gpt2,
 tune_adamw_8k_lr0.0001,tune_adamw_8k,empty,1,plan_adam_eps1e17_8k_bs256,gpt2,none,adamw,8000,256,16,2,62,0.25,1.0,0.01,,1e-17,42,0.0001,,,,
 tune_adamw_8k_lr0.0002,tune_adamw_8k,empty,1,plan_adam_eps1e17_8k_bs256,gpt2,none,adamw,8000,256,16,2,62,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
 tune_adamw_8k_lr0.0004,tune_adamw_8k,empty,1,plan_adam_eps1e17_8k_bs256,gpt2,none,adamw,8000,256,16,2,62,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
-tune_muon_128k_lr0.0001,tune_muon_128k,empty,1,plan_muon_eps1e17_128k_bs256,gpt2,none,muon,128000,256,16,2,1000,0.25,1.0,0.01,,1e-17,42,0.0001,,,,
-tune_muon_128k_lr0.0002,tune_muon_128k,empty,1,plan_muon_eps1e17_128k_bs256,gpt2,none,muon,128000,256,16,2,1000,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
-tune_muon_128k_lr0.0004,tune_muon_128k,empty,1,plan_muon_eps1e17_128k_bs256,gpt2,none,muon,128000,256,16,2,1000,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
-tune_muon_256k_lr0.0001,tune_muon_256k,empty,1,plan_muon_eps1e17_256k_bs256,gpt2,none,muon,256000,256,16,2,2000,0.25,1.0,0.01,,1e-17,42,0.0001,,,,
-tune_muon_256k_lr0.0002,tune_muon_256k,empty,1,plan_muon_eps1e17_256k_bs256,gpt2,none,muon,256000,256,16,2,2000,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
-tune_muon_256k_lr0.0004,tune_muon_256k,empty,1,plan_muon_eps1e17_256k_bs256,gpt2,none,muon,256000,256,16,2,2000,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
+tune_muon_16k_bs128_lr5e-05,tune_muon_16k_bs128,empty,1,plan_muon_eps1e17_16k_bs128,gpt2,none,muon,16000,128,8,2,250,0.25,1.0,0.01,,1e-17,42,5e-05,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_muon_16k_bs128_lr0.0001,tune_muon_16k_bs128,empty,1,plan_muon_eps1e17_16k_bs128,gpt2,none,muon,16000,128,8,2,250,0.25,1.0,0.01,,1e-17,42,0.0001,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_muon_16k_bs128_lr0.0002,tune_muon_16k_bs128,empty,1,plan_muon_eps1e17_16k_bs128,gpt2,none,muon,16000,128,8,2,250,0.25,1.0,0.01,,1e-17,42,0.0002,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_muon_16k_bs16_lr2.5e-05,tune_muon_16k_bs16,empty,1,plan_muon_eps1e17_16k_bs16,gpt2,none,muon,16000,16,1,2,2000,0.25,1.0,0.01,,1e-17,42,2.5e-05,,,,Center 5e-05 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_muon_16k_bs16_lr5e-05,tune_muon_16k_bs16,empty,1,plan_muon_eps1e17_16k_bs16,gpt2,none,muon,16000,16,1,2,2000,0.25,1.0,0.01,,1e-17,42,5e-05,,,,Center 5e-05 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_muon_16k_bs16_lr0.0001,tune_muon_16k_bs16,empty,1,plan_muon_eps1e17_16k_bs16,gpt2,none,muon,16000,16,1,2,2000,0.25,1.0,0.01,,1e-17,42,0.0001,,,,Center 5e-05 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_muon_16k_bs32_lr2.5e-05,tune_muon_16k_bs32,empty,1,plan_muon_eps1e17_16k_bs32,gpt2,none,muon,16000,32,2,2,1000,0.25,1.0,0.01,,1e-17,42,2.5e-05,,,,Center 5e-05 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_muon_16k_bs32_lr5e-05,tune_muon_16k_bs32,empty,1,plan_muon_eps1e17_16k_bs32,gpt2,none,muon,16000,32,2,2,1000,0.25,1.0,0.01,,1e-17,42,5e-05,,,,Center 5e-05 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_muon_16k_bs32_lr0.0001,tune_muon_16k_bs32,empty,1,plan_muon_eps1e17_16k_bs32,gpt2,none,muon,16000,32,2,2,1000,0.25,1.0,0.01,,1e-17,42,0.0001,,,,Center 5e-05 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_muon_16k_bs64_lr5e-05,tune_muon_16k_bs64,empty,1,plan_muon_eps1e17_16k_bs64,gpt2,none,muon,16000,64,4,2,500,0.25,1.0,0.01,,1e-17,42,5e-05,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_muon_16k_bs64_lr0.0001,tune_muon_16k_bs64,empty,1,plan_muon_eps1e17_16k_bs64,gpt2,none,muon,16000,64,4,2,500,0.25,1.0,0.01,,1e-17,42,0.0001,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
+tune_muon_16k_bs64_lr0.0002,tune_muon_16k_bs64,empty,1,plan_muon_eps1e17_16k_bs64,gpt2,none,muon,16000,64,4,2,500,0.25,1.0,0.01,,1e-17,42,0.0002,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
 tune_muon_32k_lr0.0001,tune_muon_32k,empty,1,plan_muon_eps1e17_32k_bs256,gpt2,none,muon,32000,256,16,2,250,0.25,1.0,0.01,,1e-17,42,0.0001,,,,
 tune_muon_32k_lr0.0002,tune_muon_32k,empty,1,plan_muon_eps1e17_32k_bs256,gpt2,none,muon,32000,256,16,2,250,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
 tune_muon_32k_lr0.0004,tune_muon_32k,empty,1,plan_muon_eps1e17_32k_bs256,gpt2,none,muon,32000,256,16,2,250,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
@@ -57,27 +63,20 @@ tune_muon_64k_lr0.0004,tune_muon_64k,empty,1,plan_muon_eps1e17_64k_bs256,gpt2,no
 tune_muon_8k_lr0.0001,tune_muon_8k,empty,1,plan_muon_eps1e17_8k_bs256,gpt2,none,muon,8000,256,16,2,62,0.25,1.0,0.01,,1e-17,42,0.0001,,,,
 tune_muon_8k_lr0.0002,tune_muon_8k,empty,1,plan_muon_eps1e17_8k_bs256,gpt2,none,muon,8000,256,16,2,62,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
 tune_muon_8k_lr0.0004,tune_muon_8k,empty,1,plan_muon_eps1e17_8k_bs256,gpt2,none,muon,8000,256,16,2,62,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
-tune_adamw_16k_gpt2-large_lr0.0001,tune_adamw_16k_gpt2-large,empty,2,plan_adam_eps1e17_16k_gpt2-large,gpt2-large,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,1e-17,42,0.0001,,,,Adjust grad_accum to fit; record what was used.
-tune_adamw_16k_gpt2-large_lr0.0002,tune_adamw_16k_gpt2-large,empty,2,plan_adam_eps1e17_16k_gpt2-large,gpt2-large,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,1e-17,42,0.0002,,,,Adjust grad_accum to fit; record what was used.
-tune_adamw_16k_gpt2-large_lr0.0004,tune_adamw_16k_gpt2-large,empty,2,plan_adam_eps1e17_16k_gpt2-large,gpt2-large,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,1e-17,42,0.0004,,,,Adjust grad_accum to fit; record what was used.
-tune_adamw_16k_gpt2-medium_lr0.0001,tune_adamw_16k_gpt2-medium,empty,2,plan_adam_eps1e17_16k_gpt2-medium,gpt2-medium,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,1e-17,42,0.0001,,,,Adjust grad_accum to fit; record what was used.
-tune_adamw_16k_gpt2-medium_lr0.0002,tune_adamw_16k_gpt2-medium,empty,2,plan_adam_eps1e17_16k_gpt2-medium,gpt2-medium,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,1e-17,42,0.0002,,,,Adjust grad_accum to fit; record what was used.
-tune_adamw_16k_gpt2-medium_lr0.0004,tune_adamw_16k_gpt2-medium,empty,2,plan_adam_eps1e17_16k_gpt2-medium,gpt2-medium,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,1e-17,42,0.0004,,,,Adjust grad_accum to fit; record what was used.
+tune_adamw_16k_eps0_control_lr0.0002,tune_adamw_16k_eps0_control,empty,2,sm_adamw_eps1e17_16k_bs256,gpt2,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,0,42,0.0002,,,,D12: eval-loss check that eps_root 1e-17 vs 0 is a null. Train-only twin of the anchor; compare heldout_loss against the measured anchor rows.
 tune_adamw_16k_scale0.25_lr0.0001,tune_adamw_16k_scale0.25,empty,2,plan_adam_eps1e17_16k_scale0.25,gpt2,none,adamw,16000,256,16,2,125,0.25,0.25,0.01,,1e-17,42,0.0001,,,,
 tune_adamw_16k_scale0.25_lr0.0002,tune_adamw_16k_scale0.25,empty,2,plan_adam_eps1e17_16k_scale0.25,gpt2,none,adamw,16000,256,16,2,125,0.25,0.25,0.01,,1e-17,42,0.0002,,,,
 tune_adamw_16k_scale0.25_lr0.0004,tune_adamw_16k_scale0.25,empty,2,plan_adam_eps1e17_16k_scale0.25,gpt2,none,adamw,16000,256,16,2,125,0.25,0.25,0.01,,1e-17,42,0.0004,,,,
 tune_adamw_16k_scale0.5_lr0.0001,tune_adamw_16k_scale0.5,empty,2,plan_adam_eps1e17_16k_scale0.5,gpt2,none,adamw,16000,256,16,2,125,0.25,0.5,0.01,,1e-17,42,0.0001,,,,
 tune_adamw_16k_scale0.5_lr0.0002,tune_adamw_16k_scale0.5,empty,2,plan_adam_eps1e17_16k_scale0.5,gpt2,none,adamw,16000,256,16,2,125,0.25,0.5,0.01,,1e-17,42,0.0002,,,,
 tune_adamw_16k_scale0.5_lr0.0004,tune_adamw_16k_scale0.5,empty,2,plan_adam_eps1e17_16k_scale0.5,gpt2,none,adamw,16000,256,16,2,125,0.25,0.5,0.01,,1e-17,42,0.0004,,,,
-tune_adamw_16k_warmup100_lr0.0001,tune_adamw_16k_warmup100,empty,2,plan_adam_eps1e17_16k_warmup100,gpt2,none,adamw,16000,256,16,2,125,100,1.0,0.01,,1e-17,42,0.0001,,,,
-tune_adamw_16k_warmup100_lr0.0002,tune_adamw_16k_warmup100,empty,2,plan_adam_eps1e17_16k_warmup100,gpt2,none,adamw,16000,256,16,2,125,100,1.0,0.01,,1e-17,42,0.0002,,,,
-tune_adamw_16k_warmup100_lr0.0004,tune_adamw_16k_warmup100,empty,2,plan_adam_eps1e17_16k_warmup100,gpt2,none,adamw,16000,256,16,2,125,100,1.0,0.01,,1e-17,42,0.0004,,,,
-tune_adamw_16k_warmup200_lr0.0001,tune_adamw_16k_warmup200,empty,2,plan_adam_eps1e17_16k_warmup200,gpt2,none,adamw,16000,256,16,2,125,200,1.0,0.01,,1e-17,42,0.0001,,,,
-tune_adamw_16k_warmup200_lr0.0002,tune_adamw_16k_warmup200,empty,2,plan_adam_eps1e17_16k_warmup200,gpt2,none,adamw,16000,256,16,2,125,200,1.0,0.01,,1e-17,42,0.0002,,,,
-tune_adamw_16k_warmup200_lr0.0004,tune_adamw_16k_warmup200,empty,2,plan_adam_eps1e17_16k_warmup200,gpt2,none,adamw,16000,256,16,2,125,200,1.0,0.01,,1e-17,42,0.0004,,,,
-tune_adamw_16k_warmup500_lr0.0001,tune_adamw_16k_warmup500,blocked,2,plan_adam_eps1e17_16k_warmup500,gpt2,none,adamw,16000,256,16,2,125,500,1.0,0.01,,1e-17,42,0.0001,,,,500 warmup steps exceed the 125-step run; decide extend-epochs vs all-warmup before running (CONTROLS: warmup units).
-tune_adamw_16k_warmup500_lr0.0002,tune_adamw_16k_warmup500,blocked,2,plan_adam_eps1e17_16k_warmup500,gpt2,none,adamw,16000,256,16,2,125,500,1.0,0.01,,1e-17,42,0.0002,,,,500 warmup steps exceed the 125-step run; decide extend-epochs vs all-warmup before running (CONTROLS: warmup units).
-tune_adamw_16k_warmup500_lr0.0004,tune_adamw_16k_warmup500,blocked,2,plan_adam_eps1e17_16k_warmup500,gpt2,none,adamw,16000,256,16,2,125,500,1.0,0.01,,1e-17,42,0.0004,,,,500 warmup steps exceed the 125-step run; decide extend-epochs vs all-warmup before running (CONTROLS: warmup units).
+tune_muon_16k_eps0_control_lr0.0002,tune_muon_16k_eps0_control,empty,2,sm_muon_eps1e17_16k_bs256,gpt2,none,muon,16000,256,16,2,125,0.25,1.0,0.01,,0,42,0.0002,,,,D12: eval-loss check that eps_root 1e-17 vs 0 is a null. Train-only twin of the anchor; compare heldout_loss against the measured anchor rows.
+tune_adamw_16k_gpt2-large_lr5e-05,tune_adamw_16k_gpt2-large,blocked,2,plan_adam_eps1e17_16k_gpt2-large,gpt2-large,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,1e-17,42,5e-05,,,,D11: BLOCKED until the scaling plan is signed off. Center one octave down (larger models prefer lower lr). Adjust grad_accum to fit; record it.
+tune_adamw_16k_gpt2-large_lr0.0001,tune_adamw_16k_gpt2-large,blocked,2,plan_adam_eps1e17_16k_gpt2-large,gpt2-large,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,1e-17,42,0.0001,,,,D11: BLOCKED until the scaling plan is signed off. Center one octave down (larger models prefer lower lr). Adjust grad_accum to fit; record it.
+tune_adamw_16k_gpt2-large_lr0.0002,tune_adamw_16k_gpt2-large,blocked,2,plan_adam_eps1e17_16k_gpt2-large,gpt2-large,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,1e-17,42,0.0002,,,,D11: BLOCKED until the scaling plan is signed off. Center one octave down (larger models prefer lower lr). Adjust grad_accum to fit; record it.
+tune_adamw_16k_gpt2-medium_lr5e-05,tune_adamw_16k_gpt2-medium,blocked,2,plan_adam_eps1e17_16k_gpt2-medium,gpt2-medium,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,1e-17,42,5e-05,,,,D11: BLOCKED until the scaling plan is signed off. Center one octave down (larger models prefer lower lr). Adjust grad_accum to fit; record it.
+tune_adamw_16k_gpt2-medium_lr0.0001,tune_adamw_16k_gpt2-medium,blocked,2,plan_adam_eps1e17_16k_gpt2-medium,gpt2-medium,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,1e-17,42,0.0001,,,,D11: BLOCKED until the scaling plan is signed off. Center one octave down (larger models prefer lower lr). Adjust grad_accum to fit; record it.
+tune_adamw_16k_gpt2-medium_lr0.0002,tune_adamw_16k_gpt2-medium,blocked,2,plan_adam_eps1e17_16k_gpt2-medium,gpt2-medium,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,,1e-17,42,0.0002,,,,D11: BLOCKED until the scaling plan is signed off. Center one octave down (larger models prefer lower lr). Adjust grad_accum to fit; record it.
 tune_adamw_16k_clip1.0_lr0.0001,tune_adamw_16k_clip1.0,empty,3,plan_adam_eps1e17_16k_clip1.0,gpt2,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,1.0,1e-17,42,0.0001,,,,
 tune_adamw_16k_clip1.0_lr0.0002,tune_adamw_16k_clip1.0,empty,3,plan_adam_eps1e17_16k_clip1.0,gpt2,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,1.0,1e-17,42,0.0002,,,,
 tune_adamw_16k_clip1.0_lr0.0004,tune_adamw_16k_clip1.0,empty,3,plan_adam_eps1e17_16k_clip1.0,gpt2,none,adamw,16000,256,16,2,125,0.25,1.0,0.01,1.0,1e-17,42,0.0004,,,,
