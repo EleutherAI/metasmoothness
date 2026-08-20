@@ -36,6 +36,20 @@ takeover in the commit message. Before stealing, check for the previous node's p
 artifacts (the row's `run_dir`) — per-query MAGIC scores and subset-sliced banks resume
 cheaply, so prefer resuming to restarting.
 
+## Standing directive (from Lucia): drain the tuning grid
+
+Any agent with idle GPUs should claim and run tuning rows, in `priority` order, until
+every non-blocked row in `tuning.csv` is `measured`. Record results in the builder and
+commit as each run finishes — do not batch results at the end of a session. Commit every
+generated run config: `gen_tuning_run.py` mirrors each yaml to `configs/tuning/`; commit
+the mirror together with the claim.
+
+**GPU packing rule:** maximize concurrent runs, not GPUs per run. Two GPT-2 runs on 2 GPUs
+each beat one run on 4 — tuning-size models gain little from wider data parallelism, and
+throughput of the whole grid is what matters. Suggested slots on an 8-GPU node: 2 GPUs per
+run, skipping GPUs that other jobs occupy (check `nvidia-smi` first). Take larger slots
+only where memory demands it (gpt2-medium and larger, MAGIC rollouts).
+
 ## Running a tuning row
 
 `scripts/gen_tuning_run.py <run_id>` writes the full training config (every control filled;

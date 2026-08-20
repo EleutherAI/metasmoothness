@@ -4,10 +4,10 @@ Usage:
     python scripts/gen_tuning_run.py tune_adamw_8k_lr0.0002 [--seed 42] [--nproc 2]
 
 Reads the row from tuning.csv, writes a bergson `train` config under
-/mnt/ssd-2/lucia/paper_runs/tuning/<run_id>_s<seed>/, and prints the exact commands to run.
-The config encodes every control from CONTROLS.md; the row supplies what varies. Groups whose
-runs are 63 steps or fewer need two seeds (42 and 43) — run the command once per seed and
-record the mean held-out loss in the row.
+/mnt/ssd-2/lucia/paper_runs/tuning/<run_id>_s<seed>/, mirrors it to
+<repo>/configs/tuning/<run_id>_s<seed>.yaml (commit that copy with the claim), and prints
+the exact commands to run. The config encodes every control from CONTROLS.md; the row
+supplies what varies. One seed per point (see DECISIONS.md, tuning procedure step 4).
 
 After the held-out number is recorded, delete <run_path>/checkpoints — training checkpoints
 are large and tuning runs never reuse them. (The keep-checkpoints control applies to
@@ -84,10 +84,15 @@ def main() -> None:
     with open(cfg_path, "w") as f:
         yaml.safe_dump(cfg, f, sort_keys=False)
 
+    mirror = REPO / "configs" / "tuning" / f"{args.run_id}_s{args.seed}.yaml"
+    mirror.parent.mkdir(parents=True, exist_ok=True)
+    with open(mirror, "w") as f:
+        yaml.safe_dump(cfg, f, sort_keys=False)
+
     steps = math.ceil(n * ep / bs)
-    two_seed = steps <= 63
     print(f"wrote {cfg_path}   ({steps} steps; ga={ga} at nproc={args.nproc})")
-    print(f"\n# 1. train ({'run for --seed 42 AND 43, record the MEAN' if two_seed else 'single seed'}):")
+    print(f"mirrored to {mirror} — commit it with the claim")
+    print("\n# 1. train:")
     print(f"PYTHONPATH={BERGSON} bergson {cfg_path}")
     print("\n# 2. held-out loss (fill heldout_loss in tuning.csv via the builder):")
     print(f"python {REPO}/scripts/heldout_eval.py {run_path}/model")
