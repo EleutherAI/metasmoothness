@@ -216,8 +216,12 @@ still catches meaningful mistuning, and the finest spacing the metric can suppor
 
 ## Sweep centers
 
-Centers use prior knowledge about how lr optima move, so that most groups finish in three runs
-instead of needing extensions:
+Grids differ between arms only through two stated rules, so no arm's range is hand-picked
+from prior results: (1) every arm centers on the reference-configuration optimum — the
+standard tune-at-a-reference-then-transfer practice; (2) batch-size arms shift the whole grid
+by sqrt(bs/256), the published batch-scaling heuristic. The model-size arms widen the grid by
+one step downward rather than shifting it. Extensions beyond any grid are data-driven
+(endpoint rule) and recorded in tuning.csv like every other run:
 
 | axis | center | reason |
 |---|---|---|
