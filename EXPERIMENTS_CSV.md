@@ -5,8 +5,16 @@ One row per experiment. Parameter columns first, result columns last, provenance
 `build_experiments_csv.py`; edit the script, never the CSV.
 
 ```
-python build_experiments_csv.py   # -> experiments.csv (82 rows: 1 done, 43 partial, 38 planned)
+python build_tuning_csv.py        # -> tuning.csv      (stage 0: hp selection, run FIRST)
+python build_experiments_csv.py   # -> experiments.csv (stage 1: the grid itself)
 ```
+
+**Staging:** `tuning.csv` registers the held-out lr mini-sweeps that must be measured before a
+planned experiment's lr is final — one row per (config, lr), grouped by `sweep_group`, with the
+`gates` column naming the experiments.csv row(s) each group unblocks. The 16k anchor sweeps are
+already measured (2e-4 for both optimizers); everything else is empty rows to claim. Lowest
+heldout_loss in a group wins; an endpoint win adds one octave before freezing. Only the
+eval-side ckptavg rows are exempt from gating (CONTROLS protocol rule 3).
 
 ## Admission policy (2026-08-20)
 

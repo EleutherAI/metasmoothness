@@ -270,12 +270,15 @@ for bs in [16, 32, 64, 128]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_bs{bs}", batch_size=bs,
         grad_accum_steps=max(1, bs // 16),
         notes="Batch-size axis. bs256 measured (MAGIC 0.9333).")
-for n in [4000, 8000, 32000]:
+for n in [4000, 8000, 32000, 64000, 128000, 256000]:
     add(BASE17, run_id=f"plan_adam_eps1e17_{n//1000}k_bs256", n_docs=n,
-        notes="N axis. 16k measured (MAGIC 0.9333).")
-for n in [4000, 8000, 32000]:
+        notes="N axis (nested chain, EleutherAI/bergson-smollm2-scaling). 16k measured "
+              "(MAGIC 0.9333). lr gated on tuning.csv sweep_group "
+              f"tune_adamw_{n//1000}k.")
+for n in [4000, 8000, 32000, 64000, 128000, 256000]:
     add(BASE17, run_id=f"plan_muon_eps1e17_{n//1000}k_bs256", n_docs=n, optimizer="muon",
-        notes="N axis, muon. 16k measured (MAGIC 0.8470).")
+        notes="N axis, muon. 16k measured (MAGIC 0.8470). lr gated on tuning.csv "
+              f"sweep_group tune_muon_{n//1000}k.")
 for w in [100, 200, 500]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_warmup{w}", warmup=w,
         notes="ABSOLUTE warmup steps (target axis 100-500), vs the baseline's 0.25 fraction "
