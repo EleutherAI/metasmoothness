@@ -259,7 +259,9 @@ for rid, bd in [(r[0], r[13]) for r in GRID if not r[0].endswith("_rep2")]:
 # scripts/ekfac_lds.py against each bank's validation.csv; scores at
 # /mnt/ssd-2/lucia/s16k_<opt>/ekfac_scores, code commit 10874f93 (main-parent worktree).
 EKFAC_FILL = {"adamw": dict(ekfac_lds=0.4251, ekfac_ci_lo=0.3772, ekfac_ci_hi=0.4693,
-                            ekfac_n_subsets=100, code_commit="10874f93")}
+                            ekfac_n_subsets=100, code_commit="10874f93"),
+              "muon": dict(ekfac_lds=0.4285, ekfac_ci_lo=0.3856, ekfac_ci_hi=0.4674,
+                           ekfac_n_subsets=100, code_commit="10874f93")}
 for opt in ["adamw", "muon"]:
     add(GPT2_FT, run_id=f"fill_sm_{opt}_eps1e17_16k_bs256_ms_ekfac",
         status="partial" if opt in EKFAC_FILL else "planned",

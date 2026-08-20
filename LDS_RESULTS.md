@@ -641,3 +641,15 @@ reproducing the per-epoch `adam_eps0_16k` value 0.1186):
 The highest EK-FAC LDS on any admitted bank (per-epoch grid max: 0.31). Sign note:
 raw bergson scores are gradient-signed; the recorded convention negates them.
 muon twin in progress.
+
+muon twin (same pipeline, bank `/mnt/ssd-2/lucia/s16k_muon/merged`, scores
+`/mnt/ssd-2/lucia/s16k_muon/ekfac_scores`):
+
+| config | ekfac_lds | 95% CI | n_subsets | n_queries | MAGIC on same bank |
+|---|---|---|---|---|---|
+| muon eps1e-17 16k bs256 | 0.4285 | [0.3856, 0.4674] | 100 | 20 | 0.8470 |
+
+**Observation:** EK-FAC does not separate the optimizers at the anchor (0.4251 vs
+0.4285, diff 0.003 — within every CI and the 0.02 run-to-run bar), while MAGIC
+separates them decisively on the same banks (0.9333 vs 0.8470, paired diff +0.086,
+19/20 query wins). The two methods disagree about whether the optimizer matters.
