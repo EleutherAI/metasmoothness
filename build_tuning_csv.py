@@ -212,6 +212,12 @@ RESULTS = {
         status="measured", heldout_loss=3.3114,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_4k_lr0.0004_s42",
         notes="Endpoint winner of the 3-point grid; 8e-4 extension registered."),
+    "tune_adamw_32k_lr0.0001": dict(
+        status="measured", heldout_loss=3.2388,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_32k_lr0.0001_s42"),
+    "tune_adamw_32k_lr0.0002": dict(
+        status="measured", heldout_loss=3.2365,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_32k_lr0.0002_s42"),
     "tune_muon_8k_lr0.0001": dict(
         status="measured", heldout_loss=3.2974,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_8k_lr0.0001_s42"),
