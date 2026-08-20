@@ -280,13 +280,18 @@ for bs in [16, 32, 64, 128]:
     add(BASE17, run_id=f"plan_muon_eps1e17_16k_bs{bs}", optimizer="muon", batch_size=bs,
         grad_accum_steps=max(1, bs // 16),
         notes="D5: muon twin of the batch-size axis. bs256 measured (MAGIC 0.8470).")
+# Tuned lr per completed sweep group (procedure step 5); 2e-4 until the group completes.
+TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e-4,
+            "plan_muon_eps1e17_4k_bs256": 4e-4}
 for n in [4000, 8000, 32000, 64000]:
-    add(BASE17, run_id=f"plan_adam_eps1e17_{n//1000}k_bs256", n_docs=n,
+    rid = f"plan_adam_eps1e17_{n//1000}k_bs256"
+    add(BASE17, run_id=rid, n_docs=n, lr=TUNED_LR.get(rid, 2e-4),
         notes="N axis (nested chain, EleutherAI/bergson-smollm2-scaling). 16k measured "
               "(MAGIC 0.9333). lr comes from tuning.csv sweep_group "
               f"tune_adamw_{n//1000}k.")
 for n in [4000, 8000, 32000, 64000]:
-    add(BASE17, run_id=f"plan_muon_eps1e17_{n//1000}k_bs256", n_docs=n, optimizer="muon",
+    rid = f"plan_muon_eps1e17_{n//1000}k_bs256"
+    add(BASE17, run_id=rid, n_docs=n, optimizer="muon", lr=TUNED_LR.get(rid, 2e-4),
         notes="N axis, muon. 16k measured (MAGIC 0.8470). lr comes from tuning.csv "
               f"sweep_group tune_muon_{n//1000}k.")
 # D1 (2026-08-20): "warm start" = attribution window, a pre-training experiment —

@@ -182,6 +182,18 @@ RESULTS = {
     "tune_adamw_4k_lr0.0004": dict(
         status="measured", heldout_loss=3.3311,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_4k_lr0.0004_s42"),
+    "tune_adamw_4k_lr5e-05": dict(
+        status="measured", heldout_loss=3.3236,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_4k_lr5e-05_s42",
+        notes="Extension point. Group complete: interior optimum at 1e-4 (3.3149) — "
+              "selected for plan_adam_eps1e17_4k_bs256 (gap to 2e-4 is 0.0029, above the "
+              "tie threshold, so the tuned value replaces the center)."),
+    "tune_muon_4k_lr0.0008": dict(
+        status="measured", heldout_loss=3.3363,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_4k_lr0.0008_s42",
+        notes="Extension point. Group complete: interior optimum at 4e-4 (3.3114) — "
+              "selected for plan_muon_eps1e17_4k_bs256 (gap to 2e-4 is 0.0024, above the "
+              "tie threshold)."),
     "tune_adamw_8k_lr0.0001": dict(
         status="measured", heldout_loss=3.2866,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_8k_lr0.0001_s42"),
