@@ -178,6 +178,15 @@ RESULTS = {
     "tune_adamw_16k_bs16_lr2.5e-05": dict(
         status="measured", heldout_loss=3.2502,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_bs16_lr2.5e-05_s42"),
+    "tune_adamw_16k_bs16_lr5e-05": dict(
+        status="measured", heldout_loss=3.2497,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_bs16_lr5e-05_s42",
+        notes="Group complete: interior optimum at the sqrt-rule center 5e-5 (2.5e-5 gap "
+              "0.0005 is under the tie threshold; center selected on both grounds) — "
+              "selected for plan_adam_eps1e17_16k_bs16."),
+    "tune_adamw_16k_bs16_lr0.0001": dict(
+        status="measured", heldout_loss=3.2620,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_bs16_lr0.0001_s42"),
     "tune_adamw_4k_lr0.0001": dict(
         status="measured", heldout_loss=3.3149,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_4k_lr0.0001_s42",
