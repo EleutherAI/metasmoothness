@@ -1,7 +1,7 @@
-run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_64k_lr0.0004_s42
+run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs32_lr2.5e-05_s42
 steps:
 - train:
-    run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_64k_lr0.0004_s42
+    run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs32_lr2.5e-05_s42
     overwrite: true
     model: gpt2
     model_kwargs: resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0
@@ -11,17 +11,17 @@ steps:
       nnode: 1
       nproc_per_node: 2
     data:
-      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_64k.hf
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_16k.hf
       split: train
       chunk_length: 0
     lr_schedule:
-      lr: 0.0004
+      lr: 2.5e-05
       lr_scheduler_type: polynomial
       lr_start: 1.0e-06
-      lr_end: 4.0e-05
+      lr_end: 2.5e-06
       warmup_steps: 0.25
-    batch_size: 256
-    grad_accum_steps: 8
+    batch_size: 32
+    grad_accum_steps: 1
     num_epochs: 2
     seed: 42
     optimizer: muon
