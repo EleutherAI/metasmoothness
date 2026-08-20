@@ -178,6 +178,17 @@ for mod in ["none", "qk_norm", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_64k_lr5e-05": dict(
+        status="measured", heldout_loss=3.2340,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_64k_lr5e-05_s42",
+        notes="Extension point. Group complete: interior optimum at 1e-4 (3.2314, margin "
+              "0.0026 over 5e-5) — selected for plan_adam_eps1e17_64k_bs256."),
+    "tune_muon_16k_bs32_lr2.5e-05": dict(
+        status="measured", heldout_loss=3.2497,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs32_lr2.5e-05_s42"),
+    "tune_muon_16k_bs32_lr5e-05": dict(
+        status="measured", heldout_loss=3.2441,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs32_lr5e-05_s42"),
     "tune_muon_16k_bs16_lr0.0001": dict(
         status="measured", heldout_loss=3.2573,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs16_lr0.0001_s42",
