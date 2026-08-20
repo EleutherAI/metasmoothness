@@ -30,11 +30,10 @@ Conventions
 status      done    = metasmoothness, magic_lds and ekfac_lds all measured
             partial = at least one of the three measured
             planned = nothing measured; the row exists to be claimed
-steps       n_docs * num_epochs / batch_size (global batch), rounded. Five configs are not
-            integer (4k and 8k at bs256; 16k at bs512, all x.5 or x.25): for these, read the
-            actual optimizer step count from the run log and correct the cell — the trainer
-            pads the final partial batch with zero-weight documents, and the recorded number
-            must be the real one.
+steps       ceil(n_docs * num_epochs / batch_size). Exact: the trainer concatenates all
+            epochs into one shuffled sequence (shuffled_epochs) and pads that sequence once,
+            at its end, with zero-weight copies of the last document — so a fractional config
+            (4k/8k at bs256, 16k at bs512) has exactly one partial batch in the whole run.
 eps_root    epsilon inside the AdamW sqrt: m / (sqrt(v + eps_root) + adam_eps). Non-standard.
             For muon it reaches only the AdamW-fallback params (121,344 of 163M = 0.07%).
 warmup      lr-warmup as a fraction of total steps (values below 1; at 1 or above the trainer
@@ -109,7 +108,8 @@ def add(base, **kw):
     r = dict(base)
     r.update(kw)
     if "steps" not in r and r.get("n_docs") and r.get("batch_size") and r.get("num_epochs"):
-        r["steps"] = round(r["n_docs"] * r["num_epochs"] / r["batch_size"])
+        import math
+        r["steps"] = math.ceil(r["n_docs"] * r["num_epochs"] / r["batch_size"])
     rows.append(r)
 
 

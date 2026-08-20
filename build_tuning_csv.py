@@ -48,7 +48,8 @@ def sweep(group, selects_lr_for, lrs=MINI, status="empty", priority=2, **cfg):
         r.update(run_id=f"{group}_lr{lr:g}", sweep_group=group, selects_lr_for=selects_lr_for,
                  status=status, priority=priority, lr=lr)
         if not r.get("steps"):
-            r["steps"] = round(int(r["n_docs"]) * int(r["num_epochs"]) / int(r["batch_size"]))
+            import math
+            r["steps"] = math.ceil(int(r["n_docs"]) * int(r["num_epochs"]) / int(r["batch_size"]))
         rows.append(r)
 
 

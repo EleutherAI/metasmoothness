@@ -140,6 +140,18 @@ needs a fresh ~50-100-retrain bank; `none` = full rebuild. The per-epoch grid ba
 `/mnt/ssd-2/lucia/s16k_{adamw,muon}/merged` (models kept, base-training trajectories deleted —
 EK-FAC cheap, a fresh MAGIC rollout must first retrain, which reproduces deterministically).
 
+## Optional future data (run if time permits)
+
+- **Learning-rate optimum vs batch size.** The tuning sweeps center the batch-size groups
+  with a square-root rule (`2e-4 * sqrt(bs/256)`, rounded to a 2x step). The completed sweeps
+  will show whether the optimum actually follows that rule; extending each batch-size group by
+  one or two more lr points would map the optimum-vs-batch curve properly, for both
+  optimizers — the rule is an Adam heuristic and muon's scaling is unverified.
+- **Matched-steps double batch.** The step-count arms are anchor (125 steps, bs256), double
+  epochs (250 steps, bs256), and double batch (63 steps, bs512). A bs512 + 4-epoch run
+  (125 steps at double batch) would complete the factorial and isolate batch size at matched
+  step count.
+
 ## Planned pre-training experiments (not in the current grid)
 
 **Attribution window (also called "warm start").** Do not run attribution over the first N training
