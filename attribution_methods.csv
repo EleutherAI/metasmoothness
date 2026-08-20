@@ -1,0 +1,53 @@
+run_id,method,variant,lds,ci_lo,ci_hi,n_subsets,n_queries,run_dir,source_doc,notes
+sm_adam_eps1e6_4k,shampoo,-1/2,0.3071,0.27,0.342,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_adam_eps1e6_4k,shampoo,-1/4,0.3264,0.294,0.358,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_adam_eps0_4k,shampoo,-1/2,0.2145,0.178,0.249,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_adam_eps0_4k,shampoo,-1/4,0.1562,0.122,0.192,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_adam_eps0_4k,shampoo,-1/8,0.1111,0.076,0.145,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_muon_eps1e6_5e5_4k,shampoo,-1/2,0.5217,0.481,0.561,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_muon_eps1e6_5e5_4k,shampoo,-1/4,0.4304,0.388,0.471,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_muon_eps1e6_5e5_4k,shampoo,-1/8,0.3026,0.26,0.343,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_muon_eps0_5e5_4k,shampoo,-1/2,0.5208,0.479,0.561,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_muon_eps0_5e5_4k,shampoo,-1/4,0.4306,0.389,0.471,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_muon_eps0_5e5_4k,shampoo,-1/8,0.301,0.26,0.343,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_muon_eps0_1e4_4k,shampoo,-1/2,0.5206,0.479,0.56,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_muon_eps0_1e4_4k,shampoo,-1/4,0.4093,0.371,0.447,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+sm_muon_eps0_1e4_4k,shampoo,-1/8,0.2682,0.229,0.307,50,,,LDS_RESULTS.md,apply_power = 2x this label.
+wt_adam_eps1e6_bs64_lotus,magic,bwd eval,0.9688,,,400,50,runs/lotus_bwd_eval,LDS_RESULTS.md,
+wt_adam_eps1e6_bs64_lotus,source,damp0,0.3902,,,400,50,runs/lotus_source_q50_damp0_validate,LDS_RESULTS.md,
+wt_adam_eps1e6_bs64_lotus,source,adam,0.2068,,,400,50,runs/lotus_source_adam_q50_validate,LDS_RESULTS.md,
+wt_adam_eps1e6_bs64_lotus,source,default,-0.3871,,,400,50,runs/lotus_source_q50_validate,LDS_RESULTS.md,
+wt_adam_eps1e6_bs64_lotus,ekfac,docspace,0.2588,,,400,50,runs/lotus_ekfac50q_docspace_vs_lotus_bank,LDS_RESULTS.md,
+wt_adam_eps1e6_bs64_lotus,ekfac,allium-0,0.0543,,,400,50,runs/lotus_scores_ekfac50q_allium-0_validate,LDS_RESULTS.md,
+wt_adam_eps1e6_bs64_lotus,trackstar,docs p32 noopt,0.2002,,,400,50,runs/gpt2_lotus_trackstar50q_docs_p32_noopt_vs_lotus_bank,LDS_RESULTS.md,
+wt_adam_eps1e6_bs64_lotus,trackstar,docs,0.1838,,,400,50,runs/gpt2_lotus_trackstar50q_docs_vs_lotus_bank,LDS_RESULTS.md,
+wt_adam_eps1e6_bs64_lotus,trackstar,default,0.1767,,,400,50,runs/lotus_trackstar_q50_validate,LDS_RESULTS.md,
+wt_adam_eps0_bs64,source,source2,0.1531,,,50,50,runs/epsroot0_source2_q50_validate,LDS_RESULTS.md,
+wt_adam_eps0_bs64,source,source2 adam hybrid,0.1446,,,50,50,runs/epsroot0_source2_adam_hybrid_validate,LDS_RESULTS.md,
+wt_adam_eps0_bs64,source,source2 adam,0.0811,,,50,50,runs/epsroot0_source2_adam_q50_validate,LDS_RESULTS.md,
+wt_adam_eps0_bs64,ekfac,allium-0,-0.0109,,,50,50,runs/epsroot0_scores_ekfac50q_allium-0_validate,LDS_RESULTS.md,
+wt_adam_eps0_bs64,magic,spotcheck,,,,50,1,runs/epsroot0_bank,LDS_RESULTS.md,Returned NaN.
+wt_adamw_eps1e8_lr0.0008_bank100,trackstar_no_adam_norm,,0.1764,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr0.0008_bank100,trackstar_no_adam_norm,,0.0374,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr0.0002_bank100,trackstar_no_adam_norm,,0.168,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr8e-05_bank100,trackstar_no_adam_norm,,0.2395,,,100,50,,BASELINE_LDS.md,
+wt_adamw_eps1e8_lr0.0008_bank100,bm25_lexical,,0.16,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr0.0008_bank100,bm25_lexical,,0.0625,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr0.0002_bank100,bm25_lexical,,0.1821,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr8e-05_bank100,bm25_lexical,,0.2552,,,100,50,,BASELINE_LDS.md,
+wt_adamw_eps1e8_lr0.0008_bank100,activation_similarity,,0.09,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr0.0008_bank100,activation_similarity,,0.069,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr0.0002_bank100,activation_similarity,,0.0956,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr8e-05_bank100,activation_similarity,,0.122,,,100,50,,BASELINE_LDS.md,
+wt_adamw_eps1e8_lr0.0008_bank100,qwen3_embedding_8b,,0.11,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr0.0008_bank100,qwen3_embedding_8b,,0.0536,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr0.0002_bank100,qwen3_embedding_8b,,0.1036,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr8e-05_bank100,qwen3_embedding_8b,,0.159,,,100,50,,BASELINE_LDS.md,
+wt_adamw_eps1e8_lr0.0008_bank100,jina_v3_semantic,,0.06,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr0.0008_bank100,jina_v3_semantic,,,,,100,50,,BASELINE_LDS.md,jina FAILED on this bank.
+wt_muon_eps1e8_lr0.0002_bank100,jina_v3_semantic,,0.0881,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr8e-05_bank100,jina_v3_semantic,,0.0945,,,100,50,,BASELINE_LDS.md,
+wt_adamw_eps1e8_lr0.0008_bank100,gradient_cosine,,0.05,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr0.0008_bank100,gradient_cosine,,0.0038,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr0.0002_bank100,gradient_cosine,,0.0298,,,100,50,,BASELINE_LDS.md,
+wt_muon_eps1e8_lr8e-05_bank100,gradient_cosine,,0.0505,,,100,50,,BASELINE_LDS.md,
