@@ -53,6 +53,7 @@ import os
 COLUMNS = [
     # --- identity ---
     "run_id", "status", "family",
+    "node_in_charge", "node_checkin_date",
     # --- model ---
     "model", "model_init", "arch_mod", "n_params_m", "logit_scale",
     # --- data ---
@@ -315,6 +316,23 @@ add(BASE17, run_id="plan_adam_eps1e17_16k_clip1.0", max_grad_norm=1.0,
     notes="Rep-era data (excluded) suggested clipping is a no-op (norms rarely exceed 1).")
 
 
+def _preserve_claims(out_path, rows):
+    """Carry node claims over from the existing CSV so regeneration never drops them.
+
+    Claims are the one thing edited in the CSV directly (see NODES.md); everything else
+    is edited in this script.
+    """
+    if not os.path.exists(out_path):
+        return
+    with open(out_path, newline="") as f:
+        old = {r["run_id"]: r for r in csv.DictReader(f)}
+    for r in rows:
+        prev = old.get(r["run_id"])
+        if prev:
+            r["node_in_charge"] = prev.get("node_in_charge", "") or r.get("node_in_charge", "")
+            r["node_checkin_date"] = prev.get("node_checkin_date", "") or r.get("node_checkin_date", "")
+
+
 def main():
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments.csv")
     for r in rows:
@@ -327,6 +345,7 @@ def main():
             "pipeline only (WikiText does not scale)")
     order = {"done": 0, "partial": 1, "planned": 2}
     rows.sort(key=lambda r: (order.get(r["status"], 3), r["family"], r["run_id"]))
+    _preserve_claims(out, rows)
     with open(out, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS, extrasaction="raise")
         w.writeheader()

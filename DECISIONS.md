@@ -84,69 +84,62 @@ train-only anchor twins at eps_root=0 (one per optimizer, lr 2e-4), compare held
 Registered as the `tune_*_16k_eps0_control` rows in tuning.csv. No bank unless the loss check
 surprises.
 
+
+### D6. Query count: 20 (resolved); tail-filter estimator specified
+
+**Ruling:** the 20-query CIs are fine — the grid stays at 20 queries everywhere.
+
+Reference (anchor, 100 subsets, 10k bootstrap): adamw 0.9333 [0.9186, 0.9448]; muon 0.8470
+[0.8274, 0.8685]; paired diff +0.0863 [+0.0670, +0.1052]. Cost note kept for the record: a
+MAGIC query is a full reverse pass (~6x the cost of one bank retrain), so raising the query
+count is more expensive than enlarging the bank.
+
+**Tail-filter estimator (understanding confirmed; specification):**
+
+- For each query: score all training documents, remove the selected slice, retrain once,
+  measure that query's loss change vs the unablated baseline; average over queries.
+- **Head or tail:** the bergson eval takes a user-facing switch selecting either end of the
+  score ranking. In practice this paper filters the **proponents** (top-scoring documents),
+  i.e. performance suppression.
+- **How much to filter:** percentage, not absolute count; **1% by default**.
+- **Interpretation:** values are **relative only** — a larger loss change means one
+  attribution method is more efficacious than another. No absolute meaning is claimed for
+  now.
+- Open implementation detail carried forward: whether the comparison includes a matched
+  random-1% control retrain (recommended, one per config), to anchor the relative scale.
+
+### D13. Run-to-run variation: use existing evidence; no dedicated repeat runs
+
+**Ruling basis:** seed randomness looks small in practice. The repo's existing data supports
+this, and in this setup a stronger statement is available: with dropout off and the init
+fixed (pretrained GPT-2), the training seed changes **only the data order** — and we have
+direct measurements of what data-order changes do.
+
+| evidence | perturbation | effect on the metric |
+|---|---|---|
+| rep -> per-epoch replication, 11 configs | entire data-order scheme changed | every EK-FAC LDS within its CI; largest shift +0.02; metasmoothness within ~0.01 |
+| replicate bank pair (bs64, eps1e-8) | identical training, second bank + scoring run | EK-FAC 0.3095 vs 0.3048 (gap 0.005) |
+| anchor split-half (computed from existing eval CSVs) | first 50 vs last 50 subsets | adamw 0.9294 vs 0.9336 (gap 0.004); muon 0.8451 vs 0.8429 (gap 0.002) |
+| held-out loss seed repeats | seed only | sd ~0.001 nats |
+
+**Revised proposal (adopted):** no dedicated repeat runs. Quote 0.02 as the conservative
+run-to-run bound (the 11-config order-change maximum, which upper-bounds seed effects here)
+and ~0.005 as the typical bank/scoring repeat gap, alongside the bootstrap CIs. Revisit only
+if an axis effect the paper wants to claim falls under 0.02.
+
 ## Open
 
-### D6. Query count: 20 vs 50 — decide from the table below
+*(D6 and D13 moved to Resolved, 2026-08-20.)*
 
-Measured confidence intervals at 20 queries (anchor config, 100 subsets, 10k bootstrap):
+### D7. The canonical EK-FAC configuration (ruling endorsed; investigation open)
 
-| quantity | value | 95% CI | CI width |
-|---|---|---|---|
-| adamw MAGIC LDS | 0.9333 | [0.9186, 0.9448] | 0.026 |
-| muon MAGIC LDS | 0.8470 | [0.8274, 0.8685] | 0.041 |
-| paired diff (adamw - muon) | +0.0863 | [+0.0670, +0.1052] | 0.038 |
-
-Projected widths at 50 queries (shrink by about sqrt(20/50) = 0.63): adamw ~0.017, muon
-~0.026, paired diff ~0.024. So 20 queries already resolves paired differences down to roughly
-0.04, and 50 queries would resolve roughly 0.025.
-
-Cost correction to keep in view: in this pipeline **queries are not cheaper than retrains for
-MAGIC**. Each MAGIC query is a full reverse pass over the trajectory (measured 25 min at 125
-steps on 4 GPUs, about 1.7 GPU-hours), while each bank retrain is about 8 minutes on 2 GPUs
-(about 0.28 GPU-hours) — a query costs roughly 6 retrains. Going from 20 to 50 queries adds
-about 50 GPU-hours per config, more than the entire 100-retrain bank. Queries are cheap only
-for EK-FAC-style scorers.
-
-**Recommendation:** stay at 20 unless an axis produces differences in the 0.02-0.04 band that
-the paper needs to call significant; in that case rerun only the affected configs at 50.
-
-**Tail-based sampling estimator — understanding to confirm.** As described: for each query,
-score every training document, remove the top x% of documents by score, retrain **once** on
-the remainder, and measure that query's loss change against the unablated baseline; average
-the effect over many queries. Consequences for sample-size planning, if this reading is right:
-
-- Retrains scale with the number of *queries* (each query removes a different top-x% set),
-  not with a subset count — 20 queries = 20 retrains, versus 100 for LDS.
-- A matched control (remove a random x% of equal size) is needed to interpret the effect; one
-  shared control retrain per config may suffice, or one per query for a paired test.
-- The measured effect should be much larger than LDS's signal (random 1% removal moved mean
-  query loss by only ~0.003 nats; targeted top-1% removal should move the query's own loss by
-  far more), so fewer queries may give usable CIs — the CI is the across-query standard error
-  of the loss-change, a different quantity from LDS's bootstrap width.
-
-### D7. The canonical EK-FAC configuration
-
-Ruling so far: do **not** pin whatever one run happened to use. There is a canonically correct
+Ruling (endorsed 2026-08-20): do **not** pin whatever one run happened to use. There is a canonically correct
 configuration and it should equal the library default. Open items: determine what the bergson
 library default actually is (gradient space, damping selection), check whether the historical
 "docspace" and "allium-0" variants differ from it and why they differed 5x on one bank, and
 confirm the choice together before the ekfac_lds column fills. Until then, EK-FAC scoring
 runs are on hold.
 
-### D13. Repeat runs to measure run-to-run variation (plain language)
-
-When the paper says "config A scores 0.93 and config B scores 0.90", we need to know how much
-those numbers move if we simply redo the same experiment. Two sources of movement:
-
-1. **Bank noise** — rebuild the 100 retrained models with a different random draw of leave-out
-   subsets, score the same attribution scores against the new bank. Our only measurement of
-   this is 0.005 (EK-FAC, at an old bs64 config).
-2. **Training noise** — retrain the base model with a different seed and redo attribution.
-   Unmeasured.
-
-Proposal (open): one repeat of each kind at the anchor config, giving the headline numbers
-their own error bars beyond the bootstrap CI (which only captures estimator noise, not these).
-Cost: one extra bank (~100 retrains) plus one extra rollout.
 
 ---
 

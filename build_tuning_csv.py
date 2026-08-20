@@ -24,6 +24,7 @@ import os
 
 COLUMNS = [
     "run_id", "sweep_group", "status", "priority", "gates",
+    "node_in_charge", "node_checkin_date",
     "model", "arch_mod", "optimizer", "n_docs", "batch_size", "grad_accum_steps",
     "num_epochs", "steps", "warmup", "logit_scale", "weight_decay", "max_grad_norm",
     "eps_root", "seed", "lr",
@@ -153,6 +154,23 @@ for mod in ["none", "qk_norm", "preact_layernorm", "preact_batchnorm"]:
           notes="Blocked: gpt2_custom model does not exist yet.")
 
 
+def _preserve_claims(out_path, rows):
+    """Carry node claims over from the existing CSV so regeneration never drops them.
+
+    Claims are the one thing edited in the CSV directly (see NODES.md); everything else
+    is edited in this script.
+    """
+    if not os.path.exists(out_path):
+        return
+    with open(out_path, newline="") as f:
+        old = {r["run_id"]: r for r in csv.DictReader(f)}
+    for r in rows:
+        prev = old.get(r["run_id"])
+        if prev:
+            r["node_in_charge"] = prev.get("node_in_charge", "") or r.get("node_in_charge", "")
+            r["node_checkin_date"] = prev.get("node_checkin_date", "") or r.get("node_checkin_date", "")
+
+
 def main():
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tuning.csv")
     for r in rows:
@@ -160,6 +178,7 @@ def main():
             r.setdefault(c, "")
     order = {"measured": 0, "empty": 1, "blocked": 2}
     rows.sort(key=lambda r: (r["priority"], order.get(r["status"], 3), r["sweep_group"], r["lr"]))
+    _preserve_claims(out, rows)
     with open(out, "w", newline="") as f:
         w = csv.DictWriter(f, fieldnames=COLUMNS, extrasaction="raise")
         w.writeheader()
