@@ -181,6 +181,18 @@ for mod in ["none", "qk_norm", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_16k_wd0.1_lr0.0001": dict(
+        status="measured", heldout_loss=3.2592,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_wd0.1_lr0.0001_s42"),
+    "tune_adamw_16k_wd0.1_lr0.0002": dict(
+        status="measured", heldout_loss=3.2572,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_wd0.1_lr0.0002_s42",
+        notes="Group complete: interior at the anchor 2e-4. The wd0.1 curve matches "
+              "wd0.0 point-for-point (3.2592/3.2572/3.2669 vs 3.2592/3.2572/3.2670) — "
+              "weight decay is a null on heldout loss at these settings."),
+    "tune_adamw_16k_wd0.1_lr0.0004": dict(
+        status="measured", heldout_loss=3.2669,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_wd0.1_lr0.0004_s42"),
     "tune_adamw_16k_clip1.0_lr0.0001": dict(
         status="measured", heldout_loss=3.2553,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_clip1.0_lr0.0001_s42"),
