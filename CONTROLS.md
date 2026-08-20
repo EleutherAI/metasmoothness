@@ -128,5 +128,9 @@ Every ablation changes exactly one row of the tables above:
 
 ## Not controls (recorded, not fixed)
 
-`nproc_per_node` (with micro-batch fixed it only changes wall-clock; ga absorbs it),
+`nproc_per_node` — statistically neutral (ga absorbs it), but NOT neutral for bit-exact
+reuse: retraining the adam_eps1e8_4k bank base on its own commit at nproc 4 vs the bank's
+nproc 8 diverges by 7.7e-3 max-abs (reduction order compounds over 125 steps). Bit-exact
+recomputation (MAGIC replay, D9-style retrains) must match the original run's world size;
+record nproc with every bank. Also
 CephFS paths, wandb. `n_docs`-dependent `steps` is derived, never set independently.

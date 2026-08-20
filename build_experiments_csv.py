@@ -268,7 +268,10 @@ for rid, bd in [(r[0], r[13]) for r in GRID if not r[0].endswith("_rep2")]:
         bank_dir=f"{PEREPOCH_RUNS}/{bd}/bank", source_doc="planned",
         notes=f"MAGIC per-query rollout for {rid}: the per-epoch bank exists, so only the "
               "metagradient run + validate --retrained_dir is needed. Budget one reverse pass "
-              "per query.")
+              "per query. MUST run at the bank's world size (nproc 8; banks built on "
+              "37d7b386): a nproc-4 retrain of the base on that same commit diverges 7.7e-3 "
+              "— replay is only faithful at matched nproc. Code choice (current vs 37d7b386) "
+              "needs a nproc-8 bit-gate when 8 GPUs are free.")
 # EK-FAC (D7 canonical: damped_inverse 0.1, kfac+ev_correction, query_20) measured by
 # scripts/ekfac_lds.py against each bank's validation.csv; scores at
 # /mnt/ssd-2/lucia/s16k_<opt>/ekfac_scores, code commit 10874f93 (main-parent worktree).

@@ -144,8 +144,10 @@ EK-FAC cheap, a fresh MAGIC rollout must first retrain, which reproduces determi
 ## Reuse rules
 
 Retrain banks and checkpoints are the expensive assets; most additions to a config are
-scoring-only. Reuse is safe exactly when training config, seed, datasets and (for MAGIC
-scores) code version match — the deterministic pipeline makes matched recomputation
+scoring-only. Reuse is safe exactly when training config, seed, datasets, (for MAGIC
+scores) code version, and — for any bit-exact recomputation — **world size** match
+(nproc changes fp reduction order: measured 7.7e-3 divergence retraining a bank base at
+nproc 4 vs its original nproc 8 on the same commit) — the deterministic pipeline makes matched recomputation
 bit-exact, and mismatches are silent corruption, so check the match, then reuse freely:
 
 1. **One bank per experiment row, shared by every scorer.** The 50-100 retrained models and
