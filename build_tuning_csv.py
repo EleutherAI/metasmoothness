@@ -228,7 +228,12 @@ RESULTS = {
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_32k_lr0.0001_s42"),
     "tune_muon_32k_lr0.0002": dict(
         status="measured", heldout_loss=3.2372,
-        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_32k_lr0.0002_s42"),
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_32k_lr0.0002_s42",
+        notes="Group complete: interior optimum at 2e-4 (margin 0.0036) — selected "
+              "for plan_muon_eps1e17_32k_bs256."),
+    "tune_muon_32k_lr0.0004": dict(
+        status="measured", heldout_loss=3.2479,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_32k_lr0.0004_s42"),
     "tune_muon_8k_lr0.0001": dict(
         status="measured", heldout_loss=3.2974,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_8k_lr0.0001_s42"),

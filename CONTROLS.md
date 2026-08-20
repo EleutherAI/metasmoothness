@@ -94,7 +94,7 @@ protocol, not an afterthought:
 | control | value | why |
 |---|---|---|
 | global batch | 256 | ablation axis; 256 is the anchor (the regime where MAGIC works) |
-| micro-batch | a memory knob, not a control — record `grad_accum_steps` per run | micro-batch/ga does not affect results (heldout loss, LDS, metasmoothness are all ga-invariant; ga is rank-preserving, Spearman 0.9995). The one exception: ga rescales raw MAGIC score magnitudes ~0.68x per doubling, so raw scores are comparable only at equal ga — LDS and rank metrics are unaffected. Within one config, bank retrains and the base run keep the same ga (bit-exact reuse requires a matched config) |
+| micro-batch | a memory knob, not a control — record `grad_accum_steps` per run | micro-batch/ga does not affect results: the accumulation rescales each micro-loss by its token share, reproducing the full-batch gradient up to float associativity, and `test_magic_grad_accum_weight_grads_match` + `test_accumulate_grads_matches_full_batch` verify it (6/6 pass, checked at bergson commit 8ce0cd76). The historical "ga rescales raw MAGIC magnitudes ~0.68x" observation was a property of the retired 0.10.1 scoring code (`37d7b386`) — it applies when interpreting scores recorded on that code, not to new runs. Within one config, bank retrains and the base run keep the same ga (bit-exact reuse requires a matched config) |
 | shuffle | per-epoch (`1e6eea7f`+), training AND bank AND ms probe | admission policy; builder asserts it |
 | seed | 42 (training and subset draw) | subset lists then match across optimizers, enabling paired comparisons |
 | precision | fp32, `use_tf32_matmuls: false` | metasmoothness is ill-conditioned near zero; tf32 kept off as a precaution |
