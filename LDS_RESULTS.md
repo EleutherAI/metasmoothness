@@ -659,3 +659,16 @@ separates them decisively on the same banks (0.9333 vs 0.8470, paired diff +0.08
 at `/mnt/ssd-2/lucia/s16k_adamw/ms`). The adamw anchor is now a complete
 three-metric row: **ms 0.9928 / MAGIC 0.9333 / EK-FAC 0.4251**. muon ms probe in
 progress.
+
+**muon anchor ms = 0.9963** (fd 0.1, seed 0, movement_l1 29313, code 10874f93, probe
+at `/mnt/ssd-2/lucia/s16k_muon/ms`). Both anchor rows are complete three-metric
+configs:
+
+| config | ms | magic_lds | ekfac_lds |
+|---|---|---|---|
+| adamw eps1e-17 16k bs256 | 0.9928 | 0.9333 | 0.4251 |
+| muon eps1e-17 16k bs256 | 0.9963 | 0.8470 | 0.4285 |
+
+**Inversion to carry into the analysis:** metasmoothness ranks muon above adamw
+(+0.0035) while MAGIC ranks adamw above muon (+0.086). At the anchor, higher
+metasmoothness does not imply higher MAGIC LDS between optimizers.

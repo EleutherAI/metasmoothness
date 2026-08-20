@@ -197,11 +197,12 @@ ANCHOR_FILL = {
                   ekfac_n_subsets=100, metasmoothness=0.9928, ms_direction_seed=0,
                   ms_fd_step=0.1),
     "muon": dict(ekfac_lds=0.4285, ekfac_ci_lo=0.3856, ekfac_ci_hi=0.4674,
-                 ekfac_n_subsets=100),
+                 ekfac_n_subsets=100, metasmoothness=0.9963, ms_direction_seed=0,
+                 ms_fd_step=0.1),
 }
 for opt, lds, lo, hi in [("adamw", 0.9333, 0.9186, 0.9448), ("muon", 0.8470, 0.8274, 0.8685)]:
     add(GPT2_FT, run_id=f"sm_{opt}_eps1e17_16k_bs256",
-        status="done" if opt == "adamw" else "partial", n_docs=16000,
+        status="done", n_docs=16000,
         optimizer=opt, lr=2e-4, eps_root=1e-17, batch_size=256, grad_accum_steps=16,
         num_epochs=2, magic_lds=lds, magic_ci_lo=lo, magic_ci_hi=hi, magic_n_queries=20,
         n_subsets=100, n_queries=20, run_dir=f"/mnt/ssd-2/lucia/s16k_{opt}",
@@ -274,13 +275,13 @@ for rid, bd in [(r[0], r[13]) for r in GRID if not r[0].endswith("_rep2")]:
 EKFAC_FILL = {}  # results live on the sm_* parent rows (ANCHOR_FILL above)
 for opt in ["adamw", "muon"]:
     add(GPT2_FT, run_id=f"fill_sm_{opt}_eps1e17_16k_bs256_ms_ekfac",
-        status="done" if opt == "adamw" else "partial",
+        status="done",
         n_docs=16000, optimizer=opt, lr=2e-4, eps_root=1e-17, batch_size=256,
         grad_accum_steps=16, source_doc="planned", n_queries=20,
         bank_dir=f"/mnt/ssd-2/lucia/s16k_{opt}/merged",
         **EKFAC_FILL.get(opt, {}),
-        notes=f"Work ticket: results are recorded on sm_{opt}_eps1e17_16k_bs256. EK-FAC "
-              "measured for both optimizers; adamw ms measured (0.9928); muon ms in progress.")
+        notes=f"Work ticket complete: results are recorded on sm_{opt}_eps1e17_16k_bs256 "
+              "(ms, EK-FAC, and MAGIC all measured for both optimizers).")
 
 # =====================================================================================
 # 4. PLANNED — one-factor deviations from the scaling_magic anchor (GPT-2, SmolLM2 16k,
