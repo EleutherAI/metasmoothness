@@ -91,6 +91,9 @@ sweep("tune_adamw_4k", selects_lr_for="plan_adam_eps1e17_4k_bs256", lrs=[5e-5],
 sweep("tune_adamw_64k", selects_lr_for="plan_adam_eps1e17_64k_bs256", lrs=[5e-5],
       priority=1, optimizer="adamw", n_docs=64000,
       notes="Endpoint extension: 1e-4 won the 3-point grid (3.2314 vs 3.2393 at 2e-4).")
+sweep("tune_muon_64k", selects_lr_for="plan_muon_eps1e17_64k_bs256", lrs=[5e-5],
+      priority=1, optimizer="muon", n_docs=64000,
+      notes="Endpoint extension: 1e-4 won the 3-point grid (3.2323 vs 3.2417 at 2e-4).")
 sweep("tune_muon_4k", selects_lr_for="plan_muon_eps1e17_4k_bs256", lrs=[8e-4],
       priority=1, optimizer="muon", n_docs=4000,
       notes="Endpoint extension: 4e-4 won the 3-point grid (3.3114 vs 3.3138 at 2e-4).")
@@ -175,6 +178,10 @@ for mod in ["none", "qk_norm", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_muon_64k_lr0.0004": dict(
+        status="measured", heldout_loss=3.2804,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_64k_lr0.0004_s42",
+        notes="1e-4 is an endpoint winner (gap 0.0094); 5e-5 extension registered."),
     "tune_muon_16k_bs16_lr2.5e-05": dict(
         status="measured", heldout_loss=3.2441,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs16_lr2.5e-05_s42"),
