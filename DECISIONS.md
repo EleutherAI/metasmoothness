@@ -38,7 +38,7 @@ chain loses nothing by not using the 128k and 256k sizes.
 
 ### D4. Keep every dataset size, including 4k
 
-No data points are removed. 4k (31 steps at bs256) stays on the axis; it is cheap. Its known
+No data points are removed. 4k (32 steps at bs256) stays on the axis; it is cheap. Its known
 limitation — short-run effects are confounded with small-N — is recorded in CONTROLS and
 handled in the sweep procedure (2 seeds, below).
 
@@ -57,10 +57,13 @@ moments) in addition to the existing keep-checkpoints rule. CONTROLS updated.
 ### D9. Checkpoint averaging: last 4 checkpoints, averaged query gradient
 
 Definition: average the **query gradient** over the **last 4 checkpoints** of the run (k=4 is
-the default; the k=8 row is removed). First step is replicating Louis's effect on the existing
-anchor config before adding grid rows. Note: the anchor's base-training checkpoints were
-deleted, so the replication first re-trains the anchor base with checkpoints kept
-(deterministic at fixed seed, ~125 steps).
+the default; the k=8 row is removed). **Both scorers get the averaged gradient** (ruling
+2026-08-20): MAGIC seeds its reverse pass with it, and EK-FAC preconditions it. First step is
+replicating Louis's effect on the existing anchor config before adding grid rows. Note: the
+anchor's base-training checkpoints were deleted, so the replication first re-trains the
+anchor base with checkpoints kept — the deterministic bergson trainer reproduces the base
+model bit-exactly at the fixed seed (that is the point of the trainer), so the existing
+anchor bank remains valid for the ckptavg comparison (~125 steps).
 
 ### D10. Custom GPT-2: finalize, upload, use the OLMo QK-norm
 
@@ -70,12 +73,13 @@ variant runs, fine-tune the *unmodified* custom implementation once and confirm 
 loss matches stock GPT-2 — this separates "effect of the modification" from "effect of
 reimplementing GPT-2". The arch rows stay blocked until the model is uploaded.
 
-### D11. Model scaling: minimal, and check the plan first
+### D11. Model scaling: gpt2-medium is the registered target
 
-Scale minimally (gpt2-medium before gpt2-large, and only if medium is informative). A concrete
-cost-and-feasibility plan goes to Lucia for sign-off **before** any model-size run starts,
-including the tuning sweeps. The tuning groups stay registered but are not claimable until
-sign-off.
+**Ruling (2026-08-20): `gpt2-medium` (355M, stock HF — same architecture, tokenizer, and
+pre-training corpus as gpt2-124M) is the registered scaling target.** `gpt2-large` is
+deferred and runs only if medium proves informative. A concrete cost-and-feasibility plan
+still goes to Lucia for sign-off **before** any model-size run starts, including the tuning
+sweeps; the tuning groups stay registered but are not claimable until sign-off.
 
 ### D12. eps_root: a handful of anchor twins, eval-loss check only
 
@@ -88,6 +92,11 @@ surprises.
 ### D6. Query count: 20 (resolved); tail-filter estimator specified
 
 **Ruling:** the 20-query CIs are fine — the grid stays at 20 queries everywhere.
+**Escalation rule (2026-08-20):** 20 queries (`query_20.hf`) unless a config's 95% bootstrap
+CI half-width exceeds **0.025**; then re-score with `query_50.hf` (scoring-only against the
+same bank). 0.025 is just above the widest anchor half-width (muon ~0.021) and comparable to
+the D13 run-to-run bar, so escalation triggers only when the CI would blur a reportable
+effect.
 
 Reference (anchor, 100 subsets, 10k bootstrap): adamw 0.9333 [0.9186, 0.9448]; muon 0.8470
 [0.8274, 0.8685]; paired diff +0.0863 [+0.0670, +0.1052]. Cost note kept for the record: a
@@ -140,18 +149,36 @@ perturbation larger than any seed change) and **~0.005** as the typical repeat g
 effect the paper claims must clear 0.02; an effect below that is reported as "within
 run-to-run variation". Revisit only if a key axis effect lands under 0.02.
 
+### D7. Canonical EK-FAC configuration: the bergson default, `damped_inverse`
+
+**Resolved (2026-08-20):** the canonical EK-FAC configuration for every `ekfac_lds` cell is
+the bergson library default: `inversion="damped_inverse"` (uniform Tikhonov,
+`1/(lambda + c*mean(lambda))`) with `damping_factor=0.1` (relative to the mean eigenvalue).
+`factored_tikhonov` (the Martens-Grosse pi-split) exists in the library but is not used.
+**EK-FAC scoring is unblocked.** Historical note: the rep-era "docspace" and "allium-0"
+variants have no counterpart in the bergson codebase (as of 2026-08-20); their 5x disagreement
+on one bank stays unexplained but cannot recur — every new score uses the one canonical
+config above, recorded via `code_commit`.
+
+### D14. preact_batchnorm dropped from the architecture axis
+
+**Resolved (2026-08-20):** the `preact_batchnorm` tuning group and experiment row are
+removed. Two unfixable conflicts with the control set:
+
+1. The trainer runs with `train_mode=false` (`model.eval()`), where BatchNorm uses its
+   never-updated running statistics — the row would either train a broken model or require
+   `train_mode=true`, contradicting a fixed control.
+2. BatchNorm couples per-document gradients to the other documents in the micro-batch, so
+   MAGIC's per-doc metagradient and EK-FAC's per-sample gradients lose their meaning and
+   micro-batch size becomes a hidden factor. Any attribution change on the row would be
+   confounded between "batchnorm hurts attribution" and "per-doc gradients are ill-defined
+   under batch coupling".
+
+The architecture axis keeps `qk_norm` and `preact_layernorm` (both per-sample operations).
+
 ## Open
 
-*(D6 and D13 moved to Resolved, 2026-08-20.)*
-
-### D7. The canonical EK-FAC configuration (ruling endorsed; investigation open)
-
-Ruling (endorsed 2026-08-20): do **not** pin whatever one run happened to use. There is a canonically correct
-configuration and it should equal the library default. Open items: determine what the bergson
-library default actually is (gradient space, damping selection), check whether the historical
-"docspace" and "allium-0" variants differ from it and why they differed 5x on one bank, and
-confirm the choice together before the ekfac_lds column fills. Until then, EK-FAC scoring
-runs are on hold.
+*(D6 and D13 moved to Resolved 2026-08-20; D7 resolved 2026-08-20 — none open.)*
 
 
 ---

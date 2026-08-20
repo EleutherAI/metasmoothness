@@ -33,7 +33,7 @@ LDS is measured for both optimizers (adamw 0.9333 [0.9186, 0.9448], muon 0.8470
 | model-selection set | `heldout_4k.hf` (4000 docs), fixed | verified disjoint from every train set (the 256k conflict is resolved by excluding heldout docs from the rebuilt 256k) — **never select lr or report generalisation on train loss** |
 | epochs | 2, fixed across N | matches the LLM post-training norm, which is the target setting: DeepSeek-V3 SFT = 2 epochs, Tulu 3 SFT = 2 epochs (8B and 70B), OLMo 2 SFT (Tulu 3 recipe) = 2 epochs, OLMo 3 = 2 epochs. Token axis = vary N at fixed epochs; steps then scale 31 -> 2000. (Tulu 3 also uses a warmup *ratio* — 0.3 — supporting the fraction convention.) |
 
-Caveat to carry: at bs256/2ep, N=4k is only 31 steps (8 warmup). The 4k point stays on the axis
+Caveat to carry: at bs256/2ep, N=4k is only 32 steps (8 warmup). The 4k point stays on the axis
 but short-run effects are confounded with small-N there; 8k (62 steps) is the smallest dataset size to lean on.
 
 ## Optimizer
@@ -94,7 +94,7 @@ protocol, not an afterthought:
 | control | value | why |
 |---|---|---|
 | global batch | 256 | ablation axis; 256 is the anchor (the regime where MAGIC works) |
-| micro-batch | **16 per device, held fixed**; `grad_accum_steps = 256 / (16 * nproc)` | ga is rank-preserving (LDS-safe, Spearman 0.9995) but rescales raw MAGIC magnitudes ~0.68x per doubling — so raw scores are comparable only at equal ga; record ga per run |
+| micro-batch | a memory knob, not a control — record `grad_accum_steps` per run | micro-batch/ga does not affect results (heldout loss, LDS, metasmoothness are all ga-invariant; ga is rank-preserving, Spearman 0.9995). The one exception: ga rescales raw MAGIC score magnitudes ~0.68x per doubling, so raw scores are comparable only at equal ga — LDS and rank metrics are unaffected. Within one config, bank retrains and the base run keep the same ga (bit-exact reuse requires a matched config) |
 | shuffle | per-epoch (`1e6eea7f`+), training AND bank AND ms probe | admission policy; builder asserts it |
 | seed | 42 (training and subset draw) | subset lists then match across optimizers, enabling paired comparisons |
 | precision | fp32, `use_tf32_matmuls: false` | metasmoothness is ill-conditioned near zero; tf32 kept off as a precaution |
@@ -105,7 +105,7 @@ protocol, not an afterthought:
 | control | value | why |
 |---|---|---|
 | subsets | 100 random leave-out @ **1% fraction** | fraction (not fixed count) keeps the perturbation proportional across N; 1% of 4k = 40 docs, of 256k = 2560 |
-| queries | `query_20.hf`, per-query MAGIC (`query_method: none`) | one reverse pass per query (budget 20x); `mean` cannot produce per-query LDS |
+| queries | `query_20.hf`, per-query MAGIC (`query_method: none`) | one reverse pass per query (budget 20x); `mean` cannot produce per-query LDS. Escalation (D6): if a config's 95% CI half-width exceeds 0.025, re-score with `query_50.hf` (scoring-only, same bank) |
 | LDS | mean per-query Spearman; 10k-resample bootstrap; optimizer contrasts paired over queries | the established pipeline |
 | metasmoothness | `fd_step 0.1`, `direction_seed 0`; confirm any cell that is surprising or < 0.9 at `direction_seed 1`; always record `total_movement_l1` | ms < ~0.02 carries no information (sign-statistic noise) |
 | MAGIC code | record `code_commit` on every row | a correctness bug in MAGIC would invalidate all results regardless of version bookkeeping, so no commit pin is required; the recorded commit exists so that any suspicious cross-row difference can be checked against a code change after the fact (one past fix moved a config 0.37 -> 0.17) |
@@ -117,7 +117,7 @@ Every ablation changes exactly one row of the tables above:
 
 | axis | varies | everything else |
 |---|---|---|
-| batch size | bs 16..256, both optimizers; ga holds micro-batch 16 | fixed; steps co-vary with bs at fixed epochs — the step-count arms below provide the deconfound |
+| batch size | bs 16..256, both optimizers; ga recorded per run (memory knob) | fixed; steps co-vary with bs at fixed epochs — the step-count arms below provide the deconfound |
 | tokens | N = 4k..64k (nested) | fixed, incl. epochs=2 |
 | step count | epochs 2 -> 4 at fixed bs; and bs 256 -> 512 at fixed epochs | fixed; the pair separates steps from batch |
 | optimizer | adamw vs muon | fixed, incl. lr 2e-4 (verified optimal for both) |

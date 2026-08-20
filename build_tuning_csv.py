@@ -12,10 +12,11 @@ group is complete, write the winning lr into the matching experiments.csv row(s)
 `selects_lr_for` column names them.
 
 These are train-only runs: no banks, no subsets, no MAGIC. Cost is ~steps x bs; at bs256
-that is 31 steps (4k) to 500 steps (64k).
+that is 32 steps (4k) to 500 steps (64k).
 
 status: measured = both loss columns filled; empty = to run; blocked = prerequisite
-missing (gpt2_custom does not exist yet; model-size groups await the D11 sign-off).
+missing (the gpt2_custom implementation for arch groups, the D11 cost sign-off for
+model-size groups, the bergson logit-scale hook for logit-scale groups).
 """
 
 import csv
@@ -119,18 +120,24 @@ for opt in ["adamw", "muon"]:
 for mdl in ["gpt2-medium", "gpt2-large"]:
     sweep(f"tune_adamw_16k_{mdl}", selects_lr_for=f"plan_adam_eps1e17_16k_{mdl}",
           lrs=[5e-5, 1e-4, 2e-4], status="blocked", priority=2, model=mdl,
-          notes="D11: BLOCKED until the scaling plan is signed off. Center one octave down "
-                "(larger models prefer lower lr). Adjust grad_accum to fit; record it.")
+          notes=("D11: gpt2-medium is the registered scaling target (2026-08-20); BLOCKED "
+                 "until the cost plan is signed off. Center one octave down (larger models "
+                 "prefer lower lr). Adjust grad_accum to fit; record it."
+                 if mdl == "gpt2-medium" else
+                 "D11: deferred — runs only if gpt2-medium proves informative."))
 
 # D1 (2026-08-20): the former warm-start section is gone — warm start = attribution window,
 # a pre-training axis; no lr-warmup sweeps exist.
 
 # ---------------------------------------------------------------------------------
-# 5. Logit scale (adam, 16k) — landscape-changing, so it gets a sweep.
+# 5. Logit scale (adam, 16k) — landscape-changing, so it gets a sweep. Blocked on the
+#    bergson logit-scale hook (ruling 2026-08-20) — the tuning runs themselves need the
+#    hook, not just the banks.
 # ---------------------------------------------------------------------------------
 for s in [0.5, 0.25]:
     sweep(f"tune_adamw_16k_scale{s}", selects_lr_for=f"plan_adam_eps1e17_16k_scale{s}",
-          priority=2, logit_scale=s)
+          status="blocked", priority=2, logit_scale=s,
+          notes="Blocked on the bergson logit-scale hook.")
 
 # ---------------------------------------------------------------------------------
 # 6. Weight decay / clipping (adam, 16k). Likely lr-neutral (rep-era nulls), so
@@ -145,12 +152,28 @@ sweep("tune_adamw_16k_clip1.0", selects_lr_for="plan_adam_eps1e17_16k_clip1.0", 
 # ---------------------------------------------------------------------------------
 # 7. Architecture mods — blocked on the gpt2_custom implementation. The no-mod
 #    custom control needs its own sweep too (it is not stock gpt2).
+#    preact_batchnorm dropped (D14, 2026-08-20): eval-mode training makes BN
+#    stats stale and batch coupling makes per-doc gradients ill-defined.
 # ---------------------------------------------------------------------------------
-for mod in ["none", "qk_norm", "preact_layernorm", "preact_batchnorm"]:
+for mod in ["none", "qk_norm", "preact_layernorm"]:
     tag = "arch_control" if mod == "none" else mod
     sweep(f"tune_adamw_16k_{tag}", selects_lr_for=f"plan_adam_eps1e17_16k_{tag}",
           status="blocked", priority=3, model="gpt2_custom", arch_mod=mod,
-          notes="Blocked: gpt2_custom model does not exist yet.")
+          notes="Blocked on the gpt2_custom implementation (D10).")
+
+
+# ---------------------------------------------------------------------------------
+# Measured results for rows registered above (edit here when a run finishes, then
+# regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
+# ---------------------------------------------------------------------------------
+RESULTS = {
+    "tune_adamw_8k_lr0.0002": dict(
+        status="measured", heldout_loss=3.2851,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_8k_lr0.0002_s42",
+        notes="Measured 2026-08-20 (protocol-validation run, lotus-0). Seed 42: 3.2851; "
+              "seed 43: 3.2839 (dir suffix _s43); gap 0.0012 nats at 63 steps — matches "
+              "the ~0.001 seed-noise floor measured at 125 steps."),
+}
 
 
 def _preserve_claims(out_path, rows):
@@ -164,6 +187,8 @@ def _preserve_claims(out_path, rows):
     with open(out_path, newline="") as f:
         old = {r["run_id"]: r for r in csv.DictReader(f)}
     for r in rows:
+        if r["status"] == "measured":
+            continue  # a finished row has results and no owner (NODES.md)
         prev = old.get(r["run_id"])
         if prev:
             r["node_in_charge"] = prev.get("node_in_charge", "") or r.get("node_in_charge", "")
@@ -173,6 +198,7 @@ def _preserve_claims(out_path, rows):
 def main():
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tuning.csv")
     for r in rows:
+        r.update(RESULTS.get(r["run_id"], {}))
         for c in COLUMNS:
             r.setdefault(c, "")
     order = {"measured": 0, "empty": 1, "blocked": 2}

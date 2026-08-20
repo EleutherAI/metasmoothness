@@ -120,7 +120,8 @@ new   = d[(d.status == "planned") & ~d.run_id.str.startswith("fill_")]
 Ground rules for new runs: per-epoch shuffle code (`1e6eea7f` or later), `dropout` configured
 0.0 explicitly, `train_mode` left false, fp32, `cleanup_ckpts=false` with checkpoints kept
 (checkpoint-averaging and window analyses need them), one estimator config per comparison
-(100 subsets @1%, 20+ queries), and record `code_commit`. **SmolLM2 pipeline only — WikiText is
+(100 subsets @1%, 20 queries from `query_20.hf` — escalate to `query_50.hf`, scoring-only,
+only where the 95% CI half-width exceeds 0.025; see D6), and record `code_commit`. **SmolLM2 pipeline only — WikiText is
 banned from paper runs (it does not scale); the builder asserts `dataset == smollm2`.** The full
 control set, with the evidence behind each value, is in [`CONTROLS.md`](CONTROLS.md).
 

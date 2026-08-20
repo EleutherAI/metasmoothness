@@ -298,13 +298,18 @@ add(BASE17, run_id="plan_adam_eps1e17_16k_bs512", batch_size=512, grad_accum_ste
     notes="D2: uncontrolled double batch (63 steps). lr comes from tune_adamw_16k_bs512.")
 for mdl, prm in [("gpt2-medium", 355), ("gpt2-large", 774)]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_{mdl}", model=mdl, n_params_m=prm,
-        notes="Model-size axis. MAGIC is one reverse pass per query and scales with params.")
+        notes="Model-size axis. MAGIC is one reverse pass per query and scales with params. "
+              + ("gpt2-medium is the registered scaling target (D11, 2026-08-20)."
+                 if mdl == "gpt2-medium" else
+                 "Deferred: runs only if gpt2-medium proves informative (D11)."))
 add(BASE17, run_id="plan_adam_eps1e17_16k_ckptavg4", ckpt_avg_k=4,
-    notes="D9: average the QUERY GRADIENT over the last 4 checkpoints. Replicate Louis's "
-          "effect on the anchor first (re-train the anchor base with checkpoints kept — "
-          "the originals were deleted; deterministic at seed 42). Eval-side: exempt from "
-          "lr gating.")
-for mod in ["qk_norm", "preact_layernorm", "preact_batchnorm"]:
+    notes="D9: average the QUERY GRADIENT over the last 4 checkpoints; BOTH scorers (MAGIC "
+          "and EK-FAC) use the averaged gradient. Replicate Louis's effect on the anchor "
+          "first (re-train the anchor base with checkpoints kept — the originals were "
+          "deleted; the deterministic trainer reproduces it bit-exactly at seed 42). "
+          "Eval-side: exempt from lr gating.")
+# preact_batchnorm dropped (D14, 2026-08-20) — see DECISIONS.md.
+for mod in ["qk_norm", "preact_layernorm"]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_{mod}", arch_mod=mod, model="gpt2_custom",
         notes="Needs the GPT-2-like custom model. Compare ONLY against "
               "plan_adam_eps1e17_16k_arch_control (same custom model, no mod), never stock gpt2.")
@@ -312,7 +317,8 @@ add(BASE17, run_id="plan_adam_eps1e17_16k_arch_control", arch_mod="none", model=
     notes="Control for the arch_mod rows: custom model, no modification.")
 for s in [0.5, 0.25]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_scale{s}", logit_scale=s,
-        notes="Rep-era 4k/eps1e-8 data (excluded) moved ms 0.876->0.609 but also delta_l2 — "
+        notes="Blocked on the bergson logit-scale hook (tuning group blocked too). Rep-era "
+              "4k/eps1e-8 data (excluded) moved ms 0.876->0.609 but also delta_l2 — "
               "not a clean isolate; re-measure here.")
 for wd in [0.0, 0.1]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_wd{wd}", weight_decay=wd,
