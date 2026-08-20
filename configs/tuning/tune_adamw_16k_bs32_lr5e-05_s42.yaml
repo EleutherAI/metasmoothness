@@ -34,3 +34,5 @@ steps:
     train_mode: false
     save_models: true
     save_optimizer_state: none
+    save_mode: interval
+    save_interval: 1000000000

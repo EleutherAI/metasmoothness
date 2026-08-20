@@ -1,7 +1,7 @@
-run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_bs32_lr0.0001_s42
+run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs16_lr2.5e-05_s42
 steps:
 - train:
-    run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_bs32_lr0.0001_s42
+    run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs16_lr2.5e-05_s42
     overwrite: true
     model: gpt2
     model_kwargs: resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0
@@ -15,16 +15,16 @@ steps:
       split: train
       chunk_length: 0
     lr_schedule:
-      lr: 0.0001
+      lr: 2.5e-05
       lr_scheduler_type: polynomial
       lr_start: 1.0e-06
-      lr_end: 1.0e-05
+      lr_end: 2.5e-06
       warmup_steps: 0.25
-    batch_size: 32
+    batch_size: 16
     grad_accum_steps: 1
     num_epochs: 2
     seed: 42
-    optimizer: adamw
+    optimizer: muon
     adam_beta1: 0.95
     adam_beta2: 0.975
     adam_eps: 1.0e-08
