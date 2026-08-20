@@ -204,10 +204,13 @@ still catches meaningful mistuning, and the finest spacing the metric can suppor
    noise), select the anchor value 2e-4 (or the group's center) rather than the numerical
    winner. This keeps lr constant along an axis unless the data clearly demands a change, so
    most comparisons stay one-factor.
-4. **Seeds:** one run per point, except at the 4k dataset size (31 training steps), where run-to-run
-   noise is plausibly larger than the differences being measured: use two seeds per point
-   there and select on the mean. If any group's three points are not lowest-in-the-middle or
+4. **Seeds:** one run per point, except for groups whose runs are 63 steps or fewer — the
+   4k and 8k dataset sizes (32 and 63 steps) and the double-batch arm (63 steps) — where
+   run-to-run noise is plausibly larger than the differences being measured: use two seeds
+   per point there and select on the mean. These are the cheapest runs in the grid, so the
+   doubling costs minutes. If any group's three points are not lowest-in-the-middle or
    monotone, rerun the odd point with a second seed before acting on it.
+
 5. Record every run in `tuning.csv` (train_loss, heldout_loss, run_dir); when the group is
    complete, write the winning lr into the experiment rows named in its `selects_lr_for` column.
 

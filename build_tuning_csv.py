@@ -83,8 +83,8 @@ for opt in ["adamw", "muon"]:
         k = f"{n // 1000}k"
         sweep(f"tune_{opt}_{k}", selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_{k}_bs256",
               priority=1, optimizer=opt, n_docs=n,
-              notes="4k is 31 steps at bs256/2ep — expect noisy selection; see CONTROLS caveat."
-                    if n == 4000 else "")
+              notes="Short run (63 steps or fewer): 2 seeds per point, select on the mean."
+                    if n in (4000, 8000) else "")
 
 # ---------------------------------------------------------------------------------
 # 2. Batch-size axis (adam). Steps co-vary with bs at fixed epochs; lr optimum is
@@ -103,7 +103,8 @@ for opt in ["adamw", "muon"]:
 sweep("tune_adamw_16k_ep4", selects_lr_for="plan_adam_eps1e17_16k_ep4", priority=1, num_epochs=4,
       notes="D2 double-epochs arm (250 steps).")
 sweep("tune_adamw_16k_bs512", selects_lr_for="plan_adam_eps1e17_16k_bs512", priority=1,
-      batch_size=512, grad_accum_steps=32, notes="D2 uncontrolled double-batch arm (63 steps).")
+      batch_size=512, grad_accum_steps=32,
+      notes="Uncontrolled double-batch arm, 63 steps: 2 seeds per point, select on the mean.")
 # D12 eps_root eval-loss control (not an lr sweep: single point per optimizer)
 for opt in ["adamw", "muon"]:
     sweep(f"tune_{opt}_16k_eps0_control", selects_lr_for=f"sm_{opt}_eps1e17_16k_bs256",
