@@ -143,11 +143,13 @@ section). Every measured repeat source:
 | anchor split-half | LDS from subsets 0-49 vs 50-99 | adamw 0.9294 vs 0.9336 (0.004); muon 0.8451 vs 0.8429 (0.002) | /mnt/ssd-2/lucia/s16k_{opt}/eval_q20/validation.csv |
 | held-out loss, repeated seeds | training seed | sd ~0.001 nats | measured 2026-08-06 |
 
-**Ruling (adopted):** run no dedicated repeat experiments. When writing the paper, treat
-**0.02 LDS** as the conservative run-to-run error bar (the worst case observed under a
-perturbation larger than any seed change) and **~0.005** as the typical repeat gap. Any
-effect the paper claims must clear 0.02; an effect below that is reported as "within
-run-to-run variation". Revisit only if a key axis effect lands under 0.02.
+**Ruling (adopted):** run no dedicated repeat experiments. Treat **0.02 LDS** as the
+conservative run-to-run error bar (the worst case observed under a perturbation larger
+than any seed change) and **~0.005** as the typical repeat gap. Any effect the paper
+claims must clear 0.02; an effect below that is reported as "within run-to-run
+variation". Revisit only if a key axis effect lands under 0.02. The bar is an internal
+heuristic for deciding when more data is needed — the paper does not discuss or justify
+it, and no caveat about its provenance is required there.
 
 ### D7. Canonical EK-FAC configuration: the bergson default, `damped_inverse`
 
@@ -233,12 +235,14 @@ still catches meaningful mistuning, and the finest spacing the metric can suppor
    noise), select the anchor value 2e-4 (or the group's center) rather than the numerical
    winner. This keeps lr constant along an axis unless the data clearly demands a change, so
    most comparisons stay one-factor.
-4. **Seeds:** one run per point, except for groups whose runs are 63 steps or fewer — the
-   4k and 8k dataset sizes (32 and 63 steps) and the double-batch arm (63 steps) — where
-   run-to-run noise is plausibly larger than the differences being measured: use two seeds
-   per point there and select on the mean. These are the cheapest runs in the grid, so the
-   doubling costs minutes. If any group's three points are not lowest-in-the-middle or
-   monotone, rerun the odd point with a second seed before acting on it.
+4. **Seeds:** one run per point everywhere. An earlier draft required two seeds for
+   short-run groups (63 steps or fewer), on the guess that seed noise grows when a run is
+   only a few dozen batches; a direct measurement showed it does not: seeds 42 and 43 of
+   `tune_adamw_8k_lr0.0002` (63 steps) give heldout 3.2851 vs 3.2839 — a 0.0012-nat gap,
+   at the ~0.001 seed-noise floor measured at 125 steps. The remaining safeguards cover
+   the residual risk at zero cost: the tie rule (step 3) absorbs sub-0.002 differences,
+   and if a group's three points are not lowest-in-the-middle or monotone, rerun the odd
+   point with a second seed before acting on it.
 
 5. Record every run in `tuning.csv` (train_loss, heldout_loss, run_dir); when the group is
    complete, write the winning lr into the experiment rows named in its `selects_lr_for` column.

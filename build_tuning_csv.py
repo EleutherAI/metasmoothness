@@ -83,9 +83,7 @@ for opt in ["adamw", "muon"]:
     for n in [4000, 8000, 32000, 64000]:
         k = f"{n // 1000}k"
         sweep(f"tune_{opt}_{k}", selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_{k}_bs256",
-              priority=1, optimizer=opt, n_docs=n,
-              notes="Short run (63 steps or fewer): 2 seeds per point, select on the mean."
-                    if n in (4000, 8000) else "")
+              priority=1, optimizer=opt, n_docs=n)
 
 # ---------------------------------------------------------------------------------
 # 2. Batch-size axis (adam). Steps co-vary with bs at fixed epochs; lr optimum is
@@ -105,7 +103,7 @@ sweep("tune_adamw_16k_ep4", selects_lr_for="plan_adam_eps1e17_16k_ep4", priority
       notes="D2 double-epochs arm (250 steps).")
 sweep("tune_adamw_16k_bs512", selects_lr_for="plan_adam_eps1e17_16k_bs512", priority=1,
       batch_size=512, grad_accum_steps=32,
-      notes="Uncontrolled double-batch arm, 63 steps: 2 seeds per point, select on the mean.")
+      notes="D2: uncontrolled double-batch arm (63 steps).")
 # D12 eps_root eval-loss control (not an lr sweep: single point per optimizer)
 for opt in ["adamw", "muon"]:
     sweep(f"tune_{opt}_16k_eps0_control", selects_lr_for=f"sm_{opt}_eps1e17_16k_bs256",
@@ -172,7 +170,8 @@ RESULTS = {
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_8k_lr0.0002_s42",
         notes="Measured 2026-08-20 (protocol-validation run, lotus-0). Seed 42: 3.2851; "
               "seed 43: 3.2839 (dir suffix _s43); gap 0.0012 nats at 63 steps — matches "
-              "the ~0.001 seed-noise floor measured at 125 steps."),
+              "the ~0.001 seed-noise floor measured at 125 steps. This measurement is "
+              "the evidence behind dropping the short-run 2-seed rule (procedure step 4)."),
 }
 
 
