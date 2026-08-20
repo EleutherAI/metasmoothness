@@ -178,6 +178,25 @@ for mod in ["none", "qk_norm", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_16k_ep4_lr0.0001": dict(
+        status="measured", heldout_loss=3.2503,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_ep4_lr0.0001_s42"),
+    "tune_adamw_16k_eps0_control_lr0.0002": dict(
+        status="measured", heldout_loss=3.2572,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_eps0_control_lr0.0002_s42",
+        notes="D12 resolved: identical to the eps1e-17 anchor (3.2572) to all four "
+              "decimals - eps_root 1e-17 vs 0 is a null on eval loss."),
+    "tune_muon_16k_eps0_control_lr0.0002": dict(
+        status="measured", heldout_loss=3.2570,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_eps0_control_lr0.0002_s42",
+        notes="D12 resolved: identical to the eps1e-17 anchor (3.2570) to all four "
+              "decimals."),
+    "tune_muon_16k_bs128_lr5e-05": dict(
+        status="measured", heldout_loss=3.2609,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs128_lr5e-05_s42"),
+    "tune_muon_16k_bs128_lr0.0001": dict(
+        status="measured", heldout_loss=3.2501,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs128_lr0.0001_s42"),
     "tune_adamw_16k_bs128_lr0.0001": dict(
         status="measured", heldout_loss=3.2498,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_bs128_lr0.0001_s42",

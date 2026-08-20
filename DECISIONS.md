@@ -85,8 +85,11 @@ sweeps; the tuning groups stay registered but are not claimable until sign-off.
 
 Run the minimum needed to show eps_root 1e-17 does not make eval loss non-negligibly worse:
 train-only anchor twins at eps_root=0 (one per optimizer, lr 2e-4), compare held-out loss.
-Registered as the `tune_*_16k_eps0_control` rows in tuning.csv. No bank unless the loss check
-surprises.
+Registered as the `tune_*_16k_eps0_control` rows in tuning.csv.
+
+**Measured — null confirmed:** the eps_root=0 twins reproduce the eps1e-17 anchors' held-out
+loss to all four reported decimals (adamw 3.2572 vs 3.2572; muon 3.2570 vs 3.2570). No bank
+needed; the check closed with no surprise.
 
 
 ### D6. Query count: 20 (resolved); tail-filter estimator specified
