@@ -37,6 +37,10 @@ warmup      fraction of total steps (the trainer's convention). Planned warm-sta
             specify absolute steps say so in their notes and must not share a plot axis.
 ckpt_avg_k  near-final checkpoints the query loss is averaged over (1 = none). Needs
             cleanup_ckpts=false at train time.
+heldout_loss  mean per-token CE on heldout_4k (scripts/heldout_eval.py). The tuning protocol in
+            CONTROLS.md requires it for every row; empty = not yet measured. Anchor-config
+            reference (from the lr-sweep twin at ga4): adamw 3.2572, muon 3.2570,
+            untrained gpt2 3.4981.
 reusable    bank+scores = retrained models on disk; re-score a new method without retraining
             bank        = retrained models only
             ms_only     = metasmoothness.json only
@@ -65,7 +69,7 @@ COLUMNS = [
     "metasmoothness", "ms_direction_seed", "ms_fd_step",
     "magic_lds", "magic_ci_lo", "magic_ci_hi", "magic_n_queries",
     "ekfac_lds", "ekfac_ci_lo", "ekfac_ci_hi", "ekfac_n_subsets",
-    "train_loss", "delta_l1", "delta_l2",
+    "train_loss", "heldout_loss", "delta_l1", "delta_l2",
     # --- provenance ---
     "run_dir", "bank_dir", "code_commit", "reusable", "source_doc", "notes",
 ]

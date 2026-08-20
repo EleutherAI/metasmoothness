@@ -31,7 +31,7 @@ LDS is measured for both optimizers (adamw 0.9333 [0.9186, 0.9448], muon 0.8470
 | train sets | `train_{4,8,16,32,64,128,256}k` — one nested chain, each a superset of the last | scaling must mean "same docs plus more"; the 64k+ family was rebuilt 2026-08-20 to restore nesting (old 64k shared only ~4k docs with 32k) |
 | LDS queries | `query_20.hf` (20 docs), fixed across ALL runs | verified disjoint from every train set incl. 256k; 20 queries gave CI width ~±0.013 at the anchor |
 | model-selection set | `heldout_4k.hf` (4000 docs), fixed | verified disjoint from every train set (the 256k conflict is resolved by excluding heldout docs from the rebuilt 256k) — **never select lr or report generalisation on train loss** |
-| epochs | 2, fixed across N | token axis = vary N at fixed epochs (OLMo3 uses 2); steps then scale 31 -> 2000 |
+| epochs | 2, fixed across N | matches the LLM post-training norm, which is the target setting: DeepSeek-V3 SFT = 2 epochs, Tulu 3 SFT = 2 epochs (8B and 70B), OLMo 2 SFT (Tulu 3 recipe) = 2 epochs, OLMo 3 = 2 epochs. Token axis = vary N at fixed epochs; steps then scale 31 -> 2000. (Tulu 3 also uses a warmup *ratio* — 0.3 — supporting the fraction convention.) |
 
 Caveat to carry: at bs256/2ep, N=4k is only 31 steps (8 warmup). The 4k rung stays on the axis
 but short-run effects are confounded with small-N there; 8k (62 steps) is the smallest rung to
@@ -46,7 +46,7 @@ lean on.
 | schedule | polynomial, `lr_start 1e-6`, `lr_end = lr/10`, `warmup_steps 0.25` (fraction) | fraction keeps the schedule self-similar across N — required for token scaling; `warmup >= 1` would be absolute steps (code: `LRScheduleConfig`) |
 | adam_beta1 / beta2 | 0.95 / 0.975 | code defaults; every measured point uses them (MAGIC-paper lineage) |
 | adam_eps | 1e-8 | code default |
-| eps_root | **1e-17, pinned in every yaml** | largest value that does not raise the fp32 noise floor; the current branch's code default is **1e-8** — never rely on the default |
+| eps_root | **1e-17, pinned in every yaml** | numerically this is standard AdamW (the sqrt noise floor swamps it), which is what the paper should study. The code default 1e-8 descends from the MAGIC paper's setup (~4k docs / 4 epochs / adam), where damping made attribution work at small batch; we make **no claim** that MAGIC works in that regime — our main setting (bs256) demonstrably works at effectively-zero eps_root. Never rely on the code default. Optional cheap control: an eps_root=0 twin of the anchor to demonstrate 1e-17 vs 0 is a null (prior evidence: muon MAGIC paired diff -0.0005 [-0.0093, +0.0078]) |
 | weight decay | 0.01 | code default; rep-era evidence says a null on ms over 0-0.3 |
 | grad clipping | none (`max_grad_norm` unset) | ablation axis; rep-era evidence says a no-op at these settings |
 
@@ -63,6 +63,32 @@ lr selection evidence (held-out `heldout_4k` CE, anchor config, models in
 
 The 2e-4-vs-1e-4 gap (~0.002) is near the seed-noise floor (~0.001), but 2e-4 is best for both
 optimizers, the curve is smooth on both sides, and both measured MAGIC anchors sit at 2e-4.
+
+**Scope of this tuning: N=16k only.** The optimum is not assumed to transfer along any axis that
+changes the optimization problem — there is already a hint it drifts (at bs256/1ep/32k, 8e-4 beat
+2e-3 and 4e-3 on held-out; lower lrs were untested there). Transfer is *verified, never assumed*
+— see the tuning protocol below.
+
+## Tuning protocol (every experiment must be a well-tuned config)
+
+The experiments are only meaningful on fairly good training configs, so tuning is part of the
+protocol, not an afterthought:
+
+1. **Selection metric is always heldout_4k CE** (`scripts/heldout_eval.py`), never train loss —
+   the train-loss optimum has been measured to generalise worse than untrained GPT-2.
+2. **Before any attribution run on a config whose optimization problem differs from the anchor**
+   (different N, batch size, optimizer, model size, warmup, or architecture), run a 3-point lr
+   mini-sweep {0.5x, 1x, 2x around the incumbent} — train-only, no banks, so it costs minutes at
+   small N and a few hours at 256k. If an endpoint wins, extend one octave and re-check. Freeze
+   the winner, then build the bank at that lr.
+3. **Exempt** (eval-side or provably lr-neutral): checkpoint averaging, subset/estimator
+   settings, attribution-window changes on an existing run.
+4. **Record `heldout_loss` in experiments.csv for every row** and require it to beat untrained
+   GPT-2 (3.4981) by a clear margin; a row whose model is at or worse than untrained is flagged,
+   not plotted.
+5. If the mini-sweep moves lr off the anchor value, the row's lr column records the tuned value —
+   the ablation is then "axis + retuned lr", which is the standard tuned-baseline convention (an
+   optimizer or batch-size comparison at a fixed, mistuned lr would be the real confound).
 
 ## Training mechanics
 
