@@ -76,6 +76,11 @@ def main() -> None:
             "train_mode": False,
             "save_models": True,
             "save_optimizer_state": "none",
+            # Train-only sweep: keep no trajectory. The default save_mode "sqrt"
+            # wrote ~50 GB of checkpoints per 1000-step run; "interval" with an
+            # out-of-range interval saves only the final state.
+            "save_mode": "interval",
+            "save_interval": 10**9,
         }}],
     }
 
