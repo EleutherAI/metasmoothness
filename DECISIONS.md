@@ -216,11 +216,12 @@ still catches meaningful mistuning, and the finest spacing the metric can suppor
 
 ## Sweep centers
 
-Grids differ between arms only through two stated rules, so no arm's range is hand-picked
-from prior results: (1) every arm centers on the reference-configuration optimum — the
-standard tune-at-a-reference-then-transfer practice; (2) batch-size arms shift the whole grid
-by sqrt(bs/256), the published batch-scaling heuristic. The model-size arms widen the grid by
-one step downward rather than shifting it. Extensions beyond any grid are data-driven
+The rule for grid ranges: the only value taken from our own measurements is the shared
+reference center (2e-4, the reference-configuration optimum), applied uniformly to every arm
+— the standard tune-at-a-reference-then-transfer practice. Per-arm differences from that
+center come only from published or conventional heuristics, never from our own data: the
+batch-size arms shift by sqrt(bs/256), and the model-size arms shift one 2x step down
+(larger models conventionally prefer lower lr). Extensions beyond any grid are data-driven
 (endpoint rule) and recorded in tuning.csv like every other run:
 
 | axis | center | reason |
