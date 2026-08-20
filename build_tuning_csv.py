@@ -175,6 +175,9 @@ for mod in ["none", "qk_norm", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_muon_64k_lr0.0002": dict(
+        status="measured", heldout_loss=3.2417,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_64k_lr0.0002_s42"),
     "tune_adamw_64k_lr0.0004": dict(
         status="measured", heldout_loss=3.2671,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_64k_lr0.0004_s42",
