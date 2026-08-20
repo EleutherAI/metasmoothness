@@ -136,10 +136,19 @@ GRID = [
     ("sm_muon_eps0_5e5_4k",     4000, "muon",  5e-5, 0,      64, 4, 0.9960, 0.4648, 0.422, 0.504, 0.0053, 0.0061, "muon_eps0_4k"),
     ("sm_muon_eps1e6_5e5_4k",   4000, "muon",  5e-5, 1e-6,   64, 4, 0.9962, 0.4630, 0.420, 0.503, 0.0053, 0.0061, "muon_eps1e6_4k"),
 ]
+# train_loss backfilled 2026-08-20: eval-mode mean CE of each bank's saved base model
+# over its own train set (scripts/heldout_eval.py --heldout <train set>), GPU eval.
+TRAIN_LOSS = {"adam_eps0_16k": 2.6482, "adam_eps0_4k": 2.5846, "adam_eps0_8k": 2.5983,
+              "adam_eps1e10_4k": 2.6896, "adam_eps1e6_4k": 3.1849, "adam_eps1e6_8k": 3.1836,
+              "adam_eps1e8_4k": 3.0175, "adam_eps1e8_4k_drop0": 3.0175,
+              "adam_eps1e8_bs128_4k": 2.9837, "muon_eps0_4k": 3.0901, "muon_eps1e6_4k": 3.0912}
+
 for rid, n, opt, lr, eps, bs, ep, ms, ek, lo, hi, l1, l2, bd in GRID:
     extra = {}
+    if bd in TRAIN_LOSS:
+        extra["train_loss"] = TRAIN_LOSS[bd]
     if rid == "sm_adam_eps1e8_4k_rep2":
-        extra = dict(dropout_cfg=0.0,
+        extra = dict(extra, dropout_cfg=0.0,
                      notes="Replicate of sm_adam_eps1e8_4k: identical effective training "
                            "(its rep-era twin differed only in the INERT dropout cfg). The "
                            "EK-FAC gap to its twin (0.3048 vs 0.3095) is bank-level noise.")
