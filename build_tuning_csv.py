@@ -84,6 +84,13 @@ for opt in ["adamw", "muon"]:
         k = f"{n // 1000}k"
         sweep(f"tune_{opt}_{k}", selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_{k}_bs256",
               priority=1, optimizer=opt, n_docs=n)
+# Endpoint extensions (procedure step 2: an endpoint win adds one 2x step outward).
+sweep("tune_adamw_4k", selects_lr_for="plan_adam_eps1e17_4k_bs256", lrs=[5e-5],
+      priority=1, optimizer="adamw", n_docs=4000,
+      notes="Endpoint extension: 1e-4 won the 3-point grid (3.3149 vs 3.3178 at 2e-4).")
+sweep("tune_muon_4k", selects_lr_for="plan_muon_eps1e17_4k_bs256", lrs=[8e-4],
+      priority=1, optimizer="muon", n_docs=4000,
+      notes="Endpoint extension: 4e-4 won the 3-point grid (3.3114 vs 3.3138 at 2e-4).")
 
 # ---------------------------------------------------------------------------------
 # 2. Batch-size axis (adam). Steps co-vary with bs at fixed epochs; lr optimum is
@@ -165,6 +172,34 @@ for mod in ["none", "qk_norm", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_4k_lr0.0001": dict(
+        status="measured", heldout_loss=3.3149,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_4k_lr0.0001_s42",
+        notes="Endpoint winner of the 3-point grid; 5e-5 extension registered."),
+    "tune_adamw_4k_lr0.0002": dict(
+        status="measured", heldout_loss=3.3178,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_4k_lr0.0002_s42"),
+    "tune_adamw_4k_lr0.0004": dict(
+        status="measured", heldout_loss=3.3311,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_4k_lr0.0004_s42"),
+    "tune_adamw_8k_lr0.0001": dict(
+        status="measured", heldout_loss=3.2866,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_8k_lr0.0001_s42"),
+    "tune_adamw_8k_lr0.0004": dict(
+        status="measured", heldout_loss=3.2957,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_8k_lr0.0004_s42",
+        notes="Group complete: interior optimum at 2e-4 (3.2851) — "
+              "selected for plan_adam_eps1e17_8k_bs256."),
+    "tune_muon_4k_lr0.0001": dict(
+        status="measured", heldout_loss=3.3462,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_4k_lr0.0001_s42"),
+    "tune_muon_4k_lr0.0002": dict(
+        status="measured", heldout_loss=3.3138,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_4k_lr0.0002_s42"),
+    "tune_muon_4k_lr0.0004": dict(
+        status="measured", heldout_loss=3.3114,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_4k_lr0.0004_s42",
+        notes="Endpoint winner of the 3-point grid; 8e-4 extension registered."),
     "tune_adamw_8k_lr0.0002": dict(
         status="measured", heldout_loss=3.2851,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_8k_lr0.0002_s42",
