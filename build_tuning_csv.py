@@ -181,6 +181,14 @@ for mod in ["none", "qk_norm", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_16k_ep4_lr5e-05": dict(
+        status="measured", heldout_loss=3.2521,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_ep4_lr5e-05_s42",
+        notes="Extension point. Group complete: 1e-4 (3.2503) selected for "
+              "plan_adam_eps1e17_16k_ep4. The 5e-5 gap (0.0018) is under the tie "
+              "threshold, but the center 2e-4 is decisively excluded (0.0142 worse), so "
+              "the tie resolves to the tied value nearest the anchor. THE RUNNABLE "
+              "TUNING GRID IS COMPLETE: all 80 non-blocked rows measured."),
     "tune_adamw_16k_bs512_lr0.0001": dict(
         status="measured", heldout_loss=3.2805,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_bs512_lr0.0001_s42"),
