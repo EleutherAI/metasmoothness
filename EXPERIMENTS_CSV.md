@@ -52,7 +52,9 @@ every one of its 52 rows scored a rep-era bank. The per-epoch banks under
 `/mnt/ssd-1/lucia/perepoch/runs/*/bank` (50 models each, 11 configs) make regenerating those
 numbers scoring-only work; recreate the file when the first per-epoch scoring lands.
 
-## Resolutions of previously-flagged inconsistencies
+## Data caveats
+
+Facts about the recorded data that are easy to misread:
 
 - **WikiText eps1e-8 bs64 MAGIC 0.169 vs 0.5087** (same nominal config, different banks and
   estimator sizes): both rep-trained, so both are excluded. The discrepancy is closed for the CSV
@@ -68,10 +70,6 @@ numbers scoring-only work; recreate the file when the first per-epoch scoring la
 - **metasmoothness below ~0.02 carries no information** (sign-statistic noise; the same OLMo2 run
   scored 0.0101 and -0.000165 with movement agreeing to 0.12%). Applies to the OLMo2 full-run
   rows, which are recorded as ~0, not as precise values.
-- **`warmup` units** (superseded by D1): the trainer's `warmup` is a *fraction* when below 1
-  and *absolute steps* at 1 or above; the control is 0.25. The "warm start" axis this bullet
-  once covered turned out to mean an attribution window, not lr warmup, and moved to the
-  planned pre-training experiments — no row varies `warmup` anymore.
 - **eps1e-17 adamw scores** were rebuilt from per-query `.pt` files after the `docs-4`
   padded-query bug; verified bit-identical convention against muon's normally-written scores.
 - **train_loss on the per-epoch grid** was not recorded during the replication; those cells are
@@ -106,7 +104,7 @@ rows are the cheapest path back:
 | optimizer adam / muon | 15 / 11 (gpt2) | muon MAGIC only at eps1e-17 |
 | tokens (axis: 4k-64k) | 4k:14 8k:4 16k:6 32k:2 64k:0 | |
 | model size | 0 | |
-| checkpoint averaging | 0 | (warm start moved to planned pre-training experiments, D1) |
+| checkpoint averaging | 0 | |
 | QK-norm / pre-act norms | 0 | needs the gpt2_custom model + its own control row |
 | logit scale / wd / clip | 0 admitted | rep-era measurements excluded; planned rows re-measure at the anchor |
 
@@ -144,7 +142,7 @@ EK-FAC cheap, a fresh MAGIC rollout must first retrain, which reproduces determi
 
 ## Planned pre-training experiments (not in the current grid)
 
-**Attribution window ("warm start", D1).** Do not run attribution over the first N training
+**Attribution window (also called "warm start").** Do not run attribution over the first N training
 steps — for example, attribute only the last epoch. The MAGIC authors identified this as a way
 to overcome pre-training attribution instability, and the OLMo2 rows already measure it:
 full-run attribution is dead (~0 metasmoothness) while last-epoch-only attribution reaches

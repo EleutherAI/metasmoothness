@@ -34,9 +34,9 @@ steps       n_docs * num_epochs / batch_size (global batch)
 eps_root    epsilon inside the AdamW sqrt: m / (sqrt(v + eps_root) + adam_eps). Non-standard.
             For muon it reaches only the AdamW-fallback params (121,344 of 163M = 0.07%).
 warmup      lr-warmup as a fraction of total steps (values below 1; at 1 or above the trainer
-            reads absolute steps). Fixed control 0.25 — no row varies it (the "warm start"
-            axis meant an attribution window and moved to pre-training; DECISIONS D1).
-ckpt_avg_k  last-k checkpoints the QUERY GRADIENT is averaged over (1 = none; D9). Needs
+            reads absolute steps). Fixed control 0.25; no row varies it. The attribution-window
+            axis ("warm start") is a pre-training experiment — see EXPERIMENTS_CSV.md.
+ckpt_avg_k  last-k checkpoints the QUERY GRADIENT is averaged over (1 = none). Needs
             cleanup_ckpts=false at train time.
 heldout_loss  mean per-token CE on heldout_4k (scripts/heldout_eval.py). The tuning protocol in
             CONTROLS.md requires it for every row; empty = not yet measured. Anchor-config
