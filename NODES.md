@@ -47,8 +47,10 @@ cleanup. Conventions it encodes:
   the repo on `sys.path`.
 - Use the bergson main branch and record the commit in the row's `code_commit`-adjacent notes;
   do not run from someone's work-in-progress branch (the shared checkout's branch changes).
-- Tuning runs delete their checkpoints after the held-out number is recorded; the
-  keep-checkpoints control in CONTROLS.md applies to experiment runs only.
+- Tuning runs delete their checkpoints after the held-out number is recorded — except the
+  sweep winner's, for expensive configs (64k, larger models): the winning run doubles as the
+  experiment's base training (see Reuse rules in EXPERIMENTS_CSV.md). Losing runs always
+  clean up fully.
 - EK-FAC scoring is on hold until the canonical configuration is settled (DECISIONS.md, D7);
   metasmoothness and MAGIC work is not affected.
 

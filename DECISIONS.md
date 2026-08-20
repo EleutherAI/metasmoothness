@@ -105,9 +105,11 @@ count is more expensive than enlarging the bank.
 - **Interpretation:** values are **relative only** — a larger loss change means one
   attribution method is more efficacious than another. No absolute meaning is claimed for
   now.
-- **Control (resolved):** every config includes a matched **random-1% removal control
-  retrain** by default. Report the targeted-removal loss change next to the random-removal
-  loss change; the gap between them is the estimator's signal.
+- **Control (resolved):** every config includes a matched **random-1% removal control** by
+  default. Report the targeted-removal loss change next to the random-removal loss change;
+  the gap between them is the estimator's signal. No new runs needed: the config's bank
+  subsets are 100 random-1% removals already — use their loss changes as the control
+  reference (see Reuse rules in EXPERIMENTS_CSV.md).
 
 ### D13. Run-to-run variation: quantified from existing data; no dedicated repeat runs
 

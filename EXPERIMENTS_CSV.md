@@ -140,6 +140,43 @@ needs a fresh ~50-100-retrain bank; `none` = full rebuild. The per-epoch grid ba
 `/mnt/ssd-2/lucia/s16k_{adamw,muon}/merged` (models kept, base-training trajectories deleted —
 EK-FAC cheap, a fresh MAGIC rollout must first retrain, which reproduces deterministically).
 
+## Reuse rules
+
+Retrain banks and checkpoints are the expensive assets; most additions to a config are
+scoring-only. Reuse is safe exactly when training config, seed, datasets and (for MAGIC
+scores) code version match — the deterministic pipeline makes matched recomputation
+bit-exact, and mismatches are silent corruption, so check the match, then reuse freely:
+
+1. **One bank per experiment row, shared by every scorer.** The 50-100 retrained models and
+   the per-(query, subset) loss diffs in `validation.csv` are independent of the attribution
+   method. MAGIC, EK-FAC, and any later method (TrackStar, Shampoo, tail-filter) score
+   against the same bank — never rebuild a bank to add a method. Bank query losses are
+   cached on disk per config (`query_loss_cache`), so re-scoring does not even reload the
+   models.
+2. **The tail-filter's random-removal control is already built.** A random-1% control
+   retrain is distributionally identical to a bank's leave-1%-out subset retrain, and each
+   bank has 100 of them: use the bank subsets' loss changes as the random-removal reference
+   (a far tighter estimate than one dedicated control run). Only the targeted top-1%
+   removals need new retrains.
+3. **The winning tuning run is the experiment's base model.** Same config, same seed,
+   deterministic trainer — so its held-out loss fills the experiment row's `heldout_loss`
+   with no extra run, and if its checkpoints are kept, the bank pipeline resumes past base
+   training instead of retraining it. Keep the winner's checkpoints for expensive configs
+   (64k, larger models); for cheap configs, deleting and letting the bank retrain (~minutes)
+   is fine.
+4. **MAGIC rollouts reuse the bank's base-training checkpoints** — the backward pass walks
+   that exact trajectory. Keep them until every planned rollout for the config is done;
+   after that they are recoverable by deterministic retraining if ever needed again.
+5. **Standing assets:** 11 per-epoch banks (`/mnt/ssd-1/lucia/perepoch/runs/*/bank`, 50
+   models each) and the two 100-model banks (`/mnt/ssd-2/lucia/s16k_{adamw,muon}/merged`)
+   are ready for any scorer today — that is what the `fill_*` rows exploit.
+
+Not exploitable without code changes (recorded so nobody assumes otherwise): continuing the
+double-epochs bank from the anchor bank's models. The first two epochs of a 4-epoch run are
+bit-identical to the anchor (epoch shuffles are seeded `seed + epoch`), but subset retrains
+save models only — no optimizer state — so continuation from them diverges from a true
+4-epoch retrain.
+
 ## Optional future data (run if time permits)
 
 - **Learning-rate optimum vs batch size.** The tuning sweeps center the batch-size groups
