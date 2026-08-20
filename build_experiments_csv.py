@@ -189,17 +189,30 @@ add(GPT2_FT, run_id="sm_adam_eps1e8_4k_bs32_ep1", status="done", n_docs=4000, ep
           "(c0f11ba8); CI spans zero.")
 
 # eps_root 1e-17 pair (scaling_magic, 2026-08-07): per-epoch trained, MAGIC measured.
+# ms + EK-FAC filled by the fill_* work rows: D7-canonical EK-FAC scoring + ms probe,
+# both on code 10874f93 (scores/ms under /mnt/ssd-2/lucia/s16k_<opt>/). EK-FAC estimator:
+# scripts/ekfac_lds.py (loss-signed, validated on the per-epoch grid).
+ANCHOR_FILL = {
+    "adamw": dict(ekfac_lds=0.4251, ekfac_ci_lo=0.3772, ekfac_ci_hi=0.4693,
+                  ekfac_n_subsets=100, metasmoothness=0.9928, ms_direction_seed=0,
+                  ms_fd_step=0.1),
+    "muon": dict(ekfac_lds=0.4285, ekfac_ci_lo=0.3856, ekfac_ci_hi=0.4674,
+                 ekfac_n_subsets=100),
+}
 for opt, lds, lo, hi in [("adamw", 0.9333, 0.9186, 0.9448), ("muon", 0.8470, 0.8274, 0.8685)]:
-    add(GPT2_FT, run_id=f"sm_{opt}_eps1e17_16k_bs256", status="partial", n_docs=16000,
+    add(GPT2_FT, run_id=f"sm_{opt}_eps1e17_16k_bs256",
+        status="done" if opt == "adamw" else "partial", n_docs=16000,
         optimizer=opt, lr=2e-4, eps_root=1e-17, batch_size=256, grad_accum_steps=16,
         num_epochs=2, magic_lds=lds, magic_ci_lo=lo, magic_ci_hi=hi, magic_n_queries=20,
         n_subsets=100, n_queries=20, run_dir=f"/mnt/ssd-2/lucia/s16k_{opt}",
         bank_dir=f"/mnt/ssd-2/lucia/s16k_{opt}/merged", code_commit="docs-4",
         reusable="bank", source_doc="examples/scaling_magic/LDS_RESULTS.md",
+        **ANCHOR_FILL.get(opt, {}),
         notes="Paired diff adamw-muon = +0.0863 [+0.0670, +0.1052], 19/20 per-query wins; "
-              "identical subset lists. metasmoothness and EK-FAC NOT measured — the 100-model "
-              "bank exists, so EK-FAC is scoring-only. Base-training ckpts deleted (retrains "
-              "reproduce deterministically)." +
+              "identical subset lists. EK-FAC scored on code 10874f93 (D7 canonical); "
+              "EK-FAC cannot separate the optimizers (0.4251 vs 0.4285) while MAGIC "
+              "does (+0.086). ms probe: total_movement_l1 34147 (adamw). Base-training "
+              "ckpts deleted (retrains reproduce deterministically)." +
               (" adamw scores rebuilt from per-query .pt files (padded-query bug on docs-4)."
                if opt == "adamw" else ""))
 
@@ -258,19 +271,16 @@ for rid, bd in [(r[0], r[13]) for r in GRID if not r[0].endswith("_rep2")]:
 # EK-FAC (D7 canonical: damped_inverse 0.1, kfac+ev_correction, query_20) measured by
 # scripts/ekfac_lds.py against each bank's validation.csv; scores at
 # /mnt/ssd-2/lucia/s16k_<opt>/ekfac_scores, code commit 10874f93 (main-parent worktree).
-EKFAC_FILL = {"adamw": dict(ekfac_lds=0.4251, ekfac_ci_lo=0.3772, ekfac_ci_hi=0.4693,
-                            ekfac_n_subsets=100, code_commit="10874f93"),
-              "muon": dict(ekfac_lds=0.4285, ekfac_ci_lo=0.3856, ekfac_ci_hi=0.4674,
-                           ekfac_n_subsets=100, code_commit="10874f93")}
+EKFAC_FILL = {}  # results live on the sm_* parent rows (ANCHOR_FILL above)
 for opt in ["adamw", "muon"]:
     add(GPT2_FT, run_id=f"fill_sm_{opt}_eps1e17_16k_bs256_ms_ekfac",
-        status="partial" if opt in EKFAC_FILL else "planned",
+        status="done" if opt == "adamw" else "partial",
         n_docs=16000, optimizer=opt, lr=2e-4, eps_root=1e-17, batch_size=256,
         grad_accum_steps=16, source_doc="planned", n_queries=20,
         bank_dir=f"/mnt/ssd-2/lucia/s16k_{opt}/merged",
         **EKFAC_FILL.get(opt, {}),
-        notes=f"Measure metasmoothness + EK-FAC for sm_{opt}_eps1e17_16k_bs256; the 100-model "
-              "bank exists so EK-FAC is scoring-only. ms probe still to run.")
+        notes=f"Work ticket: results are recorded on sm_{opt}_eps1e17_16k_bs256. EK-FAC "
+              "measured for both optimizers; adamw ms measured (0.9928); muon ms in progress.")
 
 # =====================================================================================
 # 4. PLANNED — one-factor deviations from the scaling_magic anchor (GPT-2, SmolLM2 16k,
