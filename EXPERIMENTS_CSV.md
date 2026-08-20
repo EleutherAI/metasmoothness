@@ -68,10 +68,10 @@ numbers scoring-only work; recreate the file when the first per-epoch scoring la
 - **metasmoothness below ~0.02 carries no information** (sign-statistic noise; the same OLMo2 run
   scored 0.0101 and -0.000165 with movement agreeing to 0.12%). Applies to the OLMo2 full-run
   rows, which are recorded as ~0, not as precise values.
-- **`warmup` units**: the trainer's `warmup` is a *fraction* of total steps (baseline 0.25). The
-  planned warm-start rows (target axis 100-500) are *absolute steps* and say so in notes;
-  `warmup500` exceeds the anchor's 125 total steps and needs a decision (extend epochs, or treat
-  as all-warmup) before running. Never mix the two units on one plot axis.
+- **`warmup` units** (superseded by D1): the trainer's `warmup` is a *fraction* when below 1
+  and *absolute steps* at 1 or above; the control is 0.25. The "warm start" axis this bullet
+  once covered turned out to mean an attribution window, not lr warmup, and moved to the
+  planned pre-training experiments — no row varies `warmup` anymore.
 - **eps1e-17 adamw scores** were rebuilt from per-query `.pt` files after the `docs-4`
   padded-query bug; verified bit-identical convention against muon's normally-written scores.
 - **train_loss on the per-epoch grid** was not recorded during the replication; those cells are
@@ -102,12 +102,11 @@ rows are the cheapest path back:
 
 | axis | admitted rows | note |
 |---|---|---|
-| batch size 16-256 | 16:1(ms) 32:1 64:19 128:1 256:3 | only bs32 has MAGIC |
+| batch size 16-256 | 16:1(ms) 32:1 64:20 128:1 256:3 | only bs32 has MAGIC |
 | optimizer adam / muon | 15 / 11 (gpt2) | muon MAGIC only at eps1e-17 |
-| tokens/steps 4k-32k | 4k:14 8k:4 16k:5 32k:2 | |
+| tokens (axis: 4k-64k) | 4k:14 8k:4 16k:6 32k:2 64k:0 | |
 | model size | 0 | |
-| warm start | 0 | |
-| checkpoint averaging | 0 | |
+| checkpoint averaging | 0 | (warm start moved to planned pre-training experiments, D1) |
 | QK-norm / pre-act norms | 0 | needs the gpt2_custom model + its own control row |
 | logit scale / wd / clip | 0 admitted | rep-era measurements excluded; planned rows re-measure at the anchor |
 

@@ -12,11 +12,10 @@ group is complete, write the winning lr into the matching experiments.csv row(s)
 `gates` column names them.
 
 These are train-only runs: no banks, no subsets, no MAGIC. Cost is ~steps x bs; at bs256
-that is 31 steps (4k) to 2000 steps (256k).
+that is 31 steps (4k) to 500 steps (64k).
 
 status: measured = both loss columns filled; empty = to run; blocked = prerequisite
-missing (gpt2_custom does not exist yet; warmup500 exceeds the 125-step anchor and needs
-the extend-vs-all-warmup decision first).
+missing (gpt2_custom does not exist yet; model-size groups await the D11 sign-off).
 """
 
 import csv
@@ -121,10 +120,8 @@ for mdl in ["gpt2-medium", "gpt2-large"]:
           notes="D11: BLOCKED until the scaling plan is signed off. Center one octave down "
                 "(larger models prefer lower lr). Adjust grad_accum to fit; record it.")
 
-# ---------------------------------------------------------------------------------
-# 4. Warm start (adam, 16k). warmup here is ABSOLUTE steps (>=1 per LRScheduleConfig).
-# ---------------------------------------------------------------------------------
-# D1 (2026-08-20): warm start = attribution window (pre-training axis); warmup groups removed.
+# D1 (2026-08-20): the former warm-start section is gone — warm start = attribution window,
+# a pre-training axis; no lr-warmup sweeps exist.
 
 # ---------------------------------------------------------------------------------
 # 5. Logit scale (adam, 16k) — landscape-changing, so it gets a sweep.

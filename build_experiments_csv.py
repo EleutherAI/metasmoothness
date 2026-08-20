@@ -33,9 +33,10 @@ status      done    = metasmoothness, magic_lds and ekfac_lds all measured
 steps       n_docs * num_epochs / batch_size (global batch)
 eps_root    epsilon inside the AdamW sqrt: m / (sqrt(v + eps_root) + adam_eps). Non-standard.
             For muon it reaches only the AdamW-fallback params (121,344 of 163M = 0.07%).
-warmup      fraction of total steps (the trainer's convention). Planned warm-start rows that
-            specify absolute steps say so in their notes and must not share a plot axis.
-ckpt_avg_k  near-final checkpoints the query loss is averaged over (1 = none). Needs
+warmup      lr-warmup as a fraction of total steps (values below 1; at 1 or above the trainer
+            reads absolute steps). Fixed control 0.25 — no row varies it (the "warm start"
+            axis meant an attribution window and moved to pre-training; DECISIONS D1).
+ckpt_avg_k  last-k checkpoints the QUERY GRADIENT is averaged over (1 = none; D9). Needs
             cleanup_ckpts=false at train time.
 heldout_loss  mean per-token CE on heldout_4k (scripts/heldout_eval.py). The tuning protocol in
             CONTROLS.md requires it for every row; empty = not yet measured. Anchor-config

@@ -11,7 +11,9 @@ file was written from `lotus-0`). Use the bare hostname, nothing else.
 
 ## Claiming a row
 
-1. `git pull` (or check `git log`) first — another node may have claimed since your last look.
+1. Check `git log` first — another node may have claimed since your last look. (All nodes
+   share this one checkout, so commits are visible immediately; `git pull` only matters if
+   you work from a separate clone of `github.com/EleutherAI/metasmoothness`.)
 2. Pick a row whose `node_in_charge` is empty and whose `status` is `empty` (tuning.csv) or
    `planned` (experiments.csv). Respect `priority` order and the `blocked` status.
 3. Write your hostname into `node_in_charge` and today's date (UTC, `YYYY-MM-DD`) into

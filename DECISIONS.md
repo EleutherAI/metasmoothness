@@ -230,7 +230,7 @@ one extra run per group — the prior only has to be roughly right to pay for it
 
 ## Cost
 
-Priority-1 groups (dataset size x 2 optimizers x 5 rungs, batch size x 2 optimizers x 4
-values, ep4, bs512): 28 groups, about 90 runs, almost all under 10 minutes; the 64k rungs cost
-about an hour each. The whole grid costs less than one retrain bank, and it protects roughly
-40 of them.
+Priority-1 groups still to run (dataset size: 2 optimizers x 4 rungs; batch size: 2
+optimizers x 4 values; ep4; bs512): 18 groups, 54 runs, almost all under 10 minutes; the 64k
+rungs cost about an hour each. The whole grid costs less than one retrain bank, and it
+protects roughly 40 of them.

@@ -77,7 +77,7 @@ protocol, not an afterthought:
 1. **Selection metric is always heldout_4k CE** (`scripts/heldout_eval.py`), never train loss —
    the train-loss optimum has been measured to generalise worse than untrained GPT-2.
 2. **Before any attribution run on a config whose optimization problem differs from the anchor**
-   (different N, batch size, optimizer, model size, warmup, or architecture), run a 3-point lr
+   (different N, batch size, epochs, optimizer, model size, or architecture), run a 3-point lr
    mini-sweep {0.5x, 1x, 2x around the incumbent} — train-only, no banks, so it costs minutes at
    small N and a few hours at 256k. If an endpoint wins, extend one octave and re-check. Freeze
    the winner, then build the bank at that lr.
@@ -122,7 +122,7 @@ Every ablation changes exactly one row of the tables above:
 | step count | epochs 2 -> 4 at fixed bs; and bs 256 -> 512 at fixed epochs (D2) | fixed; the pair separates steps from batch |
 | optimizer | adamw vs muon | fixed, incl. lr 2e-4 (verified optimal for both) |
 | model size | gpt2-medium / gpt2-large | fixed; MAGIC cost scales with params |
-| ckpt averaging | `ckpt_avg_k` 1 -> 4 -> 8 | fixed; eval-side only, same trained model |
+| ckpt averaging | `ckpt_avg_k` 1 -> 4 (last-4 query-gradient average, D9) | fixed; eval-side only, same trained model |
 | arch (QK-norm, pre-act norm) | one mod on `gpt2_custom` | compare only against the `gpt2_custom` no-mod control row |
 | logit scale / wd / clip | one knob | fixed |
 
