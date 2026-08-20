@@ -282,7 +282,7 @@ for bs in [16, 32, 64, 128]:
         notes="D5: muon twin of the batch-size axis. bs256 measured (MAGIC 0.8470).")
 # Tuned lr per completed sweep group (procedure step 5); 2e-4 until the group completes.
 TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e-4,
-            "plan_muon_eps1e17_4k_bs256": 4e-4, "plan_muon_eps1e17_8k_bs256": 2e-4, "plan_adam_eps1e17_32k_bs256": 2e-4, "plan_muon_eps1e17_32k_bs256": 2e-4, "plan_adam_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs64": 1e-4}
+            "plan_muon_eps1e17_4k_bs256": 4e-4, "plan_muon_eps1e17_8k_bs256": 2e-4, "plan_adam_eps1e17_32k_bs256": 2e-4, "plan_muon_eps1e17_32k_bs256": 2e-4, "plan_adam_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs64": 1e-4, "plan_adam_eps1e17_16k_bs64": 1e-4}
 for n in [4000, 8000, 32000, 64000]:
     rid = f"plan_adam_eps1e17_{n//1000}k_bs256"
     add(BASE17, run_id=rid, n_docs=n, lr=TUNED_LR.get(rid, 2e-4),

@@ -178,6 +178,12 @@ for mod in ["none", "qk_norm", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_16k_bs64_lr0.0002": dict(
+        status="measured", heldout_loss=3.2585,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_bs64_lr0.0002_s42",
+        notes="Group complete: interior optimum at the sqrt-rule center 1e-4 — selected "
+              "for plan_adam_eps1e17_16k_bs64 (5e-5 gap 0.0010 is a tie; center wins on "
+              "both grounds)."),
     "tune_muon_16k_bs64_lr0.0002": dict(
         status="measured", heldout_loss=3.2592,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs64_lr0.0002_s42",
