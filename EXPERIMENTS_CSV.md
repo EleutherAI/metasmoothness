@@ -115,7 +115,15 @@ new   = d[(d.status == "planned") & ~d.run_id.str.startswith("fill_")]
 Ground rules for new runs: per-epoch shuffle code (`1e6eea7f` or later), `dropout` configured
 0.0 explicitly, `train_mode` left false, fp32, `cleanup_ckpts=false` with checkpoints kept
 (checkpoint-averaging and window analyses need them), one estimator config per comparison
-(100 subsets @1%, 20+ queries), and record `code_commit`. After filling a cell, edit the row in
+(100 subsets @1%, 20+ queries), and record `code_commit`. **SmolLM2 pipeline only — WikiText is
+banned from paper runs (it does not scale); the builder asserts `dataset == smollm2`.** The full
+control set, with the evidence behind each value, is in [`CONTROLS.md`](CONTROLS.md).
+
+**Datasets (2026-08-20):** `train_{4..256}k` are one verified nested chain (the old 64k+ family
+was a different draw and was rebuilt via `scripts/rebuild_scaling_family.py`; pre-rebuild
+versions kept at `*.hf.old_disjoint`). `heldout_4k` and `query_50/20` are verified disjoint from
+every rung including 256k. Canonical copies on the Hub: `EleutherAI/bergson-smollm2-scaling`
+(pushed by `scripts/push_scaling_datasets.py`, which re-verifies both invariants before upload). After filling a cell, edit the row in
 `build_experiments_csv.py`, re-run it, and commit script + CSV together.
 
 ## Checkpoint availability

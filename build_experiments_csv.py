@@ -308,6 +308,9 @@ def main():
             r.setdefault(c, "")
         assert r["dropout_effective"] in (0.0, ""), f"active dropout row admitted: {r['run_id']}"
         assert r["shuffle"] in ("per_epoch", "agnostic_1ep"), f"rep row admitted: {r['run_id']}"
+        assert r["dataset"] == "smollm2", (
+            f"non-smollm2 row admitted: {r['run_id']} — paper runs use the SmolLM2 "
+            "pipeline only (WikiText does not scale)")
     order = {"done": 0, "partial": 1, "planned": 2}
     rows.sort(key=lambda r: (order.get(r["status"], 3), r["family"], r["run_id"]))
     with open(out, "w", newline="") as f:
