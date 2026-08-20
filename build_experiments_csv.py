@@ -353,9 +353,10 @@ for mdl, prm in [("gpt2-medium", 355), ("gpt2-large", 774)]:
 add(BASE17, run_id="plan_adam_eps1e17_16k_ckptavg4", ckpt_avg_k=4,
     notes="D9: average the QUERY GRADIENT over the last 4 checkpoints; BOTH scorers (MAGIC "
           "and EK-FAC) use the averaged gradient. Replicate Louis's effect on the anchor "
-          "first (re-train the anchor base with checkpoints kept — the originals were "
-          "deleted; the deterministic trainer reproduces it bit-exactly at seed 42). "
-          "Eval-side: exempt from lr gating.")
+          "first. D15: the stored anchor base is NOT bit-reachable from the current "
+          "environment; a fresh deterministic base + trajectory exist at "
+          "/mnt/ssd-2/lucia/paper_runs/d9_magic_base — the replication path awaits the "
+          "D15 ruling. Eval-side: exempt from lr gating.")
 # preact_batchnorm dropped (D14) — see DECISIONS.md.
 for mod in ["qk_norm", "preact_layernorm"]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_{mod}", arch_mod=mod, model="gpt2_custom",
@@ -373,6 +374,26 @@ for wd in [0.0, 0.1]:
         notes="Rep-era data (excluded) suggested weight decay is a null on ms over 0-0.3.")
 add(BASE17, run_id="plan_adam_eps1e17_16k_clip1.0", max_grad_norm=1.0,
     notes="Rep-era data (excluded) suggested clipping is a no-op (norms rarely exceed 1).")
+
+# Reuse rule 3: the winning tuning run is the experiment's base model, so its measured
+# heldout fills the row (values from tuning.csv winners; models under paper_runs/tuning).
+HELDOUT_FROM_TUNING = {
+    "plan_adam_eps1e17_4k_bs256": 3.3149, "plan_muon_eps1e17_4k_bs256": 3.3114,
+    "plan_adam_eps1e17_8k_bs256": 3.2851, "plan_muon_eps1e17_8k_bs256": 3.2841,
+    "plan_adam_eps1e17_32k_bs256": 3.2365, "plan_muon_eps1e17_32k_bs256": 3.2372,
+    "plan_adam_eps1e17_64k_bs256": 3.2314, "plan_muon_eps1e17_64k_bs256": 3.2323,
+    "plan_adam_eps1e17_16k_bs16": 3.2497, "plan_muon_eps1e17_16k_bs16": 3.2443,
+    "plan_adam_eps1e17_16k_bs32": 3.2473, "plan_muon_eps1e17_16k_bs32": 3.2441,
+    "plan_adam_eps1e17_16k_bs64": 3.2479, "plan_muon_eps1e17_16k_bs64": 3.2464,
+    "plan_adam_eps1e17_16k_bs128": 3.2498, "plan_muon_eps1e17_16k_bs128": 3.2501,
+    "plan_adam_eps1e17_16k_ep4": 3.2503, "plan_adam_eps1e17_16k_bs512": 3.2751,
+    "plan_adam_eps1e17_16k_wd0.0": 3.2572, "plan_adam_eps1e17_16k_wd0.1": 3.2572,
+    "plan_adam_eps1e17_16k_clip1.0": 3.2543,
+    "sm_adamw_eps1e17_16k_bs256": 3.2572, "sm_muon_eps1e17_16k_bs256": 3.2570,
+}
+for r in rows:
+    if r["run_id"] in HELDOUT_FROM_TUNING and not r.get("heldout_loss"):
+        r["heldout_loss"] = HELDOUT_FROM_TUNING[r["run_id"]]
 
 
 def _preserve_claims(out_path, rows):
