@@ -57,8 +57,8 @@ moments) in addition to the existing keep-checkpoints rule. CONTROLS updated.
 ### D9. Checkpoint averaging: last 4 checkpoints, averaged query gradient
 
 Definition: average the **query gradient** over the **last 4 checkpoints** of the run (k=4 is
-the default; the k=8 row is removed). **Both scorers get the averaged gradient** (ruling
-2026-08-20): MAGIC seeds its reverse pass with it, and EK-FAC preconditions it. First step is
+the default; the k=8 row is removed). **Both scorers get the averaged gradient**: MAGIC
+seeds its reverse pass with it, and EK-FAC preconditions it. First step is
 replicating Louis's effect on the existing anchor config before adding grid rows. Note: the
 anchor's base-training checkpoints were deleted, so the replication first re-trains the
 anchor base with checkpoints kept — the deterministic bergson trainer reproduces the base
@@ -75,7 +75,7 @@ reimplementing GPT-2". The arch rows stay blocked until the model is uploaded.
 
 ### D11. Model scaling: gpt2-medium is the registered target
 
-**Ruling (2026-08-20): `gpt2-medium` (355M, stock HF — same architecture, tokenizer, and
+**Ruling: `gpt2-medium` (355M, stock HF — same architecture, tokenizer, and
 pre-training corpus as gpt2-124M) is the registered scaling target.** `gpt2-large` is
 deferred and runs only if medium proves informative. A concrete cost-and-feasibility plan
 still goes to Lucia for sign-off **before** any model-size run starts, including the tuning
@@ -92,7 +92,7 @@ surprises.
 ### D6. Query count: 20 (resolved); tail-filter estimator specified
 
 **Ruling:** the 20-query CIs are fine — the grid stays at 20 queries everywhere.
-**Escalation rule (2026-08-20):** 20 queries (`query_20.hf`) unless a config's 95% bootstrap
+**Escalation rule:** 20 queries (`query_20.hf`) unless a config's 95% bootstrap
 CI half-width exceeds **0.025**; then re-score with `query_50.hf` (scoring-only against the
 same bank). 0.025 is just above the widest anchor half-width (muon ~0.021) and comparable to
 the D13 run-to-run bar, so escalation triggers only when the CI would blur a reportable
@@ -151,18 +151,18 @@ run-to-run variation". Revisit only if a key axis effect lands under 0.02.
 
 ### D7. Canonical EK-FAC configuration: the bergson default, `damped_inverse`
 
-**Resolved (2026-08-20):** the canonical EK-FAC configuration for every `ekfac_lds` cell is
+**Resolved:** the canonical EK-FAC configuration for every `ekfac_lds` cell is
 the bergson library default: `inversion="damped_inverse"` (uniform Tikhonov,
 `1/(lambda + c*mean(lambda))`) with `damping_factor=0.1` (relative to the mean eigenvalue).
 `factored_tikhonov` (the Martens-Grosse pi-split) exists in the library but is not used.
 **EK-FAC scoring is unblocked.** Historical note: the rep-era "docspace" and "allium-0"
-variants have no counterpart in the bergson codebase (as of 2026-08-20); their 5x disagreement
+variants have no counterpart in the bergson codebase (checked at commit 8ce0cd76); their 5x disagreement
 on one bank stays unexplained but cannot recur — every new score uses the one canonical
 config above, recorded via `code_commit`.
 
 ### D14. preact_batchnorm dropped from the architecture axis
 
-**Resolved (2026-08-20):** the `preact_batchnorm` tuning group and experiment row are
+**Resolved:** the `preact_batchnorm` tuning group and experiment row are
 removed. Two unfixable conflicts with the control set:
 
 1. The trainer runs with `train_mode=false` (`model.eval()`), where BatchNorm uses its
@@ -178,7 +178,7 @@ The architecture axis keeps `qk_norm` and `preact_layernorm` (both per-sample op
 
 ## Open
 
-*(D6 and D13 moved to Resolved 2026-08-20; D7 resolved 2026-08-20 — none open.)*
+*(none — git history records when each ruling moved to Resolved.)*
 
 
 ---

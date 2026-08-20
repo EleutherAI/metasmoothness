@@ -299,7 +299,7 @@ add(BASE17, run_id="plan_adam_eps1e17_16k_bs512", batch_size=512, grad_accum_ste
 for mdl, prm in [("gpt2-medium", 355), ("gpt2-large", 774)]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_{mdl}", model=mdl, n_params_m=prm,
         notes="Model-size axis. MAGIC is one reverse pass per query and scales with params. "
-              + ("gpt2-medium is the registered scaling target (D11, 2026-08-20)."
+              + ("gpt2-medium is the registered scaling target (D11)."
                  if mdl == "gpt2-medium" else
                  "Deferred: runs only if gpt2-medium proves informative (D11)."))
 add(BASE17, run_id="plan_adam_eps1e17_16k_ckptavg4", ckpt_avg_k=4,
@@ -308,7 +308,7 @@ add(BASE17, run_id="plan_adam_eps1e17_16k_ckptavg4", ckpt_avg_k=4,
           "first (re-train the anchor base with checkpoints kept — the originals were "
           "deleted; the deterministic trainer reproduces it bit-exactly at seed 42). "
           "Eval-side: exempt from lr gating.")
-# preact_batchnorm dropped (D14, 2026-08-20) — see DECISIONS.md.
+# preact_batchnorm dropped (D14) — see DECISIONS.md.
 for mod in ["qk_norm", "preact_layernorm"]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_{mod}", arch_mod=mod, model="gpt2_custom",
         notes="Needs the GPT-2-like custom model. Compare ONLY against "

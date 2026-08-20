@@ -120,7 +120,7 @@ for opt in ["adamw", "muon"]:
 for mdl in ["gpt2-medium", "gpt2-large"]:
     sweep(f"tune_adamw_16k_{mdl}", selects_lr_for=f"plan_adam_eps1e17_16k_{mdl}",
           lrs=[5e-5, 1e-4, 2e-4], status="blocked", priority=2, model=mdl,
-          notes=("D11: gpt2-medium is the registered scaling target (2026-08-20); BLOCKED "
+          notes=("D11: gpt2-medium is the registered scaling target; BLOCKED "
                  "until the cost plan is signed off. Center one octave down (larger models "
                  "prefer lower lr). Adjust grad_accum to fit; record it."
                  if mdl == "gpt2-medium" else
@@ -131,8 +131,8 @@ for mdl in ["gpt2-medium", "gpt2-large"]:
 
 # ---------------------------------------------------------------------------------
 # 5. Logit scale (adam, 16k) — landscape-changing, so it gets a sweep. Blocked on the
-#    bergson logit-scale hook (ruling 2026-08-20) — the tuning runs themselves need the
-#    hook, not just the banks.
+#    bergson logit-scale hook — the tuning runs themselves need the hook, not just
+#    the banks.
 # ---------------------------------------------------------------------------------
 for s in [0.5, 0.25]:
     sweep(f"tune_adamw_16k_scale{s}", selects_lr_for=f"plan_adam_eps1e17_16k_scale{s}",
@@ -152,8 +152,8 @@ sweep("tune_adamw_16k_clip1.0", selects_lr_for="plan_adam_eps1e17_16k_clip1.0", 
 # ---------------------------------------------------------------------------------
 # 7. Architecture mods — blocked on the gpt2_custom implementation. The no-mod
 #    custom control needs its own sweep too (it is not stock gpt2).
-#    preact_batchnorm dropped (D14, 2026-08-20): eval-mode training makes BN
-#    stats stale and batch coupling makes per-doc gradients ill-defined.
+#    preact_batchnorm dropped (D14): eval-mode training makes BN stats stale and
+#    batch coupling makes per-doc gradients ill-defined.
 # ---------------------------------------------------------------------------------
 for mod in ["none", "qk_norm", "preact_layernorm"]:
     tag = "arch_control" if mod == "none" else mod

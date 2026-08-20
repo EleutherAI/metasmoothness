@@ -51,7 +51,7 @@ cleanup. Conventions it encodes:
   sweep winner's, for expensive configs (64k, larger models): the winning run doubles as the
   experiment's base training (see Reuse rules in EXPERIMENTS_CSV.md). Losing runs always
   clean up fully.
-- EK-FAC scoring uses the canonical configuration ruled in D7 (2026-08-20): the bergson
+- EK-FAC scoring uses the canonical configuration ruled in D7: the bergson
   default, `inversion="damped_inverse"`, `damping_factor=0.1`. No other EK-FAC settings are
   admissible for `ekfac_lds` cells.
 
