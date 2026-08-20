@@ -37,7 +37,7 @@ tune_adamw_64k_lr0.0001,tune_adamw_64k,empty,1,plan_adam_eps1e17_64k_bs256,,,gpt
 tune_adamw_64k_lr0.0002,tune_adamw_64k,empty,1,plan_adam_eps1e17_64k_bs256,,,gpt2,none,adamw,64000,256,16,2,500,0.25,1.0,0.01,,1e-17,42,0.0002,,,,
 tune_adamw_64k_lr0.0004,tune_adamw_64k,empty,1,plan_adam_eps1e17_64k_bs256,,,gpt2,none,adamw,64000,256,16,2,500,0.25,1.0,0.01,,1e-17,42,0.0004,,,,
 tune_adamw_8k_lr0.0001,tune_adamw_8k,empty,1,plan_adam_eps1e17_8k_bs256,,,gpt2,none,adamw,8000,256,16,2,63,0.25,1.0,0.01,,1e-17,42,0.0001,,,,"Short run (63 steps or fewer): 2 seeds per point, select on the mean."
-tune_adamw_8k_lr0.0002,tune_adamw_8k,empty,1,plan_adam_eps1e17_8k_bs256,,,gpt2,none,adamw,8000,256,16,2,63,0.25,1.0,0.01,,1e-17,42,0.0002,,,,"Short run (63 steps or fewer): 2 seeds per point, select on the mean."
+tune_adamw_8k_lr0.0002,tune_adamw_8k,empty,1,plan_adam_eps1e17_8k_bs256,lotus-0,2026-08-20,gpt2,none,adamw,8000,256,16,2,63,0.25,1.0,0.01,,1e-17,42,0.0002,,,,"Short run (63 steps or fewer): 2 seeds per point, select on the mean."
 tune_adamw_8k_lr0.0004,tune_adamw_8k,empty,1,plan_adam_eps1e17_8k_bs256,,,gpt2,none,adamw,8000,256,16,2,63,0.25,1.0,0.01,,1e-17,42,0.0004,,,,"Short run (63 steps or fewer): 2 seeds per point, select on the mean."
 tune_muon_16k_bs128_lr5e-05,tune_muon_16k_bs128,empty,1,plan_muon_eps1e17_16k_bs128,,,gpt2,none,muon,16000,128,8,2,250,0.25,1.0,0.01,,1e-17,42,5e-05,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
 tune_muon_16k_bs128_lr0.0001,tune_muon_16k_bs128,empty,1,plan_muon_eps1e17_16k_bs128,,,gpt2,none,muon,16000,128,8,2,250,0.25,1.0,0.01,,1e-17,42,0.0001,,,,Center 0.0001 from the sqrt-batch rule (DECISIONS: sweep centers).
