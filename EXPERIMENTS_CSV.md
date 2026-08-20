@@ -11,7 +11,7 @@ python build_experiments_csv.py   # -> experiments.csv (stage 1: the grid itself
 
 **Staging:** `tuning.csv` registers the held-out lr mini-sweeps that must be measured before a
 planned experiment's lr is final — one row per (config, lr), grouped by `sweep_group`, with the
-`gates` column naming the experiments.csv row(s) each group unblocks. The 16k anchor sweeps are
+`selects_lr_for` column naming the experiments.csv row(s) that take their learning rate from the winner. The 16k anchor sweeps are
 already measured (2e-4 for both optimizers); everything else is empty rows to claim. Lowest
 heldout_loss in a group wins; an endpoint win adds one octave before freezing. Only the
 eval-side ckptavg rows are exempt from gating (CONTROLS protocol rule 3).
@@ -127,7 +127,7 @@ control set, with the evidence behind each value, is in [`CONTROLS.md`](CONTROLS
 **Datasets (2026-08-20):** `train_{4..256}k` are one verified nested chain (the old 64k+ family
 was a different draw and was rebuilt via `scripts/rebuild_scaling_family.py`; pre-rebuild
 versions kept at `*.hf.old_disjoint`). `heldout_4k` and `query_50/20` are verified disjoint from
-every rung including 256k. Canonical copies on the Hub: `EleutherAI/bergson-smollm2-scaling`
+every train set including 256k. Canonical copies on the Hub: `EleutherAI/bergson-smollm2-scaling`
 (pushed by `scripts/push_scaling_datasets.py`, which re-verifies both invariants before upload). After filling a cell, edit the row in
 `build_experiments_csv.py`, re-run it, and commit script + CSV together.
 

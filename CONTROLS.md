@@ -33,9 +33,8 @@ LDS is measured for both optimizers (adamw 0.9333 [0.9186, 0.9448], muon 0.8470
 | model-selection set | `heldout_4k.hf` (4000 docs), fixed | verified disjoint from every train set (the 256k conflict is resolved by excluding heldout docs from the rebuilt 256k) — **never select lr or report generalisation on train loss** |
 | epochs | 2, fixed across N | matches the LLM post-training norm, which is the target setting: DeepSeek-V3 SFT = 2 epochs, Tulu 3 SFT = 2 epochs (8B and 70B), OLMo 2 SFT (Tulu 3 recipe) = 2 epochs, OLMo 3 = 2 epochs. Token axis = vary N at fixed epochs; steps then scale 31 -> 2000. (Tulu 3 also uses a warmup *ratio* — 0.3 — supporting the fraction convention.) |
 
-Caveat to carry: at bs256/2ep, N=4k is only 31 steps (8 warmup). The 4k rung stays on the axis
-but short-run effects are confounded with small-N there; 8k (62 steps) is the smallest rung to
-lean on.
+Caveat to carry: at bs256/2ep, N=4k is only 31 steps (8 warmup). The 4k point stays on the axis
+but short-run effects are confounded with small-N there; 8k (62 steps) is the smallest dataset size to lean on.
 
 ## Optimizer
 

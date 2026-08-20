@@ -279,19 +279,19 @@ for bs in [16, 32, 64, 128]:
 for n in [4000, 8000, 32000, 64000]:
     add(BASE17, run_id=f"plan_adam_eps1e17_{n//1000}k_bs256", n_docs=n,
         notes="N axis (nested chain, EleutherAI/bergson-smollm2-scaling). 16k measured "
-              "(MAGIC 0.9333). lr gated on tuning.csv sweep_group "
+              "(MAGIC 0.9333). lr comes from tuning.csv sweep_group "
               f"tune_adamw_{n//1000}k.")
 for n in [4000, 8000, 32000, 64000]:
     add(BASE17, run_id=f"plan_muon_eps1e17_{n//1000}k_bs256", n_docs=n, optimizer="muon",
-        notes="N axis, muon. 16k measured (MAGIC 0.8470). lr gated on tuning.csv "
+        notes="N axis, muon. 16k measured (MAGIC 0.8470). lr comes from tuning.csv "
               f"sweep_group tune_muon_{n//1000}k.")
 # D1 (2026-08-20): "warm start" = attribution window, a pre-training experiment —
 # removed from the fine-tuning grid. See EXPERIMENTS_CSV.md "Planned pre-training experiments".
 add(BASE17, run_id="plan_adam_eps1e17_16k_ep4", num_epochs=4,
     notes="D2: double epochs (250 steps, batch unchanged) — isolates step count. "
-          "lr gated on tuning.csv sweep_group tune_adamw_16k_ep4.")
+          "lr comes from tuning.csv sweep_group tune_adamw_16k_ep4.")
 add(BASE17, run_id="plan_adam_eps1e17_16k_bs512", batch_size=512, grad_accum_steps=32,
-    notes="D2: uncontrolled double batch (63 steps). lr gated on tune_adamw_16k_bs512.")
+    notes="D2: uncontrolled double batch (63 steps). lr comes from tune_adamw_16k_bs512.")
 for mdl, prm in [("gpt2-medium", 355), ("gpt2-large", 774)]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_{mdl}", model=mdl, n_params_m=prm,
         notes="Model-size axis. MAGIC is one reverse pass per query and scales with params.")

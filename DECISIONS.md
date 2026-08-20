@@ -33,10 +33,10 @@ axis these separate step-count effects from batch-size effects.
 ### D3. Token axis runs 4k to 64k
 
 128k and 256k experiment rows and tuning groups are removed. The estimator (100 subsets, fixed
-query set) is never thinned at any rung. The 128k/256k splits stay on the Hub — the nested
-chain loses nothing by not using its top rungs.
+query set) is never thinned at any dataset size. The 128k/256k splits stay on the Hub — the nested
+chain loses nothing by not using the 128k and 256k sizes.
 
-### D4. Keep every rung, including 4k
+### D4. Keep every dataset size, including 4k
 
 No data points are removed. 4k (31 steps at bs256) stays on the axis; it is cheap. Its known
 limitation — short-run effects are confounded with small-N — is recorded in CONTROLS and
@@ -202,12 +202,12 @@ still catches meaningful mistuning, and the finest spacing the metric can suppor
    noise), select the anchor value 2e-4 (or the group's center) rather than the numerical
    winner. This keeps lr constant along an axis unless the data clearly demands a change, so
    most comparisons stay one-factor.
-4. **Seeds:** one run per point, except at the 4k rung (31 training steps), where run-to-run
+4. **Seeds:** one run per point, except at the 4k dataset size (31 training steps), where run-to-run
    noise is plausibly larger than the differences being measured: use two seeds per point
    there and select on the mean. If any group's three points are not lowest-in-the-middle or
    monotone, rerun the odd point with a second seed before acting on it.
 5. Record every run in `tuning.csv` (train_loss, heldout_loss, run_dir); when the group is
-   complete, write the winning lr into the experiment rows named in its `gates` column.
+   complete, write the winning lr into the experiment rows named in its `selects_lr_for` column.
 
 ## Sweep centers
 
@@ -230,7 +230,7 @@ one extra run per group — the prior only has to be roughly right to pay for it
 
 ## Cost
 
-Priority-1 groups still to run (dataset size: 2 optimizers x 4 rungs; batch size: 2
+Priority-1 groups still to run (dataset size: 2 optimizers x 4 sizes; batch size: 2
 optimizers x 4 values; ep4; bs512): 18 groups, 54 runs, almost all under 10 minutes; the 64k
-rungs cost about an hour each. The whole grid costs less than one retrain bank, and it
+runs cost about an hour each. The whole grid costs less than one retrain bank, and it
 protects roughly 40 of them.

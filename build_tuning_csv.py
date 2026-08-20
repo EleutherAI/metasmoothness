@@ -7,9 +7,9 @@ claim them: train the config, run `scripts/heldout_eval.py`, fill `train_loss` /
 `heldout_loss`, edit the row here, regenerate, commit.
 
 Selection rule (per sweep_group): lowest heldout_loss wins; if an endpoint of the 3-point
-grid wins, ADD one more row an octave further out and re-check before freezing. When a
+grid wins, ADD one more row one 2x step further out and re-check before freezing. When a
 group is complete, write the winning lr into the matching experiments.csv row(s) — the
-`gates` column names them.
+`selects_lr_for` column names them.
 
 These are train-only runs: no banks, no subsets, no MAGIC. Cost is ~steps x bs; at bs256
 that is 31 steps (4k) to 500 steps (64k).
@@ -22,7 +22,7 @@ import csv
 import os
 
 COLUMNS = [
-    "run_id", "sweep_group", "status", "priority", "gates",
+    "run_id", "sweep_group", "status", "priority", "selects_lr_for",
     "node_in_charge", "node_checkin_date",
     "model", "arch_mod", "optimizer", "n_docs", "batch_size", "grad_accum_steps",
     "num_epochs", "steps", "warmup", "logit_scale", "weight_decay", "max_grad_norm",
@@ -41,11 +41,11 @@ MINI = [1e-4, 2e-4, 4e-4]  # {0.5x, 1x, 2x} of the anchor optimum
 rows = []
 
 
-def sweep(group, gates, lrs=MINI, status="empty", priority=2, **cfg):
+def sweep(group, selects_lr_for, lrs=MINI, status="empty", priority=2, **cfg):
     for lr in lrs:
         r = dict(BASE)
         r.update(cfg)
-        r.update(run_id=f"{group}_lr{lr:g}", sweep_group=group, gates=gates,
+        r.update(run_id=f"{group}_lr{lr:g}", sweep_group=group, selects_lr_for=selects_lr_for,
                  status=status, priority=priority, lr=lr)
         if not r.get("steps"):
             r["steps"] = round(int(r["n_docs"]) * int(r["num_epochs"]) / int(r["batch_size"]))
@@ -65,7 +65,7 @@ ANCHOR = {("adamw", 1e-4): (None, 3.2592), ("adamw", 2e-4): (None, 3.2572),
 for (opt, lr), (tl, hl) in ANCHOR.items():
     r = dict(BASE)
     r.update(run_id=f"tune_{opt}_16k_anchor_lr{lr:g}", sweep_group=f"tune_{opt}_16k_anchor",
-             gates=f"sm_{opt}_eps1e17_16k_bs256", status="measured", priority=1,
+             selects_lr_for=f"sm_{opt}_eps1e17_16k_bs256", status="measured", priority=1,
              optimizer=opt, grad_accum_steps=4, lr=lr, train_loss=tl or "",
              heldout_loss=hl, steps=125,
              run_dir=f"/mnt/ssd-2/lucia/s16k_lrsweep/s16k_{opt}_lr{lr:g}",
@@ -74,13 +74,13 @@ for (opt, lr), (tl, hl) in ANCHOR.items():
     rows.append(r)
 
 # ---------------------------------------------------------------------------------
-# 1. Token axis (both optimizers). 16k is the measured anchor; every other rung
+# 1. Token axis (both optimizers). 16k is the measured anchor; every other dataset size
 #    needs its own mini-sweep. ga follows the micro-batch-16 rule at bs256.
 # ---------------------------------------------------------------------------------
 for opt in ["adamw", "muon"]:
     for n in [4000, 8000, 32000, 64000]:
         k = f"{n // 1000}k"
-        sweep(f"tune_{opt}_{k}", gates=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_{k}_bs256",
+        sweep(f"tune_{opt}_{k}", selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_{k}_bs256",
               priority=1, optimizer=opt, n_docs=n,
               notes="4k is 31 steps at bs256/2ep — expect noisy selection; see CONTROLS caveat."
                     if n == 4000 else "")
@@ -94,18 +94,18 @@ for opt in ["adamw", "muon"]:
     for bs in [16, 32, 64, 128]:
         c = CENTER[bs]
         sweep(f"tune_{opt}_16k_bs{bs}",
-              gates=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_16k_bs{bs}",
+              selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_16k_bs{bs}",
               lrs=[c / 2, c, c * 2], priority=1, optimizer=opt,
               batch_size=bs, grad_accum_steps=max(1, bs // 16),
               notes=f"Center {c:g} from the sqrt-batch rule (DECISIONS: sweep centers).")
 # D2 arms
-sweep("tune_adamw_16k_ep4", gates="plan_adam_eps1e17_16k_ep4", priority=1, num_epochs=4,
+sweep("tune_adamw_16k_ep4", selects_lr_for="plan_adam_eps1e17_16k_ep4", priority=1, num_epochs=4,
       notes="D2 double-epochs arm (250 steps).")
-sweep("tune_adamw_16k_bs512", gates="plan_adam_eps1e17_16k_bs512", priority=1,
+sweep("tune_adamw_16k_bs512", selects_lr_for="plan_adam_eps1e17_16k_bs512", priority=1,
       batch_size=512, grad_accum_steps=32, notes="D2 uncontrolled double-batch arm (63 steps).")
 # D12 eps_root eval-loss control (not an lr sweep: single point per optimizer)
 for opt in ["adamw", "muon"]:
-    sweep(f"tune_{opt}_16k_eps0_control", gates=f"sm_{opt}_eps1e17_16k_bs256",
+    sweep(f"tune_{opt}_16k_eps0_control", selects_lr_for=f"sm_{opt}_eps1e17_16k_bs256",
           lrs=[2e-4], priority=2, optimizer=opt, eps_root=0,
           notes="D12: eval-loss check that eps_root 1e-17 vs 0 is a null. Train-only twin "
                 "of the anchor; compare heldout_loss against the measured anchor rows.")
@@ -115,7 +115,7 @@ for opt in ["adamw", "muon"]:
 #    ga actually used; ga is heldout-neutral.
 # ---------------------------------------------------------------------------------
 for mdl in ["gpt2-medium", "gpt2-large"]:
-    sweep(f"tune_adamw_16k_{mdl}", gates=f"plan_adam_eps1e17_16k_{mdl}",
+    sweep(f"tune_adamw_16k_{mdl}", selects_lr_for=f"plan_adam_eps1e17_16k_{mdl}",
           lrs=[5e-5, 1e-4, 2e-4], status="blocked", priority=2, model=mdl,
           notes="D11: BLOCKED until the scaling plan is signed off. Center one octave down "
                 "(larger models prefer lower lr). Adjust grad_accum to fit; record it.")
@@ -127,7 +127,7 @@ for mdl in ["gpt2-medium", "gpt2-large"]:
 # 5. Logit scale (adam, 16k) — landscape-changing, so it gets a sweep.
 # ---------------------------------------------------------------------------------
 for s in [0.5, 0.25]:
-    sweep(f"tune_adamw_16k_scale{s}", gates=f"plan_adam_eps1e17_16k_scale{s}",
+    sweep(f"tune_adamw_16k_scale{s}", selects_lr_for=f"plan_adam_eps1e17_16k_scale{s}",
           priority=2, logit_scale=s)
 
 # ---------------------------------------------------------------------------------
@@ -135,9 +135,9 @@ for s in [0.5, 0.25]:
 #    priority 3 — but registered so the claim "tuned" holds everywhere.
 # ---------------------------------------------------------------------------------
 for wd in [0.0, 0.1]:
-    sweep(f"tune_adamw_16k_wd{wd}", gates=f"plan_adam_eps1e17_16k_wd{wd}", priority=3,
+    sweep(f"tune_adamw_16k_wd{wd}", selects_lr_for=f"plan_adam_eps1e17_16k_wd{wd}", priority=3,
           weight_decay=wd)
-sweep("tune_adamw_16k_clip1.0", gates="plan_adam_eps1e17_16k_clip1.0", priority=3,
+sweep("tune_adamw_16k_clip1.0", selects_lr_for="plan_adam_eps1e17_16k_clip1.0", priority=3,
       max_grad_norm=1.0)
 
 # ---------------------------------------------------------------------------------
@@ -146,7 +146,7 @@ sweep("tune_adamw_16k_clip1.0", gates="plan_adam_eps1e17_16k_clip1.0", priority=
 # ---------------------------------------------------------------------------------
 for mod in ["none", "qk_norm", "preact_layernorm", "preact_batchnorm"]:
     tag = "arch_control" if mod == "none" else mod
-    sweep(f"tune_adamw_16k_{tag}", gates=f"plan_adam_eps1e17_16k_{tag}",
+    sweep(f"tune_adamw_16k_{tag}", selects_lr_for=f"plan_adam_eps1e17_16k_{tag}",
           status="blocked", priority=3, model="gpt2_custom", arch_mod=mod,
           notes="Blocked: gpt2_custom model does not exist yet.")
 
