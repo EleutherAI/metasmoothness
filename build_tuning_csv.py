@@ -114,6 +114,9 @@ for opt in ["adamw", "muon"]:
 # D2 arms
 sweep("tune_adamw_16k_ep4", selects_lr_for="plan_adam_eps1e17_16k_ep4", priority=1, num_epochs=4,
       notes="D2 double-epochs arm (250 steps).")
+sweep("tune_adamw_16k_ep4", selects_lr_for="plan_adam_eps1e17_16k_ep4", lrs=[5e-5],
+      priority=1, num_epochs=4,
+      notes="Endpoint extension: 1e-4 won the 3-point grid (3.2503 vs 3.2645 at 2e-4).")
 sweep("tune_adamw_16k_bs512", selects_lr_for="plan_adam_eps1e17_16k_bs512", priority=1,
       batch_size=512, grad_accum_steps=32,
       notes="D2: uncontrolled double-batch arm (63 steps).")
@@ -178,6 +181,25 @@ for mod in ["none", "qk_norm", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_16k_ep4_lr0.0002": dict(
+        status="measured", heldout_loss=3.2645,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_ep4_lr0.0002_s42"),
+    "tune_adamw_16k_ep4_lr0.0004": dict(
+        status="measured", heldout_loss=3.3145,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_ep4_lr0.0004_s42",
+        notes="1e-4 is an endpoint winner (gap 0.0142 - double epochs clearly prefers "
+              "lower lr); 5e-5 extension registered."),
+    "tune_adamw_16k_wd0.0_lr0.0001": dict(
+        status="measured", heldout_loss=3.2592,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_wd0.0_lr0.0001_s42"),
+    "tune_adamw_16k_wd0.0_lr0.0002": dict(
+        status="measured", heldout_loss=3.2572,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_wd0.0_lr0.0002_s42",
+        notes="Group complete: interior optimum at the anchor lr 2e-4 — wd is lr-neutral "
+              "as predicted; selected for plan_adam_eps1e17_16k_wd0.0."),
+    "tune_adamw_16k_wd0.0_lr0.0004": dict(
+        status="measured", heldout_loss=3.2670,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_wd0.0_lr0.0004_s42"),
     "tune_muon_16k_bs128_lr0.0002": dict(
         status="measured", heldout_loss=3.2526,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs128_lr0.0002_s42",
