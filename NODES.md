@@ -36,6 +36,22 @@ takeover in the commit message. Before stealing, check for the previous node's p
 artifacts (the row's `run_dir`) — per-query MAGIC scores and subset-sliced banks resume
 cheaply, so prefer resuming to restarting.
 
+## Running a tuning row
+
+`scripts/gen_tuning_run.py <run_id>` writes the full training config (every control filled;
+the row supplies what varies) and prints the three commands: train, held-out eval, checkpoint
+cleanup. Conventions it encodes:
+
+- Run outputs live under `/mnt/ssd-2/lucia/paper_runs/tuning/<run_id>_s<seed>/`.
+- `PYTHONPATH` must point at the bergson checkout — the `bergson` console script does not put
+  the repo on `sys.path`.
+- Use the bergson main branch and record the commit in the row's `code_commit`-adjacent notes;
+  do not run from someone's work-in-progress branch (the shared checkout's branch changes).
+- Tuning runs delete their checkpoints after the held-out number is recorded; the
+  keep-checkpoints control in CONTROLS.md applies to experiment runs only.
+- EK-FAC scoring is on hold until the canonical configuration is settled (DECISIONS.md, D7);
+  metasmoothness and MAGIC work is not affected.
+
 ## Finishing a row
 
 Fill the result columns by editing the row in the builder script, regenerate the CSV, clear
