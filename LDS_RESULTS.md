@@ -624,3 +624,20 @@ above.** Kept here only for the record.
 **eps / batch-size sweep banks** (`chunk_length=512`): `gpt2_wikitext_eps{1e-8,2e-8,5e-8,5e-9,7e-9}`, `gpt2_wikitext_bs{448_eps1e-7,448_eps1e-8,448_eps1e-9,448_eps5e-9,480_eps1e-8,512_eps1e-8}`, `gpt2_wikitext_A40s`, `gpt2_wikitext_paper_bs32`, `gpt2_wikitext_metasmoothness_eps1e-4`, `batch_probe`. LDS for these are in `runs/eps_search/RESULTS.md`.
 
 Old/exploratory (not chunk-verified): `examples/exp_log.md` (Jun 30, token-length sweeps).
+
+## EK-FAC at the eps1e-17 anchor (current-code scoring)
+
+First EK-FAC scoring under the D7 canonical configuration (library default
+`damped_inverse`, damping 0.1, kfac + ev_correction, `query_20.hf`), run on bergson
+`10874f93` against the 100-model bank at `/mnt/ssd-2/lucia/s16k_adamw/merged`
+(scores: `/mnt/ssd-2/lucia/s16k_adamw/ekfac_scores`; estimator:
+`metasmoothness/scripts/ekfac_lds.py`, loss-signed convention validated by exactly
+reproducing the per-epoch `adam_eps0_16k` value 0.1186):
+
+| config | ekfac_lds | 95% CI | n_subsets | n_queries | MAGIC on same bank |
+|---|---|---|---|---|---|
+| adamw eps1e-17 16k bs256 | 0.4251 | [0.3772, 0.4693] | 100 | 20 | 0.9333 |
+
+The highest EK-FAC LDS on any admitted bank (per-epoch grid max: 0.31). Sign note:
+raw bergson scores are gradient-signed; the recorded convention negates them.
+muon twin in progress.
