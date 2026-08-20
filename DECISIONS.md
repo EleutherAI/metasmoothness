@@ -181,9 +181,34 @@ removed. Two unfixable conflicts with the control set:
 
 The architecture axis keeps `qk_norm` and `preact_layernorm` (both per-sample operations).
 
+### D15. Reproducibility tuple includes the environment (measured); D9 consequence open
+
+**Finding (gate series, lotus-0):** bergson training is bit-deterministic within an
+environment — two fresh runs of the s16k anchor bank config (its own commit `410aee93`,
+ga 8, nproc 4, seed 42, magic step) agree on 160/160 tensors — but NO available
+combination of commit/config/step reproduces the stored bank bases (best attempt: 12/160
+tensors, ~7e-3 divergence). Elimination order: current-code+nproc4, bank-commit+nproc4
+(world size alone gives 7.7e-3 on the 4k bank), bank-commit+ga8+train-step, and the bank's
+own magic config verbatim — all diverge identically. Conclusion: the torch/CUDA
+environment changed since the banks were built, and it is part of the bit-exactness tuple:
+**(code commit, config, seed, world size, environment)**. Every new run records the
+environment (torch/CUDA versions) alongside `code_commit`.
+
+**Consequences:** the "retrains reproduce deterministically" annotations on historical
+banks hold only in their original environments. MAGIC fill rollouts and the D9 anchor
+retrain cannot be bit-faithful to the stored trajectories/bases from today's environment.
+
+**Open (needs Lucia):** D9's replication path. Options: (a) rebuild the anchor bank fresh
+in the current environment (base + 100 retrains, ~10 4-GPU-hours, ~55 GB — also refreshes
+the anchor MAGIC number on one consistent environment; the fresh base + trajectory already
+exist at `/mnt/ssd-2/lucia/paper_runs/d9_magic_base`); or (b) accept a mixed-provenance
+comparison (fresh trajectory's ckptavg gradients scored against the old bank), which
+breaks the base==bank-base invariant and is not recommended. The 10 `fill_*_magic`
+rollouts inherit the same choice.
+
 ## Open
 
-*(none — git history records when each ruling moved to Resolved.)*
+*(D15's D9 consequence, above, is the only open item.)*
 
 
 ---
