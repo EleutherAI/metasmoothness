@@ -178,6 +178,27 @@ for mod in ["none", "qk_norm", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_muon_64k_lr5e-05": dict(
+        status="measured", heldout_loss=3.2373,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_64k_lr5e-05_s42",
+        notes="Extension point. Group complete: interior optimum at 1e-4 (3.2323, margin "
+              "0.005) — selected for plan_muon_eps1e17_64k_bs256. Both optimizers' N axes "
+              "are now fully tuned: 4k and 64k sit below/off the anchor lr, 8k-32k on it."),
+    "tune_adamw_16k_bs64_lr5e-05": dict(
+        status="measured", heldout_loss=3.2489,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_bs64_lr5e-05_s42"),
+    "tune_adamw_16k_bs64_lr0.0001": dict(
+        status="measured", heldout_loss=3.2479,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_bs64_lr0.0001_s42"),
+    "tune_adamw_16k_bs128_lr5e-05": dict(
+        status="measured", heldout_loss=3.2547,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_bs128_lr5e-05_s42"),
+    "tune_muon_16k_bs64_lr5e-05": dict(
+        status="measured", heldout_loss=3.2486,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs64_lr5e-05_s42"),
+    "tune_muon_16k_bs64_lr0.0001": dict(
+        status="measured", heldout_loss=3.2464,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs64_lr0.0001_s42"),
     "tune_muon_16k_bs32_lr0.0001": dict(
         status="measured", heldout_loss=3.2495,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs32_lr0.0001_s42",
