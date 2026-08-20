@@ -226,6 +226,9 @@ RESULTS = {
     "tune_muon_32k_lr0.0001": dict(
         status="measured", heldout_loss=3.2408,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_32k_lr0.0001_s42"),
+    "tune_muon_32k_lr0.0002": dict(
+        status="measured", heldout_loss=3.2372,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_32k_lr0.0002_s42"),
     "tune_muon_8k_lr0.0001": dict(
         status="measured", heldout_loss=3.2974,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_8k_lr0.0001_s42"),
