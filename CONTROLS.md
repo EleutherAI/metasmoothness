@@ -108,7 +108,8 @@ protocol, not an afterthought:
 | queries | `query_20.hf`, per-query MAGIC (`query_method: none`) | one reverse pass per query (budget 20x); `mean` cannot produce per-query LDS |
 | LDS | mean per-query Spearman; 10k-resample bootstrap; optimizer contrasts paired over queries | the established pipeline |
 | metasmoothness | `fd_step 0.1`, `direction_seed 0`; confirm any cell that is surprising or < 0.9 at `direction_seed 1`; always record `total_movement_l1` | ms < ~0.02 carries no information (sign-statistic noise) |
-| MAGIC code | record `code_commit`; all values post-`c0f11ba8` | the replay fix moved MAGIC 0.37 -> 0.17 on one config |
+| MAGIC code | **one pinned bergson commit for the whole grid** (record the pin here when the first grid run starts; every row records `code_commit`) | MAGIC values are code-version sensitive: a replay fix moved one config 0.37 -> 0.17, and the working tree's branch has changed three times during this project (feat/magic-grad-accum, docs-4, modula). Comparisons are valid only within one pin. If bergson must be upgraded mid-grid, re-run one already-measured reference row on the new code and require agreement within the 0.02 run-to-run bound before mixing |
+| eval batch size | eval/validate `batch_size` is set independently of the training batch; keep it at 32 or less | per-document query-loss evaluation materialises fp32 logits of batch x 512 x vocab: ~26 GB at batch 256 (measured OOM on 47.5 GB A40s), ~52 GB at batch 512. Training batch is the science; eval batch is only a memory knob |
 
 ## Per-axis deviation table
 

@@ -193,7 +193,9 @@ still catches meaningful mistuning, and the finest spacing the metric can suppor
 ## The procedure
 
 1. For each tuning group, train three runs at {0.5x, 1x, 2x} of that group's center (centers
-   below). No banks, no attribution — training plus one held-out evaluation each.
+   below). No banks, no attribution — training plus one held-out evaluation each. The sweep
+   scales the whole schedule, not just the peak: `lr_end` is defined as `lr / 10`, so it moves
+   with `lr`. This keeps each sweep a one-parameter family.
 2. If the lowest held-out loss lands on an endpoint of the three, add one more run one step of
    2x further in that direction, and re-check. Stop after two extensions: an optimum more than
    4x from the center means something unexpected changed, and that needs investigation, not
