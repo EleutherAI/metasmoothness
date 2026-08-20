@@ -178,6 +178,12 @@ for mod in ["none", "qk_norm", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_muon_16k_bs16_lr0.0001": dict(
+        status="measured", heldout_loss=3.2573,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_16k_bs16_lr0.0001_s42",
+        notes="Group complete: 2.5e-5 endpoint leads 5e-5 by 0.0002, under the 0.002 tie "
+              "threshold, so the tie rule selects the center 5e-5 and no extension fires "
+              "- selected for plan_muon_eps1e17_16k_bs16."),
     "tune_muon_64k_lr0.0004": dict(
         status="measured", heldout_loss=3.2804,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_64k_lr0.0004_s42",
