@@ -105,27 +105,38 @@ count is more expensive than enlarging the bank.
 - **Interpretation:** values are **relative only** — a larger loss change means one
   attribution method is more efficacious than another. No absolute meaning is claimed for
   now.
-- Open implementation detail carried forward: whether the comparison includes a matched
-  random-1% control retrain (recommended, one per config), to anchor the relative scale.
+- **Control (resolved):** every config includes a matched **random-1% removal control
+  retrain** by default. Report the targeted-removal loss change next to the random-removal
+  loss change; the gap between them is the estimator's signal.
 
-### D13. Run-to-run variation: use existing evidence; no dedicated repeat runs
+### D13. Run-to-run variation: quantified from existing data; no dedicated repeat runs
 
-**Ruling basis:** seed randomness looks small in practice. The repo's existing data supports
-this, and in this setup a stronger statement is available: with dropout off and the init
-fixed (pretrained GPT-2), the training seed changes **only the data order** — and we have
-direct measurements of what data-order changes do.
+**The question this answers:** when the paper reports that two configs differ by some amount
+of LDS, how much of that could be luck — the same experiment redone giving a different
+number? Bootstrap CIs do not answer this: they capture estimator noise (resampling the
+subsets/queries we have), not what happens if the training run, the bank, or the scoring is
+redone.
 
-| evidence | perturbation | effect on the metric |
-|---|---|---|
-| rep -> per-epoch replication, 11 configs | entire data-order scheme changed | every EK-FAC LDS within its CI; largest shift +0.02; metasmoothness within ~0.01 |
-| replicate bank pair (bs64, eps1e-8) | identical training, second bank + scoring run | EK-FAC 0.3095 vs 0.3048 (gap 0.005) |
-| anchor split-half (computed from existing eval CSVs) | first 50 vs last 50 subsets | adamw 0.9294 vs 0.9336 (gap 0.004); muon 0.8451 vs 0.8429 (gap 0.002) |
-| held-out loss seed repeats | seed only | sd ~0.001 nats |
+**Why no new runs are needed.** In this setup the training seed has exactly one job: it sets
+the per-epoch data order. Dropout is off and the initialization is the fixed pretrained
+GPT-2, so two seeds differ only in the order examples are visited. We already measured
+something strictly stronger than a seed change — switching the entire data-order scheme
+("rep": one fixed order repeated every epoch, the old implementation) to independent
+per-epoch reshuffling — across 11 configurations (LDS_RESULTS.md, "Per-epoch shuffle"
+section). Every measured repeat source:
 
-**Revised proposal (adopted):** no dedicated repeat runs. Quote 0.02 as the conservative
-run-to-run bound (the 11-config order-change maximum, which upper-bounds seed effects here)
-and ~0.005 as the typical bank/scoring repeat gap, alongside the bootstrap CIs. Revisit only
-if an axis effect the paper wants to claim falls under 0.02.
+| evidence | what was redone | observed change | source |
+|---|---|---|---|
+| order-scheme switch, 11 configs | the full data order | EK-FAC LDS max shift 0.02, all within CI; metasmoothness within ~0.01 | LDS_RESULTS.md per-epoch table |
+| replicate bank pair | second bank build + scoring, identical training | EK-FAC 0.3095 vs 0.3048 (0.005) | rows sm_adam_eps1e8_4k / _rep2 |
+| anchor split-half | LDS from subsets 0-49 vs 50-99 | adamw 0.9294 vs 0.9336 (0.004); muon 0.8451 vs 0.8429 (0.002) | /mnt/ssd-2/lucia/s16k_{opt}/eval_q20/validation.csv |
+| held-out loss, repeated seeds | training seed | sd ~0.001 nats | measured 2026-08-06 |
+
+**Ruling (adopted):** run no dedicated repeat experiments. When writing the paper, treat
+**0.02 LDS** as the conservative run-to-run error bar (the worst case observed under a
+perturbation larger than any seed change) and **~0.005** as the typical repeat gap. Any
+effect the paper claims must clear 0.02; an effect below that is reported as "within
+run-to-run variation". Revisit only if a key axis effect lands under 0.02.
 
 ## Open
 
