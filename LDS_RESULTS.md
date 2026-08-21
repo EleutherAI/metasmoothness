@@ -696,3 +696,17 @@ the fresh retrain (`/mnt/ssd-2/lucia/paper_runs/d9_magic_base/retrained/base`; s
 Delta 0.0004 — an order of magnitude below bank-construction noise (0.005). **Snapshot
 methods may mix fresh models with stored ground truth.** This does NOT license
 MAGIC-path mixing (score depends on the whole trajectory; separate test required).
+
+## Clean-env campaign banks (pinned paper env, tuned lrs)
+
+First definitive rows: banks built end-to-end in the pinned environment
+(ENVIRONMENT.md) at the tuned learning rates, per-query MAGIC + 100-subset
+ground truth, estimator per CONTROLS.
+
+| config | lr | magic_lds | 95% CI | n_sub | n_q | node/GPU | code |
+|---|---|---|---|---|---|---|---|
+| adamw 4k bs256 | 1e-4 | 0.9295 | [0.9195, 0.9381] | 100 | 20 | lotus-0 A100, nproc 2 | 3c66bb51 |
+
+Note: 0.9295 at 4k/bs256 sits within noise of the anchor's 0.9333 at 16k -
+MAGIC's fidelity at bs256 extends to the smallest dataset size when the lr is
+properly tuned (the tuned 1e-4, not the anchor's 2e-4).

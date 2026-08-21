@@ -323,6 +323,19 @@ for bs in [16, 32, 64, 128]:
     add(BASE17, run_id=f"plan_muon_eps1e17_16k_bs{bs}", optimizer="muon", batch_size=bs,
         grad_accum_steps=max(1, bs // 16),
         notes="D5: muon twin of the batch-size axis. bs256 measured (MAGIC 0.8470).")
+# Measured results for completed clean-env banks (env = the pinned paper env,
+# ENVIRONMENT.md; identity recorded per row in notes).
+BANK_RESULTS = {
+    "plan_adam_eps1e17_4k_bs256": dict(
+        status="partial", magic_lds=0.9295, magic_ci_lo=0.9195, magic_ci_hi=0.9381,
+        magic_n_queries=20, code_commit="3c66bb51", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_4k_bs256",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_4k_bs256",
+        notes="First clean-env bank of the campaign: pinned paper env, tuned lr 1e-4, "
+              "nproc 2, A100-SXM4-80GB, lotus-0. 101 models, 20/20 queries. "
+              "ms + EK-FAC pending (scoring-only)."),
+}
+
 # Tuned lr per completed sweep group (procedure step 5); 2e-4 until the group completes.
 TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e-4,
             "plan_muon_eps1e17_4k_bs256": 4e-4, "plan_muon_eps1e17_8k_bs256": 2e-4, "plan_adam_eps1e17_32k_bs256": 2e-4, "plan_muon_eps1e17_32k_bs256": 2e-4, "plan_adam_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs64": 1e-4, "plan_adam_eps1e17_16k_bs64": 1e-4, "plan_adam_eps1e17_16k_bs128": 1e-4, "plan_muon_eps1e17_16k_bs128": 1e-4, "plan_adam_eps1e17_16k_ep4": 1e-4,
@@ -407,6 +420,9 @@ for r in rows:
 for r in rows:
     if r["run_id"] in TUNED_LR:
         r["lr"] = TUNED_LR[r["run_id"]]
+
+for r in rows:
+    r.update(BANK_RESULTS.get(r["run_id"], {}))
 
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tuning.csv")) as _f:
     _trows = list(csv.DictReader(_f))
