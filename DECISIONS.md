@@ -82,9 +82,17 @@ requirement structural: modifications attach as forward hooks on stock modules, 
 `arch_mod="none"` has the stock state dict and produces bit-identical logits under real
 gpt2-124M weights (tested). Variants select at load time:
 `from_pretrained(..., arch_mod="qk_norm"|"preact_layernorm", trust_remote_code=True)`.
+No bergson changes are needed to run the variants: the existing `model_kwargs`
+plumbing coerces types, so a row runs with `model: EleutherAI/gpt2-custom` and
+`model_kwargs: "arch_mod=qk_norm,trust_remote_code=True,resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0"`
+(verified: Hub load with override works; parser produces a real bool).
+
 Remaining gate before the arch rows unblock: the dynamic check — one fine-tune of
-`arch_mod="none"` in the pinned env confirming held-out loss matches stock — then the
-`tune_adamw_16k_{arch_control,qk_norm,preact_layernorm}` groups open.
+`arch_mod="none"` in the pinned env confirming held-out loss matches stock. Note the
+check may be satisfiable by construction: `arch_mod="none"` has the stock state dict
+and bit-identical logits at 124M, so its fine-tune IS the stock fine-tune function;
+Lucia may waive the literal run on that argument or keep it as a pipeline test. Then
+the `tune_adamw_16k_{arch_control,qk_norm,preact_layernorm}` groups open.
 
 ### D11. Model scaling: gpt2-medium is the registered target
 
