@@ -751,5 +751,5 @@ most: muon-4k scores 0.90 smooth while both attribution methods sit at 0.30.
 Within-pair ordering is correct here (adamw smoother AND more attributable) but
 inverted at the anchor - so ms ordering is inconsistent across N and its
 magnitude is not a proxy for attributability. movement_l1 healthy on both
-probes (7577 / 19678); muon cell's direction_seed=1 confirmation in flight per
-CONTROLS.
+probes (7577 / 19678); muon cell confirmed at direction_seed=1: 0.9302 (movement 20068) -
+the high-smoothness-at-collapse reading is direction-robust.

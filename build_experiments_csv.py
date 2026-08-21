@@ -347,7 +347,7 @@ BANK_RESULTS = {
               "Paired vs adamw 4k: adamw-muon = +0.6275 [+0.5033, +0.7517], 20/20 query "
               "wins - the optimizer gap is ~7x the anchor's +0.086 at this N. EK-FAC "
               "0.3031 is statistically identical to MAGIC 0.3020 on this bank - at "
-              "muon-4k the methods agree. ms 0.9037 (movement_l1 19678; seed-1 confirmation per CONTROLS in flight) - smoothness HIGH where attribution collapsed. ALL THREE METRICS, all clean-env."),
+              "muon-4k the methods agree. ms 0.9037 (movement_l1 19678; seed-1 confirmed: 0.9302, movement 20068) - smoothness HIGH where attribution collapsed. ALL THREE METRICS, all clean-env."),
 }
 
 # Tuned lr per completed sweep group (procedure step 5); 2e-4 until the group completes.
