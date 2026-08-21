@@ -189,10 +189,14 @@ ga 8, nproc 4, seed 42, magic step) agree on 160/160 tensors — but NO availabl
 combination of commit/config/step reproduces the stored bank bases (best attempt: 12/160
 tensors, ~7e-3 divergence). Elimination order: current-code+nproc4, bank-commit+nproc4
 (world size alone gives 7.7e-3 on the 4k bank), bank-commit+ga8+train-step, and the bank's
-own magic config verbatim — all diverge identically. Conclusion: the torch/CUDA
-environment changed since the banks were built, and it is part of the bit-exactness tuple:
-**(code commit, config, seed, world size, environment)**. Every new run records the
-environment (torch/CUDA versions) alongside `code_commit`.
+own magic config verbatim — all diverge identically. Also eliminated: the datasets (raw
+files unmodified since 2026-07-16, before the banks) and a torch upgrade on lotus-0
+(installed 2026-07-08, before the banks). **The remaining cause is unidentified** — a
+different build node/GPU model, python environment, or driver-level change are the
+candidates, and the stored runs recorded no hardware or library identity, so existing
+records cannot distinguish them. What is established operationally: reproducing a stored
+run bit-exactly requires more than (code commit, config, seed, world size), and whatever
+the extra factor is, lotus-0 today does not have it.
 
 **Consequences:** the "retrains reproduce deterministically" annotations on historical
 banks hold only in their original environments. MAGIC fill rollouts and the D9 anchor
