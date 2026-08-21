@@ -720,3 +720,21 @@ lr): **+0.6275 [+0.5033, +0.7517], 20/20 query wins** - roughly 7x the anchor's
 Per-query muon Spearmans vary widely (0.05-0.71), so the collapse is uneven
 across queries. Both arms tuned (CONTROLS rule 5); the muon arm's higher tuned
 lr (4e-4) is part of what "muon at its optimum" means, not a confound.
+
+**The method-by-optimizer-by-N picture after the first clean pair** (anchors are
+old-stack, marked *; 4k rows are clean-env):
+
+| config | MAGIC LDS | EK-FAC LDS | MAGIC advantage |
+|---|---|---|---|
+| adamw 16k* | 0.9333 | 0.4251 | +0.51 |
+| muon 16k* | 0.8470 | 0.4285 | +0.42 |
+| adamw 4k | 0.9295 | 0.3975 | +0.53 |
+| muon 4k | 0.3020 | 0.3031 | +0.00 |
+
+EK-FAC is nearly flat across all four cells (0.30-0.43); MAGIC's advantage over
+it is large everywhere except muon-4k, where the two methods agree to three
+decimals. Reading: at muon-4k the trajectory information MAGIC uses adds
+nothing - the model's attributability ceiling itself collapses to snapshot
+level. The muon-4k metasmoothness probe (pending) tests whether smoothness
+predicts this collapse; at the anchor it pointed the wrong way (muon smoother
+yet less attributable).

@@ -328,7 +328,8 @@ for bs in [16, 32, 64, 128]:
 BANK_RESULTS = {
     "plan_adam_eps1e17_4k_bs256": dict(
         status="partial", magic_lds=0.9295, magic_ci_lo=0.9195, magic_ci_hi=0.9381,
-        magic_n_queries=20, code_commit="3c66bb51", reusable="bank+scores",
+        magic_n_queries=20, ekfac_lds=0.3975, ekfac_ci_lo=0.3521, ekfac_ci_hi=0.4391,
+        ekfac_n_subsets=100, code_commit="3c66bb51", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_4k_bs256",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_4k_bs256",
         notes="First clean-env bank of the campaign: pinned paper env, tuned lr 1e-4, "
