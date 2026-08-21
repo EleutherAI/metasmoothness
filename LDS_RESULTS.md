@@ -738,3 +738,18 @@ nothing - the model's attributability ceiling itself collapses to snapshot
 level. The muon-4k metasmoothness probe (pending) tests whether smoothness
 predicts this collapse; at the anchor it pointed the wrong way (muon smoother
 yet less attributable).
+
+**The clean-env 4k pair is complete - all three metrics on both arms:**
+
+| config | ms | magic_lds | ekfac_lds |
+|---|---|---|---|
+| adamw 4k (lr 1e-4) | 0.9946 | 0.9295 | 0.3975 |
+| muon 4k (lr 4e-4) | 0.9037 | 0.3020 | 0.3031 |
+
+Metasmoothness magnitude decouples from attribution where attribution degrades
+most: muon-4k scores 0.90 smooth while both attribution methods sit at 0.30.
+Within-pair ordering is correct here (adamw smoother AND more attributable) but
+inverted at the anchor - so ms ordering is inconsistent across N and its
+magnitude is not a proxy for attributability. movement_l1 healthy on both
+probes (7577 / 19678); muon cell's direction_seed=1 confirmation in flight per
+CONTROLS.
