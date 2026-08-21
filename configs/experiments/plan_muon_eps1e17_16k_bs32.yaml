@@ -12,7 +12,7 @@ steps:
     cleanup_ckpts: false
     distributed:
       nnode: 1
-      nproc_per_node: 2
+      nproc_per_node: 4
     data:
       dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_16k.hf
       split: train
