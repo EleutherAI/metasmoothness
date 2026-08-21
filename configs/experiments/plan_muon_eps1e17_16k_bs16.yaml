@@ -1,0 +1,46 @@
+run_path: /mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs16
+steps:
+- magic:
+    run_path: /mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs16
+    overwrite: false
+    resume: true
+    model: gpt2
+    model_kwargs: resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0
+    precision: fp32
+    use_tf32_matmuls: false
+    seed: 42
+    cleanup_ckpts: false
+    distributed:
+      nnode: 1
+      nproc_per_node: 2
+    data:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_16k.hf
+      split: train
+      chunk_length: 0
+    query:
+      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/query_20.hf
+      split: train
+      chunk_length: 0
+    batch_size: 16
+    grad_accum_steps: 1
+    num_epochs: 2
+    lr_schedule:
+      lr: 0.0002
+      lr_scheduler_type: polynomial
+      lr_start: 1.0e-06
+      lr_end: 2.0e-05
+      warmup_steps: 0.25
+    optimizer: muon
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    adam_eps: 1.0e-08
+    eps_root: 1.0e-17
+    weight_decay: 0.01
+    loss_reduction: mean
+    train_mode: false
+    num_subsets: 100
+    subset_fraction: 0.01
+    query_method: none
+    save_models: true
+    save_optimizer_state: none
+    save_mode: log
