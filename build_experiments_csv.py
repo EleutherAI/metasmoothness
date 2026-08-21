@@ -327,14 +327,15 @@ for bs in [16, 32, 64, 128]:
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
     "plan_adam_eps1e17_4k_bs256": dict(
-        status="partial", magic_lds=0.9295, magic_ci_lo=0.9195, magic_ci_hi=0.9381,
+        status="done", metasmoothness=0.9946, ms_direction_seed=0, ms_fd_step=0.1,
+        magic_lds=0.9295, magic_ci_lo=0.9195, magic_ci_hi=0.9381,
         magic_n_queries=20, ekfac_lds=0.3975, ekfac_ci_lo=0.3521, ekfac_ci_hi=0.4391,
         ekfac_n_subsets=100, code_commit="3c66bb51", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_4k_bs256",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_4k_bs256",
         notes="First clean-env bank of the campaign: pinned paper env, tuned lr 1e-4, "
               "nproc 2, A100-SXM4-80GB, lotus-0. 101 models, 20/20 queries. "
-              "ms + EK-FAC pending (scoring-only)."),
+              "ms 0.9946 (movement_l1 7577). ALL THREE METRICS MEASURED, all clean-env."),
     "plan_muon_eps1e17_4k_bs256": dict(
         status="partial", magic_lds=0.3020, magic_ci_lo=0.2537, magic_ci_hi=0.3487,
         magic_n_queries=20, ekfac_lds=0.3031, ekfac_ci_lo=0.2545, ekfac_ci_hi=0.3468,
