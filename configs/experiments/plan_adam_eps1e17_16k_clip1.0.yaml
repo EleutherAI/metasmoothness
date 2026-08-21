@@ -39,6 +39,7 @@ steps:
     max_grad_norm: 1.0
     loss_reduction: mean
     train_mode: false
+    skip_validation: false
     num_subsets: 100
     subset_fraction: 0.01
     query_method: none
