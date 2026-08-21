@@ -104,8 +104,10 @@ def main() -> None:
 
     print(f"wrote {cfg_path} (lr={lr:g}, nproc={args.nproc} — record nproc in the row notes)")
     print(f"mirrored to {mirror} — commit it with the claim")
-    print("\n# Run from OUTSIDE any bergson checkout (cwd shadows PYTHONPATH otherwise):")
-    print(f"cd /tmp && PYTHONPATH={BERGSON} python -P -m bergson {cfg_path}")
+    print("\n# Canonical invocation (pinned env; -s -P + NOUSERSITE close the shadowing traps):")
+    print(f"cd /tmp && CUDA_VISIBLE_DEVICES=<gpus> MASTER_PORT=<unique> PYTHONNOUSERSITE=1 \\\n"
+          f"  PYTHONPATH=/mnt/ssd-1/lucia/bergson-main-paper \\\n"
+          f"  /mnt/ssd-2/lucia/envs/paper/bin/python -s -P -m bergson {cfg_path}")
     print("\n# The magic step trains the base (checkpoints kept), builds the retrain")
     print("# bank, and runs per-query MAGIC + validation. Resumable at every stage.")
 

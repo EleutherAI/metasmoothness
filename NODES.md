@@ -88,9 +88,16 @@ measured — the row's `lr` column is the tuned value). Claim exactly as for tun
 then `scripts/gen_experiment_run.py <run_id>` writes the full bank+MAGIC config and prints
 the commands. Rules specific to experiment rows:
 
-- **Never run with a bergson checkout as your working directory** — python puts cwd first
-  on sys.path, silently shadowing PYTHONPATH with whatever branch that checkout is on. Use
-  `cd /tmp && PYTHONPATH=<bergson> python -P -m bergson <config>` as the generator prints.
+- **Use the canonical invocation exactly** — three silent-shadowing traps are closed by it
+  (cwd on sys.path, user site-packages over the env, port collisions between concurrent
+  runs; see messages/2026-08-21-env-standardisation.md):
+
+      cd /tmp && CUDA_VISIBLE_DEVICES=<gpus> MASTER_PORT=<unique-per-run> \
+        PYTHONNOUSERSITE=1 PYTHONPATH=/mnt/ssd-1/lucia/bergson-main-paper \
+        /mnt/ssd-2/lucia/envs/paper/bin/python -s -P -m bergson <config>
+
+  Verify the env before first use: `build_env.sh` (in paper_runs/_orchestration) ends
+  with a leak check asserting every core module resolves inside the env prefix.
 - **Record the world size (nproc) in the row notes.** Bit-exact reuse of the bank later
   (MAGIC re-rolls, D9-style retrains) requires the same nproc — measured, not assumed:
   identical env/code/config/seed at nproc 2 vs 4 diverge (max 1.15e-5 after 125 steps;
