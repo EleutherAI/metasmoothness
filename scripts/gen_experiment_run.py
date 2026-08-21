@@ -78,6 +78,10 @@ def main() -> None:
         **({"max_grad_norm": float(row["max_grad_norm"])} if row["max_grad_norm"] else {}),
         "loss_reduction": "mean",
         "train_mode": False,
+        # MagicConfig defaults skip_validation=True: without this override the
+        # run scores MAGIC and exits WITHOUT building the retrain bank - caught
+        # after the first completed bank had no ground truth.
+        "skip_validation": False,
         "num_subsets": int(row["n_subsets"]),
         "subset_fraction": float(row["subset_fraction"]),
         "query_method": "none",
