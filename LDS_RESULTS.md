@@ -536,7 +536,11 @@ after a crash, then per-query MAGIC (query_method none) over test[1:51]; all on 
 `37d7b386` (0.10.1 — the code the scores/bank were built on, not current main). Sweep
 code/results: `experiments/batchsize_eps1e8/`.
 
-**grad_accum note:** `grad_accum_steps>1` rescales the MAGIC metagradient (ga2 ~= 0.68x ga1,
+**grad_accum note (applies to bergson `37d7b386` / 0.10.1 ONLY — on later code the
+rescale does not exist: the grad_accum module reproduces the full-batch gradient exactly
+and `test_magic_grad_accum_weight_grads_match` + `test_accumulate_grads_matches_full_batch`
+pass 6/6, verified at `8ce0cd76`; see CONTROLS.md micro-batch row):**
+`grad_accum_steps>1` rescales the MAGIC metagradient (ga2 ~= 0.68x ga1,
 Spearman rank corr ga1-vs-ga2 = 0.9995, top-50 movers identical) but preserves rank, so the
 per-query Spearman LDS is unchanged — this is what lets the high-batch metagradient fit few GPUs
 (hold per-GPU micro-batch ~16 = ~50 GB via ga, vary global batch as the science). Raw MAGIC score
