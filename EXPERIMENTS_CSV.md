@@ -182,6 +182,13 @@ save models only — no optimizer state — so continuation from them diverges f
 
 ## Optional future data (run if time permits)
 
+- **Shampoo influence functions.** Score the paper's admitted banks with
+  Shampoo-preconditioned influence. Scoring-only under reuse rule 1 (banks are
+  scorer-independent), and D8 already makes every paper run save what it needs
+  (`save_optimizer_state: last`). The rep-era Shampoo banks were deleted to free disk —
+  their numbers live in SHAMPOO_RESULTS.md, and any paper Shampoo result comes from the
+  planned per-epoch banks in this grid, never the rep-era ones.
+
 - **Learning-rate optimum vs batch size.** The tuning sweeps center the batch-size groups
   with a square-root rule (`2e-4 * sqrt(bs/256)`, rounded to a 2x step). The completed sweeps
   will show whether the optimum actually follows that rule; extending each batch-size group by
