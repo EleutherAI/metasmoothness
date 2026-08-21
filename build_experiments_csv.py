@@ -334,6 +334,15 @@ BANK_RESULTS = {
         notes="First clean-env bank of the campaign: pinned paper env, tuned lr 1e-4, "
               "nproc 2, A100-SXM4-80GB, lotus-0. 101 models, 20/20 queries. "
               "ms + EK-FAC pending (scoring-only)."),
+    "plan_muon_eps1e17_4k_bs256": dict(
+        status="partial", magic_lds=0.3020, magic_ci_lo=0.2537, magic_ci_hi=0.3487,
+        magic_n_queries=20, code_commit="3c66bb51", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_4k_bs256",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_4k_bs256",
+        notes="Clean-env bank: pinned paper env, tuned lr 4e-4, nproc 2, A100, lotus-0. "
+              "Paired vs adamw 4k: adamw-muon = +0.6275 [+0.5033, +0.7517], 20/20 query "
+              "wins - the optimizer gap is ~7x the anchor's +0.086 at this N. "
+              "ms + EK-FAC pending (scoring-only)."),
 }
 
 # Tuned lr per completed sweep group (procedure step 5); 2e-4 until the group completes.

@@ -710,3 +710,13 @@ ground truth, estimator per CONTROLS.
 Note: 0.9295 at 4k/bs256 sits within noise of the anchor's 0.9333 at 16k -
 MAGIC's fidelity at bs256 extends to the smallest dataset size when the lr is
 properly tuned (the tuned 1e-4, not the anchor's 2e-4).
+
+| muon 4k bs256 | 4e-4 | 0.3020 | [0.2537, 0.3487] | 100 | 20 | lotus-0 A100, nproc 2 | 3c66bb51 |
+
+**Headline of the campaign so far:** the optimizer effect on MAGIC fidelity is
+strongly dataset-size-dependent. Paired adamw-muon at 4k (each arm at its tuned
+lr): **+0.6275 [+0.5033, +0.7517], 20/20 query wins** - roughly 7x the anchor's
++0.0863 at 16k. adamw holds near ceiling (0.9295) while muon collapses to 0.30.
+Per-query muon Spearmans vary widely (0.05-0.71), so the collapse is uneven
+across queries. Both arms tuned (CONTROLS rule 5); the muon arm's higher tuned
+lr (4e-4) is part of what "muon at its optimum" means, not a confound.
