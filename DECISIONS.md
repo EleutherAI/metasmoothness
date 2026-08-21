@@ -60,10 +60,12 @@ Definition: average the **query gradient** over the **last 4 checkpoints** of th
 the default; the k=8 row is removed). **Both scorers get the averaged gradient**: MAGIC
 seeds its reverse pass with it, and EK-FAC preconditions it. First step is
 replicating Louis's effect on the existing anchor config before adding grid rows. Note: the
-anchor's base-training checkpoints were deleted, so the replication first re-trains the
-anchor base with checkpoints kept — the deterministic bergson trainer reproduces the base
-model bit-exactly at the fixed seed (that is the point of the trainer), so the existing
-anchor bank remains valid for the ckptavg comparison (~125 steps).
+anchor's base-training checkpoints were deleted; a fresh deterministic re-train exists
+(with checkpoints) at /mnt/ssd-2/lucia/paper_runs/d9_magic_base, but per D15 it does NOT
+bit-reproduce the stored bank base (~0.7% weight gap, cause unidentified), so whether the
+existing anchor bank remains valid for the ckptavg comparison is exactly the D15 open
+question — resolved empirically by the snapshot-gradient transplant test and, if needed,
+a fresh bank.
 
 ### D10. Custom GPT-2: finalize, upload, use the OLMo QK-norm
 
