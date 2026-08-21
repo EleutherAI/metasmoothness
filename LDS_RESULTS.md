@@ -676,3 +676,23 @@ configs:
 **Inversion to carry into the analysis:** metasmoothness ranks muon above adamw
 (+0.0035) while MAGIC ranks adamw above muon (+0.086). At the anchor, higher
 metasmoothness does not imply higher MAGIC LDS between optimizers.
+
+## Environment-drift impact on snapshot-gradient scoring (transplant test)
+
+Question: the D15 divergence leaves fresh retrains ~0.7% (max-rel 6.8e-3) away from
+stored bank bases — does that gap change measured attribution quality for methods that
+score with gradients at a model snapshot (EK-FAC, checkpoint averaging)?
+
+Measurement: identical EK-FAC pipeline (D7 canonical, query_20, code 10874f93) against
+the same s16k_adamw 100-subset ground truth, gradients computed at the stored base vs at
+the fresh retrain (`/mnt/ssd-2/lucia/paper_runs/d9_magic_base/retrained/base`; scores at
+`/mnt/ssd-2/lucia/paper_runs/envdrift_ekfac/scores`):
+
+| gradients computed at | ekfac_lds | 95% CI |
+|---|---|---|
+| stored bank base | 0.4251 | [0.3772, 0.4693] |
+| fresh retrain (0.7% away) | 0.4247 | [0.3770, 0.4689] |
+
+Delta 0.0004 — an order of magnitude below bank-construction noise (0.005). **Snapshot
+methods may mix fresh models with stored ground truth.** This does NOT license
+MAGIC-path mixing (score depends on the whole trajectory; separate test required).
