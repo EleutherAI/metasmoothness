@@ -325,7 +325,11 @@ for bs in [16, 32, 64, 128]:
         notes="D5: muon twin of the batch-size axis. bs256 measured (MAGIC 0.8470).")
 # Tuned lr per completed sweep group (procedure step 5); 2e-4 until the group completes.
 TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e-4,
-            "plan_muon_eps1e17_4k_bs256": 4e-4, "plan_muon_eps1e17_8k_bs256": 2e-4, "plan_adam_eps1e17_32k_bs256": 2e-4, "plan_muon_eps1e17_32k_bs256": 2e-4, "plan_adam_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs64": 1e-4, "plan_adam_eps1e17_16k_bs64": 1e-4, "plan_adam_eps1e17_16k_bs128": 1e-4, "plan_muon_eps1e17_16k_bs128": 1e-4, "plan_adam_eps1e17_16k_ep4": 1e-4}
+            "plan_muon_eps1e17_4k_bs256": 4e-4, "plan_muon_eps1e17_8k_bs256": 2e-4, "plan_adam_eps1e17_32k_bs256": 2e-4, "plan_muon_eps1e17_32k_bs256": 2e-4, "plan_adam_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs64": 1e-4, "plan_adam_eps1e17_16k_bs64": 1e-4, "plan_adam_eps1e17_16k_bs128": 1e-4, "plan_muon_eps1e17_16k_bs128": 1e-4, "plan_adam_eps1e17_16k_ep4": 1e-4,
+            # Selections that landed on the anchor value - recorded explicitly so
+            # "completed sweep => entry here" holds without exception.
+            "plan_adam_eps1e17_16k_bs512": 2e-4, "plan_adam_eps1e17_16k_wd0.0": 2e-4,
+            "plan_adam_eps1e17_16k_wd0.1": 2e-4, "plan_adam_eps1e17_16k_clip1.0": 2e-4}
 for n in [4000, 8000, 32000, 64000]:
     rid = f"plan_adam_eps1e17_{n//1000}k_bs256"
     add(BASE17, run_id=rid, n_docs=n, lr=TUNED_LR.get(rid, 2e-4),
@@ -394,6 +398,34 @@ HELDOUT_FROM_TUNING = {
 for r in rows:
     if r["run_id"] in HELDOUT_FROM_TUNING and not r.get("heldout_loss"):
         r["heldout_loss"] = HELDOUT_FROM_TUNING[r["run_id"]]
+
+# TUNED_LR is applied here, to EVERY row, in one place. It was previously consumed
+# only by the N-axis loops, which shipped 9 batch-size/ep4 rows at the 2e-4 default
+# instead of their tuned 5e-5/1e-4 values - caught by bellflower-0 after 9 banks
+# launched on the wrong lr. The check below makes a missed consumption fail the
+# build: every completed tuning group's winner must match its experiment row.
+for r in rows:
+    if r["run_id"] in TUNED_LR:
+        r["lr"] = TUNED_LR[r["run_id"]]
+
+with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tuning.csv")) as _f:
+    _trows = list(csv.DictReader(_f))
+_winners: dict[str, float] = {}
+for _t in _trows:
+    _g = [x for x in _trows if x["sweep_group"] == _t["sweep_group"]]
+    if _g and all(x["status"] == "measured" and x["heldout_loss"] for x in _g):
+        _best = min(_g, key=lambda x: float(x["heldout_loss"]))
+        for _target in _best["selects_lr_for"].split(";"):
+            _winners.setdefault(_target.strip(), float(_best["lr"]))
+# The selected value can differ from the raw min (tie rule), so TUNED_LR is the
+# authority on the value; this check enforces that a completed sweep's selection
+# was RECORDED - the failure mode that shipped the wrong-lr rows was a completed
+# group whose selection never reached the row.
+for r in rows:
+    if r["run_id"] in _winners and r["run_id"].startswith("plan_"):
+        assert r["run_id"] in TUNED_LR, (
+            f"{r['run_id']}: tuning group complete but its selection is not recorded "
+            f"in TUNED_LR - the wrong-lr failure mode; record the selection")
 
 
 def _preserve_claims(out_path, rows):
