@@ -83,6 +83,12 @@ def main() -> None:
         "query_method": "none",
         "save_models": True,
         "save_optimizer_state": "last",
+        # log-spaced checkpoints (the MAGIC paper's mode): replay-compatible,
+        # denser near the end (what ckptavg wants), and keeps long-step banks
+        # (bs16/bs32: 2000/1000 steps) at ~15-20 checkpoints instead of the
+        # sqrt mode's 30-45 — the difference between 12 banks fitting on
+        # ssd-2 and not.
+        "save_mode": "log",
     }}]}
 
     os.makedirs(run_path, exist_ok=True)
