@@ -189,16 +189,22 @@ The architecture axis keeps `qk_norm` and `preact_layernorm` (both per-sample op
 environment — two fresh runs of the s16k anchor bank config (its own commit `410aee93`,
 ga 8, nproc 4, seed 42, magic step) agree on 160/160 tensors — but NO available
 combination of commit/config/step reproduces the stored bank bases (best attempt: 12/160
-tensors, ~7e-3 divergence). Elimination order: current-code+nproc4, bank-commit+nproc4
-(world size alone gives 7.7e-3 on the 4k bank), bank-commit+ga8+train-step, and the bank's
-own magic config verbatim — all diverge identically. Also eliminated: the datasets (raw
-files unmodified since 2026-07-16, before the banks) and a torch upgrade on lotus-0
-(installed 2026-07-08, before the banks). **The remaining cause is unidentified** — a
-different build node/GPU model, python environment, or driver-level change are the
-candidates, and the stored runs recorded no hardware or library identity, so existing
-records cannot distinguish them. What is established operationally: reproducing a stored
-run bit-exactly requires more than (code commit, config, seed, world size), and whatever
-the extra factor is, lotus-0 today does not have it.
+tensors, ~7e-3 divergence). The first round of elimination gates was VOID — python's cwd-first sys.path silently
+loaded the live checkout instead of the PYTHONPATH-pinned commit in every run launched
+from inside a bergson repo (protocol fix: run from /tmp with `python -P`; see NODES.md).
+The verified rerun (imports asserted inside the run): the s16k bank at its true build
+commit (410aee93), config, seed, and world size (nproc 4) STILL fails to reproduce the
+stored base (12/160 tensors equal, same signature). Also eliminated: the datasets (raw
+files unmodified since 2026-07-16), a local torch upgrade (installed 2026-07-08, before
+the banks), and the transformers version (5.13 vs 5.1 train bit-identically at equal
+nproc). **The cause is an unrecorded environment component.** The pip history bounds the
+candidates — since the 08-03 build: nvidia-nccl 2.26.2->2.28.9, datasets 4.5->5.0, numpy
+2.2.6->2.4.6, triton 3.3.1->3.6.0 — and NCCL cannot be tested by downgrade (today's torch
+binary hard-requires 2.28 symbols, which also proves pip records did not describe the
+08-03 runtime). Operationally: reproducing a stored run bit-exactly requires more than
+(code commit, config, seed, world size), and lotus-0 today does not have the missing
+factor. Snapshot-gradient scoring is measured immune to the resulting ~0.7% model gap
+(transplant test, LDS_RESULTS); MAGIC-path mixing remains untested.
 
 **Consequences:** the "retrains reproduce deterministically" annotations on historical
 banks hold only in their original environments. MAGIC fill rollouts and the D9 anchor
