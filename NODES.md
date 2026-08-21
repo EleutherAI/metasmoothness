@@ -71,6 +71,11 @@ cleanup. Conventions it encodes:
 
 ## The pinned environment
 
+**See [`ENVIRONMENT.md`](ENVIRONMENT.md) for how to build, adopt, verify and
+invoke the pinned environment.** It is the standing reference; the notes in
+`messages/` only announce changes to it. A node that has not passed its leak
+check has not adopted the environment.
+
 Paper runs execute inside the shared pinned venv so every node has identical
 torch/CUDA/NCCL/datasets/numpy/triton builds — D15 measured that an unrecorded
 environment difference breaks bit-reproducibility even when code, config, seed, and
