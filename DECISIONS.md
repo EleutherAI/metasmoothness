@@ -73,7 +73,17 @@ The custom GPT-2 implementation gets finalized and uploaded to the EleutherAI Hu
 org. Where multiple QK-norm variants exist, use the OLMo implementation. Before any modified
 variant runs, fine-tune the *unmodified* custom implementation once and confirm its held-out
 loss matches stock GPT-2 — this separates "effect of the modification" from "effect of
-reimplementing GPT-2". The arch rows stay blocked until the model is uploaded.
+reimplementing GPT-2".
+
+**Status:** implemented (bergson branch `feat/gpt2-custom`; PR pending) and uploaded as
+`EleutherAI/gpt2-custom` (private, remote code). The implementation makes the equivalence
+requirement structural: modifications attach as forward hooks on stock modules, so
+`arch_mod="none"` has the stock state dict and produces bit-identical logits under real
+gpt2-124M weights (tested). Variants select at load time:
+`from_pretrained(..., arch_mod="qk_norm"|"preact_layernorm", trust_remote_code=True)`.
+Remaining gate before the arch rows unblock: the dynamic check — one fine-tune of
+`arch_mod="none"` in the pinned env confirming held-out loss matches stock — then the
+`tune_adamw_16k_{arch_control,qk_norm,preact_layernorm}` groups open.
 
 ### D11. Model scaling: gpt2-medium is the registered target
 
