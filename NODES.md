@@ -80,7 +80,9 @@ the commands. Rules specific to experiment rows:
   on sys.path, silently shadowing PYTHONPATH with whatever branch that checkout is on. Use
   `cd /tmp && PYTHONPATH=<bergson> python -P -m bergson <config>` as the generator prints.
 - **Record the world size (nproc) in the row notes.** Bit-exact reuse of the bank later
-  (MAGIC re-rolls, D9-style retrains) requires the same nproc.
+  (MAGIC re-rolls, D9-style retrains) requires the same nproc — measured, not assumed:
+  identical env/code/config/seed at nproc 2 vs 4 diverge (max 1.15e-5 after 125 steps;
+  only constant buffers match).
 - **Disk first:** each run writes ~28 GB of checkpoints plus the retrain bank (~0.5 GB per
   model). Check `df` on the output volume before claiming; do not start a bank you cannot
   finish.

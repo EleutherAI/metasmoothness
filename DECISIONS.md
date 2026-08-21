@@ -201,8 +201,11 @@ nproc). **The cause is an unrecorded environment component.** The pip history bo
 candidates — since the 08-03 build: nvidia-nccl 2.26.2->2.28.9, datasets 4.5->5.0, numpy
 2.2.6->2.4.6, triton 3.3.1->3.6.0 — and NCCL cannot be tested by downgrade (today's torch
 binary hard-requires 2.28 symbols, which also proves pip records did not describe the
-08-03 runtime). Operationally: reproducing a stored run bit-exactly requires more than
-(code commit, config, seed, world size), and lotus-0 today does not have the missing
+08-03 runtime). World size is separately verified as part of run
+identity by a clean same-environment test: nproc 2 vs 4 with everything else identical
+diverge (max 1.15e-5 after 125 steps). Operationally: reproducing a stored run
+bit-exactly requires (code commit, config, seed, world size) AND an environment
+component the stored runs did not record; lotus-0 today does not have the missing
 factor. Snapshot-gradient scoring is measured immune to the resulting ~0.7% model gap
 (transplant test, LDS_RESULTS); MAGIC-path mixing remains untested.
 
