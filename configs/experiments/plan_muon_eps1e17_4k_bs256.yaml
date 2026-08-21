@@ -42,5 +42,5 @@ steps:
     subset_fraction: 0.01
     query_method: none
     save_models: true
-    save_optimizer_state: last
+    save_optimizer_state: none
     save_mode: log

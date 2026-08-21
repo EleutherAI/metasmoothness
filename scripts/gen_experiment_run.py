@@ -82,7 +82,9 @@ def main() -> None:
         "subset_fraction": float(row["subset_fraction"]),
         "query_method": "none",
         "save_models": True,
-        "save_optimizer_state": "last",
+        # AdamW only: persists the final second moments for TrackStar-Adam /
+        # SOURCE-Adam (D8). The saver raises on muon state, so muon rows skip it.
+        "save_optimizer_state": "last" if row["optimizer"] == "adamw" else "none",
         # log-spaced checkpoints (the MAGIC paper's mode): replay-compatible,
         # denser near the end (what ckptavg wants), and keeps long-step banks
         # (bs16/bs32: 2000/1000 steps) at ~15-20 checkpoints instead of the
