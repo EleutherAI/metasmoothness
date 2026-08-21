@@ -75,7 +75,8 @@ variant runs, fine-tune the *unmodified* custom implementation once and confirm 
 loss matches stock GPT-2 — this separates "effect of the modification" from "effect of
 reimplementing GPT-2".
 
-**Status:** implemented (bergson branch `feat/gpt2-custom`; PR pending) and uploaded as
+**Status:** implemented (`gpt2_custom/` in this repo — paper-specific code, kept out of
+the bergson library per Lucia) and uploaded as
 `EleutherAI/gpt2-custom` (private, remote code). The implementation makes the equivalence
 requirement structural: modifications attach as forward hooks on stock modules, so
 `arch_mod="none"` has the stock state dict and produces bit-identical logits under real
