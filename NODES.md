@@ -75,11 +75,11 @@ Paper runs execute inside the shared pinned venv so every node has identical
 torch/CUDA/NCCL/datasets/numpy/triton builds — D15 measured that an unrecorded
 environment difference breaks bit-reproducibility even when code, config, seed, and
 world size all match. The venv definition lives in this repo once published (see
-`messages/`); until a node has adopted it, any run it produces is **provisional**:
-kept and usable, replaced with a pinned-venv rerun when capacity allows. Every run
-records its environment (torch, NCCL, datasets, numpy, transformers versions) with
-its claim; runs made outside the pinned venv are marked provisional in their row
-notes when results are recorded.
+`messages/`); runs outside the pinned venv are **not run at all** (ruling: the earlier
+keep-but-replace provisional category created validity confusion and is retired —
+in-flight pre-venv builds were cancelled and their artifacts deleted, their rows
+unclaimed). If the venv is not ready, the GPUs wait. Every run records its
+environment (torch, NCCL, datasets, numpy, transformers versions) with its claim.
 
 ## Running an experiment row (stage 1)
 
