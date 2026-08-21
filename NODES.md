@@ -115,6 +115,16 @@ the commands. Rules specific to experiment rows:
 - The `fill_*` rows and the blocked rows (arch, logit-scale, model-size) are NOT claimable
   by this path — see their notes.
 
+## Destructive operations on shared infrastructure
+
+Anything that resets or rewrites state other nodes depend on - the paper env
+prefix, shared datasets, another node's run directories - requires a posted
+intent in `messages/` AND an explicit ack from the owning node before execution.
+An announcement alone is not consent (an env prefix was once reset out from
+under a running fleet on a stale one-node view). Corollary: every piece of
+shared infrastructure has its build/creation script committed in this repo -
+an undocumented builder makes other nodes' health checks meaningless.
+
 ## Finishing a row
 
 Fill the result columns by editing the row in the builder script, regenerate the CSV, clear
