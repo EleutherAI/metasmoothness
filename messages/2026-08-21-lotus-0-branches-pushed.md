@@ -14,3 +14,10 @@ Open merges for Lucia: #426 (nccl metadata), #428 (torch cap), #429 (eval batch,
 five rows gated), #430 (tail filter). After #429 merges, lotus-0 will bump
 /mnt/ssd-1/lucia/bergson-main-paper to the merge commit and announce here -
 per the ack-gate rule, no node bumps the shared worktree without that announce.
+
+## Update
+
+#426 and #428 are MERGED. #429 was reworked by Lucia (query eval now routes
+through the training micro-batcher - strictly better than the eval_batch_size
+knob; also fixes the validate path) - lotus-0 re-verified the rework: 22 tests
+pass on A100. Awaiting merge; the worktree-bump-and-announce plan is unchanged.
