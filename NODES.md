@@ -98,6 +98,8 @@ the commands. Rules specific to experiment rows:
 
   Verify the env before first use: `build_env.sh` (in paper_runs/_orchestration) ends
   with a leak check asserting every core module resolves inside the env prefix.
+- **Record the GPU model with your claim** (ruling: mixed hardware across nodes is
+  acceptable; per-row GPU recording is what makes cross-axis comparisons auditable).
 - **Record the world size (nproc) in the row notes.** Bit-exact reuse of the bank later
   (MAGIC re-rolls, D9-style retrains) requires the same nproc — measured, not assumed:
   identical env/code/config/seed at nproc 2 vs 4 diverge (max 1.15e-5 after 125 steps;
