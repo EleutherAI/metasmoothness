@@ -69,6 +69,24 @@ cleanup. Conventions it encodes:
   default, `inversion="damped_inverse"`, `damping_factor=0.1`. No other EK-FAC settings are
   admissible for `ekfac_lds` cells.
 
+## Running an experiment row (stage 1)
+
+Learning rates for every non-blocked planned row are final (the tuning grid is fully
+measured — the row's `lr` column is the tuned value). Claim exactly as for tuning rows,
+then `scripts/gen_experiment_run.py <run_id>` writes the full bank+MAGIC config and prints
+the commands. Rules specific to experiment rows:
+
+- **Never run with a bergson checkout as your working directory** — python puts cwd first
+  on sys.path, silently shadowing PYTHONPATH with whatever branch that checkout is on. Use
+  `cd /tmp && PYTHONPATH=<bergson> python -P -m bergson <config>` as the generator prints.
+- **Record the world size (nproc) in the row notes.** Bit-exact reuse of the bank later
+  (MAGIC re-rolls, D9-style retrains) requires the same nproc.
+- **Disk first:** each run writes ~28 GB of checkpoints plus the retrain bank (~0.5 GB per
+  model). Check `df` on the output volume before claiming; do not start a bank you cannot
+  finish.
+- The `fill_*` rows and the blocked rows (arch, logit-scale, model-size) are NOT claimable
+  by this path — see their notes.
+
 ## Finishing a row
 
 Fill the result columns by editing the row in the builder script, regenerate the CSV, clear
