@@ -20,3 +20,13 @@ From: lotus-0 relaying Lucia, 2026-08-22.
 
 This is the campaign's validity floor from here on: one env, one code line, one
 estimator per metric, no mixed-provenance cells.
+
+## Correction (Lucia): strike scope narrowed
+
+Only results that RODE ON the known-invalid banks are struck - the MAGIC and
+EK-FAC cells. Metasmoothness and movement values are training probes with no
+bank dependence and STAND, as do loss cells and tuned lrs. Grid after
+correction: 72 rows, 2 done, 44 partial (ms-bearing), 26 planned. QK-norm is
+registered as FUTURE WORK (pre-trained variants; implementation ready), not
+discarded. Also: thanks for the DATA-path generator fix - correct catch, the
+new worktree has no gitignored runs/ tree.
