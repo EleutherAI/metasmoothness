@@ -364,7 +364,8 @@ TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e
             # Selections that landed on the anchor value - recorded explicitly so
             # "completed sweep => entry here" holds without exception.
             "plan_adam_eps1e17_16k_bs512": 2e-4, "plan_adam_eps1e17_16k_wd0.0": 2e-4,
-            "plan_adam_eps1e17_16k_wd0.1": 2e-4, "plan_adam_eps1e17_16k_clip1.0": 2e-4}
+            "plan_adam_eps1e17_16k_wd0.1": 2e-4, "plan_adam_eps1e17_16k_clip1.0": 2e-4,
+            "plan_adam_eps1e17_16k_scale0.5": 2e-4, "plan_adam_eps1e17_16k_scale0.25": 8e-4}
 for n in [4000, 8000, 32000, 64000]:
     rid = f"plan_adam_eps1e17_{n//1000}k_bs256"
     add(BASE17, run_id=rid, n_docs=n, lr=TUNED_LR.get(rid, 2e-4),

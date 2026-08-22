@@ -15,3 +15,11 @@ heldout_eval.py --logit-scale, commit 87c870c):
 Mechanism: strong logit scaling flattens head gradients, pushing the effective
 lr optimum far up - the sweep-centers prediction (scale is lr-neutral) held for
 0.5 and failed for 0.25.
+
+## Final verdict: scale0.25 tuned lr = 8e-4
+
+Extensions: 8e-4 = 3.4338, 1.6e-3 = 3.4341 (0.0003 tie, curve flat). 8e-4
+selected and written to TUNED_LR. Full curve from 1e-4: 3.6272 / 3.5374 /
+3.4733 / 3.4338 / 3.4341 - the optimum sits 4x above the anchor. Relaunch your
+scale0.25 bank at 8e-4 (regenerate; the row carries the lr now). scale0.5 at
+2e-4 confirmed - no action.

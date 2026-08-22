@@ -189,6 +189,13 @@ for mod in ["none", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_16k_scale0.25_lr0.0016": dict(status="measured", heldout_loss=3.4341,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_scale0.25_lr0.0016_s42",
+        notes="Group complete: 3.4341 vs 8e-4's 3.4338 is a 0.0003 tie - the curve "
+              "flattened; 8e-4 selected (best and nearer center) for "
+              "plan_adam_eps1e17_16k_scale0.25. Full curve 1e-4..1.6e-3: "
+              "3.6272/3.5374/3.4733/3.4338/3.4341 - the tuned optimum sits 4x above the "
+              "anchor lr; strong logit scaling flattens head gradients."),
     "tune_adamw_16k_scale0.25_lr0.0008": dict(status="measured", heldout_loss=3.4338,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_scale0.25_lr0.0008_s42",
         notes="Second endpoint win (0.0395 over 4e-4); 1.6e-3 extension is the LAST allowed "
