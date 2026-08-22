@@ -26,7 +26,7 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parent.parent
-BERGSON = "/mnt/ssd-1/lucia/bergson-damping"
+BERGSON = "/mnt/ssd-1/lucia/bergson-main-paper-429"
 DATA = f"{BERGSON}/runs/ekfac_vs_n/datasets"
 RUNS = "/mnt/ssd-2/lucia/paper_runs/experiments"
 DROPOUT_OFF = "resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0"
