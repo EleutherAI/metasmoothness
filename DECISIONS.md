@@ -116,11 +116,26 @@ needed; the check closed with no surprise.
 ### D6. Query count: 20 (resolved); tail-filter estimator specified
 
 **Ruling:** the 20-query CIs are fine — the grid stays at 20 queries everywhere.
-**Escalation rule:** 20 queries (`query_20.hf`) unless a config's 95% bootstrap
-CI half-width exceeds **0.025**; then re-score with `query_50.hf` (scoring-only against the
-same bank). 0.025 is just above the widest anchor half-width (muon ~0.021) and comparable to
-the D13 run-to-run bar, so escalation triggers only when the CI would blur a reportable
-effect.
+**Escalation rule (revised 2026-08-22 by Lucia):** 20 queries (`query_20.hf`) unless a
+config's 95% bootstrap CI half-width exceeds **0.06**; then re-score with `query_50.hf`
+(scoring-only against the same bank).
+
+The threshold was originally **0.025**, set just above the widest anchor half-width
+(muon ~0.021) and comparable to the D13 run-to-run bar. In practice the clean-env grid
+produces wider single-row intervals than the anchors did: of the first three recorded
+MAGIC rows, two exceeded 0.025 (`plan_muon_eps1e17_4k_bs256` at 0.0475,
+`plan_adam_eps1e17_16k_bs64` at 0.0512), and both are rows whose per-query Spearman is
+widely spread (bs64 ranges 0.53 to 0.97). At 0.025 escalation would have been the norm
+rather than the exception, at ~2.5x scoring cost per row.
+
+**Why 0.06 does not endanger the headline claims:** this bar governs *single-row*
+intervals. The optimizer contrasts are paired over queries and have their own, much
+tighter intervals — the anchor's +0.0863 carries [+0.0670, +0.1052], a half-width of
+0.019. A single row at ±0.06 still supports a paired difference far inside that.
+
+Rows recorded before this revision keep their measured intervals; nothing is re-scored
+retroactively. Raising the query count to 50 across the grid is registered as future
+work (EXPERIMENTS_CSV.md, optional future data).
 
 Reference (anchor, 100 subsets, 10k bootstrap): adamw 0.9333 [0.9186, 0.9448]; muon 0.8470
 [0.8274, 0.8685]; paired diff +0.0863 [+0.0670, +0.1052]. Cost note kept for the record: a

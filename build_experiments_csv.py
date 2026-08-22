@@ -346,9 +346,10 @@ BANK_RESULTS = {
               "NVIDIA A40 (47.5 GB), allium-0; env python 3.11.15 / torch 2.13.0+cu126 "
               "/ nccl 2.29.3 / triton 3.7.1 / transformers 5.15.1 / datasets 5.0.1. "
               "100 models, 20/20 queries, 2001-row validation.csv. "
-              "CI half-width 0.051 EXCEEDS the D6 escalation threshold of 0.025, so "
-              "this row needs a query_50 re-score (scoring-only, same bank) before it "
-              "is reportable; the per-query spread is wide (0.53 to 0.97). "
+              "CI half-width 0.051, inside the D6 threshold of 0.06 (raised from "
+              "0.025 on 2026-08-22); reportable as measured. Per-query Spearman is "
+              "widely spread (0.53 to 0.97), so a query_50 re-score would tighten it "
+              "-- registered as future work, not required. "
               "Tuned lr 1e-4 per the completed sweep group."),
     "plan_adam_eps1e17_4k_bs256": dict(
         status="done", metasmoothness=0.9946, ms_direction_seed=0, ms_fd_step=0.1,

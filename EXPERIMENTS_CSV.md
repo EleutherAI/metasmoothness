@@ -182,6 +182,15 @@ save models only — no optimizer state — so continuation from them diverges f
 
 ## Optional future data (run if time permits)
 
+- **50-query re-scoring across the grid.** D6's escalation threshold was raised from
+  0.025 to 0.06 on 2026-08-22 because single-row CI half-widths in the clean-env grid
+  land around 0.05 for rows with widely spread per-query Spearman, which would have
+  made escalation routine at ~2.5x scoring cost per row. Re-scoring the grid against
+  `query_50.hf` would tighten every single-row interval; it is scoring-only against the
+  existing banks (`validate` with `retrained_dir` plus precomputed `--scores`), so it
+  costs no new retrains. Worth doing before any claim that rests on a *single* row's
+  interval rather than on a paired contrast.
+
 - **QK-norm (and native architecture modifications generally).** Cut from the
   current grid (D16): measuring the attribution effect of an architecture
   modification natively requires PRE-TRAINING the modification in, not grafting
