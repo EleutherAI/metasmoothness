@@ -297,7 +297,9 @@ for rid, bd in [(r[0], r[13]) for r in GRID if False]:
 # scripts/ekfac_lds.py against each bank's validation.csv; scores at
 # /mnt/ssd-2/lucia/s16k_<opt>/ekfac_scores, code commit 10874f93 (main-parent worktree).
 EKFAC_FILL = {}  # results live on the sm_* parent rows (ANCHOR_FILL above)
-for opt in ["adamw", "muon"]:
+# Anchor fill tickets removed with the invalid banks (D15 final ruling); the
+# sm_ rows themselves are the re-run vehicles.
+for opt in []:
     add(GPT2_FT, run_id=f"fill_sm_{opt}_eps1e17_16k_bs256_ms_ekfac",
         status="done",
         n_docs=16000, optimizer=opt, lr=2e-4, eps_root=1e-17, batch_size=256,
