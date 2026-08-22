@@ -32,7 +32,20 @@ BERGSON = "/mnt/ssd-1/lucia/bergson-main-paper-429"
 # breaks every generated config the moment BERGSON is repointed at a new pinned
 # worktree. Code path and data path are independent; pin the data explicitly.
 DATA = "/mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets"
-RUNS = "/mnt/ssd-2/lucia/paper_runs/experiments"
+# ssd-2 is at 98% and a finished row costs ~67 GB (16 GB checkpoints/scores plus
+# ~51 GB of bank models). ssd-1 is the same CephFS volume on every node -- verified
+# by matching csi-vol UUID, unlike /mnt/ssd-cluster which is per-node -- and has
+# the headroom, so NEW runs go there.
+#
+# An existing run stays wherever it already lives. launch.sh regenerates the config
+# on every relaunch, so switching the root unconditionally would point a resumed row
+# at an empty directory and silently discard its scored queries and checkpoints.
+RUNS_SSD2 = "/mnt/ssd-2/lucia/paper_runs/experiments"
+RUNS_SSD1 = "/mnt/ssd-1/lucia/paper_runs/experiments"
+
+
+def _run_root(run_id: str) -> str:
+    return RUNS_SSD2 if os.path.isdir(f"{RUNS_SSD2}/{run_id}") else RUNS_SSD1
 DROPOUT_OFF = "resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0"
 
 
@@ -58,7 +71,7 @@ def main() -> None:
 
     n = int(row["n_docs"])
     lr = float(row["lr"])
-    run_path = f"{RUNS}/{args.run_id}"
+    run_path = f"{_run_root(args.run_id)}/{args.run_id}"
 
     cfg = {"run_path": run_path, "steps": [{"magic": {
         "run_path": run_path,
