@@ -7,7 +7,6 @@ steps:
     model: gpt2
     model_kwargs: resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0
     precision: fp32
-    logit_scale: 0.25
     use_tf32_matmuls: false
     seed: 42
     cleanup_ckpts: false
@@ -26,10 +25,10 @@ steps:
     grad_accum_steps: 8
     num_epochs: 2
     lr_schedule:
-      lr: 0.0002
+      lr: 0.0008
       lr_scheduler_type: polynomial
       lr_start: 1.0e-06
-      lr_end: 2.0e-05
+      lr_end: 8.0e-05
       warmup_steps: 0.25
     optimizer: adamw
     adam_beta1: 0.95
@@ -46,3 +45,5 @@ steps:
     save_models: true
     save_optimizer_state: last
     save_mode: log
+    double_backward_batch_size: 4
+    logit_scale: 0.25
