@@ -119,7 +119,7 @@ def main() -> None:
     print(f"mirrored to {mirror} — commit it with the claim")
     print("\n# Canonical invocation (pinned env; -s -P + NOUSERSITE close the shadowing traps):")
     print(f"cd /tmp && CUDA_VISIBLE_DEVICES=<gpus> MASTER_PORT=<unique> PYTHONNOUSERSITE=1 \\\n"
-          f"  PYTHONPATH=/mnt/ssd-1/lucia/bergson-main-paper \\\n"
+          f"  PYTHONPATH={BERGSON} \\\n"
           f"  /mnt/ssd-2/lucia/envs/paper/bin/python -s -P -m bergson {cfg_path}")
     print("\n# The magic step trains the base (checkpoints kept), builds the retrain")
     print("# bank, and runs per-query MAGIC + validation. Resumable at every stage.")
