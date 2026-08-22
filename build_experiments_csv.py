@@ -334,6 +334,22 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    "plan_adam_eps1e17_16k_bs64": dict(
+        status="done",
+        magic_lds=0.7811, magic_ci_lo=0.7272, magic_ci_hi=0.8295,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs64",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs64",
+        notes="Batch-size axis, bs64. First completed row of the A40 fleet and the "
+              "first bank built entirely in the pinned venv. nproc 4, ga 1, "
+              "NVIDIA A40 (47.5 GB), allium-0; env python 3.11.15 / torch 2.13.0+cu126 "
+              "/ nccl 2.29.3 / triton 3.7.1 / transformers 5.15.1 / datasets 5.0.1. "
+              "100 models, 20/20 queries, 2001-row validation.csv. "
+              "CI half-width 0.051 EXCEEDS the D6 escalation threshold of 0.025, so "
+              "this row needs a query_50 re-score (scoring-only, same bank) before it "
+              "is reportable; the per-query spread is wide (0.53 to 0.97). "
+              "Tuned lr 1e-4 per the completed sweep group."),
     "plan_adam_eps1e17_4k_bs256": dict(
         status="done", metasmoothness=0.9946, ms_direction_seed=0, ms_fd_step=0.1,
         magic_lds=0.9295, magic_ci_lo=0.9195, magic_ci_hi=0.9381,
