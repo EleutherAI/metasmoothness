@@ -277,7 +277,9 @@ for knob, ms, loss, kw in [
 # =====================================================================================
 # 3. FILL rows — measurements missing on configs whose artifacts already exist (cheap).
 # =====================================================================================
-for rid, bd in [(r[0], r[13]) for r in GRID if not r[0].endswith("_rep2")]:
+# fill_* rows removed per D15 final ruling: their per-epoch banks are invalid
+# (pre-venv) and deleted; the configs re-run fresh if the paper needs them.
+for rid, bd in [(r[0], r[13]) for r in GRID if False]:
     add(GPT2_FT, run_id=f"fill_{rid}_magic", status="planned",
         n_docs=dict(GRID_N := {g[0]: g[1] for g in GRID})[rid],
         optimizer={g[0]: g[2] for g in GRID}[rid], lr={g[0]: g[3] for g in GRID}[rid],
@@ -389,7 +391,8 @@ add(BASE17, run_id="plan_adam_eps1e17_16k_ckptavg4", ckpt_avg_k=4,
           "/mnt/ssd-2/lucia/paper_runs/d9_magic_base — the replication path awaits the "
           "D15 ruling. Eval-side: exempt from lr gating.")
 # preact_batchnorm dropped (D14) — see DECISIONS.md.
-for mod in ["qk_norm", "preact_layernorm"]:
+# qk_norm cut per D16 (graft-vs-pretrain design question; out of scope).
+for mod in ["preact_layernorm"]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_{mod}", arch_mod=mod, model="gpt2_custom",
         notes="Needs the GPT-2-like custom model. Compare ONLY against "
               "plan_adam_eps1e17_16k_arch_control (same custom model, no mod), never stock gpt2.")
@@ -437,6 +440,28 @@ for r in rows:
 
 for r in rows:
     r.update(BANK_RESULTS.get(r["run_id"], {}))
+
+# D15 final ruling: only pinned-venv measurements are valid. Every attribution
+# result measured before the venv era is struck (historical values remain in
+# LDS_RESULTS.md); the rows revert to planned. Loss-only cells (train/heldout)
+# and tuned lrs stand - they are not bank measurements.
+_venv_rows = set(BANK_RESULTS)
+for r in rows:
+    if r["run_id"] in _venv_rows:
+        continue
+    struck = any(str(r.get(k, "")) not in ("", "None") for k in
+                 ("metasmoothness", "magic_lds", "ekfac_lds"))
+    if struck:
+        for k in ("metasmoothness", "ms_direction_seed", "ms_fd_step",
+                  "magic_lds", "magic_ci_lo", "magic_ci_hi", "magic_n_queries",
+                  "ekfac_lds", "ekfac_ci_lo", "ekfac_ci_hi", "ekfac_n_subsets",
+                  "delta_l1", "delta_l2"):
+            r[k] = ""
+        r["status"] = "planned"
+        r["reusable"] = "none"
+        r["notes"] = ("Pre-venv measurements struck per D15 final ruling (bank invalid, "
+                      "artifacts deleted; historical values in LDS_RESULTS.md). Re-run "
+                      "in the pinned env if the paper needs this cell. ") + r.get("notes", "")
 
 with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tuning.csv")) as _f:
     _trows = list(csv.DictReader(_f))
