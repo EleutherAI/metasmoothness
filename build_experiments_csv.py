@@ -334,6 +334,21 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    "plan_muon_eps1e17_8k_bs256": dict(
+        status="done",
+        magic_lds=0.7712, magic_ci_lo=0.7477, magic_ci_hi=0.7904,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_8k_bs256",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_8k_bs256",
+        notes="Token axis, muon at N=8k. nproc 2, NVIDIA A40, bellflower-0; pinned "
+              "venv (python 3.11.15 / torch 2.13.0+cu126 / nccl 2.29.3). 100 models, "
+              "20/20 queries. CI half-width 0.0214, inside the D6 threshold of 0.06. "
+              "COMPLETES THE 8k OPTIMIZER PAIR against plan_adam_eps1e17_8k_bs256 "
+              "(0.9163): unpaired difference adamw-muon = +0.145, far smaller than the "
+              "+0.6275 measured at 4k. The muon token axis rises steeply, 0.3020 at 4k "
+              "to 0.7712 at 8k, while adamw is flat (0.9295 to 0.9163) -- so the "
+              "optimizer gap narrows with N rather than being constant. Tuned lr 2e-4."),
     "plan_muon_eps1e17_16k_bs128": dict(
         status="done",
         magic_lds=0.8480, magic_ci_lo=0.8307, magic_ci_hi=0.8620,
