@@ -67,6 +67,7 @@ def main() -> None:
         "model": row["model"],
         "model_kwargs": DROPOUT_OFF,
         "precision": "fp32",
+        "logit_scale": float(row["logit_scale"]),
         "use_tf32_matmuls": False,
         "seed": int(row["seed"]),
         "cleanup_ckpts": False,
