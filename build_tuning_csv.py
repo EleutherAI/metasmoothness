@@ -150,8 +150,9 @@ for mdl in ["gpt2-medium", "gpt2-large"]:
 # ---------------------------------------------------------------------------------
 for s in [0.5, 0.25]:
     sweep(f"tune_adamw_16k_scale{s}", selects_lr_for=f"plan_adam_eps1e17_16k_scale{s}",
-          status="blocked", priority=2, logit_scale=s,
-          notes="Blocked on the bergson logit-scale hook.")
+          status="empty", priority=2, logit_scale=s,
+          notes="Hook exists (bergson feat/logit-scale, PR #433); run from that "
+                "worktree until merge.")
 
 # ---------------------------------------------------------------------------------
 # 6. Weight decay / clipping (adam, 16k). Likely lr-neutral (rep-era nulls), so

@@ -68,6 +68,9 @@ def main() -> None:
             "num_epochs": ep,
             "seed": args.seed,
             "optimizer": row["optimizer"],
+            # Requires the logit-scale hook (bergson feat/logit-scale, PR #433);
+            # 1.0 is a no-op on any code.
+            "logit_scale": float(row["logit_scale"]),
             "adam_beta1": 0.95, "adam_beta2": 0.975,
             "adam_eps": 1e-8, "eps_root": float(row["eps_root"]),
             "weight_decay": float(row["weight_decay"]),
