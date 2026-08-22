@@ -204,12 +204,12 @@ The architecture axis keeps `qk_norm` and `preact_layernorm` (both per-sample op
 
 ### D16. QK-norm experiments cut
 
-**Ruling:** the QK-norm rows are cut from the grid. The fine-tune-graft design
-measures "attribution after splicing a norm into a pretrained model", and the
-native question requires pre-training the modification in - out of scope for
-now. The `preact_layernorm` and `arch_control` rows stay registered but blocked,
-carrying the same graft-vs-pretrain design question, to be resolved before any
-arch run.
+**Ruling:** the QK-norm rows are cut from the current grid and registered as
+FUTURE WORK (see EXPERIMENTS_CSV.md, optional future data). The fine-tune-graft
+design measures "attribution after splicing a norm into a pretrained model";
+the native question requires pre-training the modification in, which is out of
+scope for this campaign. The `preact_layernorm` and `arch_control` rows stay
+registered but blocked, carrying the same graft-vs-pretrain design question.
 
 ### D15. Reproducibility tuple includes the environment (measured); RESOLVED by ruling
 

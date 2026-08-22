@@ -182,6 +182,15 @@ save models only — no optimizer state — so continuation from them diverges f
 
 ## Optional future data (run if time permits)
 
+- **QK-norm (and native architecture modifications generally).** Cut from the
+  current grid (D16): measuring the attribution effect of an architecture
+  modification natively requires PRE-TRAINING the modification in, not grafting
+  fresh norm layers into pretrained weights at fine-tune time. The
+  implementation is ready (`gpt2_custom/`, `EleutherAI/gpt2-custom` on the Hub,
+  OLMo-style QK-norm, bit-identical none-mod); the future study pre-trains each
+  variant at the from-scratch family's scale (~6-12 h per variant on 2-4 A100s)
+  and then runs the standard sweep + bank pipeline on top.
+
 - **Shampoo influence functions.** Score the paper's admitted banks with
   Shampoo-preconditioned influence. Scoring-only under reuse rule 1 (banks are
   scorer-independent), and D8 already makes every paper run save what it needs
