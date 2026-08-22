@@ -7,6 +7,7 @@ steps:
     model: gpt2
     model_kwargs: resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0
     precision: fp32
+    logit_scale: 1.0
     use_tf32_matmuls: false
     seed: 42
     cleanup_ckpts: false
@@ -38,6 +39,7 @@ steps:
     weight_decay: 0.0
     loss_reduction: mean
     train_mode: false
+    skip_validation: false
     num_subsets: 100
     subset_fraction: 0.01
     query_method: none
