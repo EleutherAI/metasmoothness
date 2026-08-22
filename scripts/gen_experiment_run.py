@@ -46,7 +46,12 @@ def main() -> None:
         rows = {r["run_id"]: r for r in csv.DictReader(f)}
     row = rows.get(args.run_id)
     assert row, f"{args.run_id} not in experiments.csv"
-    assert row["status"] == "planned", f"{args.run_id} status={row['status']}"
+    # planned rows, and partial rows whose bank metrics are missing (e.g. the
+    # rows reset by the D15 strike, which keep ms but need a fresh MAGIC bank):
+    # every generated bank runs per-query MAGIC + subsets + validation.
+    assert row["status"] in ("planned", "partial") and not row["magic_lds"], (
+        f"{args.run_id}: status={row['status']}, magic_lds={row['magic_lds']!r} - "
+        "this row already has a MAGIC bank")
     assert row["model"] in ("gpt2", "gpt2-medium", "gpt2-large"), (
         f"model {row['model']} needs its own generator (arch rows are blocked)")
     assert row["dataset"] == "smollm2", row["dataset"]
