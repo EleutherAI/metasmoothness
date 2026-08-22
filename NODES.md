@@ -114,15 +114,15 @@ the commands. Rules specific to experiment rows:
   (MAGIC re-rolls, D9-style retrains) requires the same nproc — measured, not assumed:
   identical env/code/config/seed at nproc 2 vs 4 diverge (max 1.15e-5 after 125 steps;
   only constant buffers match).
-- **Memory rule (measured): the MAGIC backward's peak scales with the PER-RANK
-  batch (batch_size / nproc).** On 47.5 GB A40s: per-rank batch <= 32 survives,
-  >= 64 dies - so a bs256 row needs nproc 8 (a whole node) and bs512 is
-  impossible on A40 at any on-node nproc. For generator configs (micro-batch
-  16) this is equivalently "ga <= 2", but per-rank batch is the governing
-  quantity: hand-setting ga without changing batch/nproc does NOT help. The
-  A100-80GB bound: 256 per rank survived rollouts (barely). Evidence:
-  messages/2026-08-22-bellflower-0-ga-is-the-governing-quantity.md and the
-  per-rank-batch precision note.
+- **Memory rule, post-#429 (merged main, 79c08dce+): bs256 runs at nproc 2 on
+  A40** - verified live. The pre-merge rule ("per-rank batch <= 32 on A40,
+  bs256 needs a full node") was driven by the eval path inflating with batch
+  size; with the query stream at minimal width that constraint is gone, and
+  following the old rule now wastes three quarters of a node per row. History
+  and measurements: messages/2026-08-22-bellflower-0-ga-is-the-governing-quantity.md
+  and the URGENT-worktree-bump follow-up. Caveats that remain: bs512 is
+  untested post-merge (2x the footprint; check before claiming), and runs on
+  PRE-merge code still obey the old rule.
 - **Relaunch tooling must not wipe the run dir** - resume restarts from
   per_query/*.pt and checkpoints; a launcher that clears them turns resumes into
   silent from-zero restarts (this destroyed 16 scored queries once; wiping is
