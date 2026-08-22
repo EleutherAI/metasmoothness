@@ -151,7 +151,9 @@ HELDOUT = {"adam_eps0_16k": 3.3517, "adam_eps0_4k": 3.4230, "adam_eps0_8k": 3.38
            "adam_eps1e8_4k": 3.3065, "adam_eps1e8_4k_drop0": 3.3065,
            "adam_eps1e8_bs128_4k": 3.3153, "muon_eps0_4k": 3.2796, "muon_eps1e6_4k": 3.2798}
 
-for rid, n, opt, lr, eps, bs, ep, ms, ek, lo, hi, l1, l2, bd in GRID:
+# Legacy eps-root-damping family: OUT of the paper CSV (ruling 2026-08-22);
+# values archived in LDS_RESULTS.md.
+for rid, n, opt, lr, eps, bs, ep, ms, ek, lo, hi, l1, l2, bd in []:
     extra = {}
     if bd in TRAIN_LOSS:
         extra["train_loss"] = TRAIN_LOSS[bd]
@@ -189,7 +191,7 @@ MS_ONLY = [
     ("sm_muon_eps0_5e5_4k_bs16", 4000, "muon",  5e-5, 0,     16, 4, 0.9932,
      "Batch size does not un-saturate muon; adam collapses to 0.500 at bs16 (rep-era, excluded)."),
 ]
-for rid, n, opt, lr, eps, bs, ep, ms, note in MS_ONLY:
+for rid, n, opt, lr, eps, bs, ep, ms, note in []:
     add(GPT2_FT, run_id=rid, status="partial", n_docs=n, optimizer=opt, lr=lr, eps_root=eps,
         batch_size=bs, num_epochs=ep, metasmoothness=ms, reusable="ms_only",
         run_dir="/mnt/ssd-2/lucia/muon_ms_steps" if opt == "muon" and n > 4000 else "",
@@ -197,15 +199,16 @@ for rid, n, opt, lr, eps, bs, ep, ms, note in MS_ONLY:
 
 # epochs=1: shuffle-agnostic, so the rep-era measurements remain valid. The only row
 # with all three metrics.
-add(GPT2_FT, run_id="sm_adam_eps1e8_4k_bs32_ep1", status="done", n_docs=4000, eps_root=1e-8,
-    batch_size=32, num_epochs=1, shuffle="agnostic_1ep", metasmoothness=0.837,
-    ekfac_lds=0.1781, ekfac_n_subsets=50, magic_lds=0.05, magic_ci_lo=-0.054,
-    magic_ci_hi=0.145, magic_n_queries=20, train_loss=3.07, delta_l1=0.0087,
-    delta_l2=0.0100, run_dir="/mnt/ssd-2/lucia/muon4k/magicroll_bs32",
-    reusable="bank+scores",
-    notes="1 epoch = one pass over one order, so the shuffle implementation cannot matter; "
-          "admitted although measured on the older code. MAGIC on the FIXED metagrad code "
-          "(c0f11ba8); CI spans zero.")
+# [removed 2026-08-22: legacy eps-damping row, not this paper's controls; ms archived in LDS_RESULTS.md]
+# add(GPT2_FT, run_id="sm_adam_eps1e8_4k_bs32_ep1", status="done", n_docs=4000, eps_root=1e-8,
+#     batch_size=32, num_epochs=1, shuffle="agnostic_1ep", metasmoothness=0.837,
+#     ekfac_lds=0.1781, ekfac_n_subsets=50, magic_lds=0.05, magic_ci_lo=-0.054,
+#     magic_ci_hi=0.145, magic_n_queries=20, train_loss=3.07, delta_l1=0.0087,
+#     delta_l2=0.0100, run_dir="/mnt/ssd-2/lucia/muon4k/magicroll_bs32",
+#     reusable="bank+scores",
+#     notes="1 epoch = one pass over one order, so the shuffle implementation cannot matter; "
+#           "admitted although measured on the older code. MAGIC on the FIXED metagrad code "
+#           "(c0f11ba8); CI spans zero.")
 
 # eps_root 1e-17 pair (scaling_magic, 2026-08-07): per-epoch trained, MAGIC measured.
 # ms + EK-FAC filled by the fill_* work rows: D7-canonical EK-FAC scoring + ms probe,
@@ -236,43 +239,44 @@ for opt, lds, lo, hi in [("adamw", 0.9333, 0.9186, 0.9448), ("muon", 0.8470, 0.8
               (" adamw scores rebuilt from per-query .pt files (padded-query bug on docs-4)."
                if opt == "adamw" else ""))
 
+# [moved out 2026-08-22: OLMo2 family is a different study; values in LDS_RESULTS.md]
 # =====================================================================================
 # 2. OLMo2 from-scratch (dropout genuinely 0.0; per-epoch rows only). Different model
 #    family — kept for the pre-training endpoint; filter on `family` for GPT-2-only plots.
 # =====================================================================================
-add(OLMO2, run_id="olmo2_muon_16k_full", status="partial", n_docs=16000,
-    metasmoothness=-0.000, train_loss=2.92, delta_l1=4.56, delta_l2=4.10,
-    run_dir="/mnt/ssd-2/lucia/scratch_olmo", reusable="bank",
-    notes="Dead endpoint: ms ~= 0 (below the ~0.02 information floor). The rep-era full-run "
-          "EK-FAC (0.0175, CI spans 0) is excluded; the rep bank exists if a per-epoch rebuild "
-          "is ever wanted, but the per-epoch ms says the answer is already 'unattributable'.")
-add(OLMO2, run_id="olmo2_muon_16k_tail083", status="partial", n_docs=16000,
-    attr_window_frac=0.833, metasmoothness=0.984, ekfac_lds=0.161, ekfac_ci_lo=0.123,
-    ekfac_ci_hi=0.198, ekfac_n_subsets=50, n_queries=50, train_loss=3.23,
-    run_dir="runs/tail_bank_083_full", code_commit="5833a9b3", reusable="bank",
-    notes="MAIN RESULT: attributing only the last epoch makes pre-training scoreable (9x, "
-          "disjoint CIs) at the model's full loss. Tail-MAGIC was in progress, not recorded.")
-for frac, ms in [(0.25, 0.025), (0.5, 0.355), (0.6, 0.669), (0.75, 0.793),
-                 (0.896, 0.986), (0.95, 0.993), (0.99, 0.990)]:
-    add(OLMO2, run_id=f"olmo2_muon_16k_window{frac}", status="partial", n_docs=16000,
-        attr_window_frac=frac, metasmoothness=ms, reusable="ms_only",
-        notes="Window sweep, ms only. frac>0.833 loses doc coverage (bank would be invalid).")
-for n, st, ms, loss in [(4000, 188, 0.0095, 4.98), (8000, 375, 0.0177, 3.95),
-                        (32000, 1500, 0.0051, 3.09)]:
-    add(OLMO2, run_id=f"olmo2_muon_{n//1000}k_full", status="partial", n_docs=n, steps=st,
-        metasmoothness=ms, train_loss=loss, reusable="ms_only",
-        notes="Full-run attribution flat at ~0 across 1.9 nats of loss.")
-for knob, ms, loss, kw in [
-        ("opt_adamw", 0.647, 6.18, dict(optimizer="adamw", lr=8e-4)),
-        ("lr3e-3", 0.019, 2.69, dict(lr=3e-3)),
-        ("wd0", 0.003, 3.27, dict(weight_decay=0.0)),
-        ("epsroot1e-4", 0.004, 3.34, dict(eps_root=1e-4)),
-        ("bs64", 0.005, 4.31, dict(batch_size=64, num_epochs=3)),
-        ("bs256", 0.006, 1.34, dict(batch_size=256, num_epochs=12))]:
-    add(OLMO2, run_id=f"olmo2_muon_16k_{knob}", status="partial", n_docs=16000,
-        metasmoothness=ms, train_loss=loss, reusable="ms_only",
-        notes="opt_adamw's 0.647 is at loss 6.18 — unusable." if knob == "opt_adamw" else "",
-        **kw)
+# add(OLMO2, run_id="olmo2_muon_16k_full", status="partial", n_docs=16000,
+#     metasmoothness=-0.000, train_loss=2.92, delta_l1=4.56, delta_l2=4.10,
+#     run_dir="/mnt/ssd-2/lucia/scratch_olmo", reusable="bank",
+#     notes="Dead endpoint: ms ~= 0 (below the ~0.02 information floor). The rep-era full-run "
+#           "EK-FAC (0.0175, CI spans 0) is excluded; the rep bank exists if a per-epoch rebuild "
+#           "is ever wanted, but the per-epoch ms says the answer is already 'unattributable'.")
+# add(OLMO2, run_id="olmo2_muon_16k_tail083", status="partial", n_docs=16000,
+#     attr_window_frac=0.833, metasmoothness=0.984, ekfac_lds=0.161, ekfac_ci_lo=0.123,
+#     ekfac_ci_hi=0.198, ekfac_n_subsets=50, n_queries=50, train_loss=3.23,
+#     run_dir="runs/tail_bank_083_full", code_commit="5833a9b3", reusable="bank",
+#     notes="MAIN RESULT: attributing only the last epoch makes pre-training scoreable (9x, "
+#           "disjoint CIs) at the model's full loss. Tail-MAGIC was in progress, not recorded.")
+# for frac, ms in [(0.25, 0.025), (0.5, 0.355), (0.6, 0.669), (0.75, 0.793),
+#                  (0.896, 0.986), (0.95, 0.993), (0.99, 0.990)]:
+#     add(OLMO2, run_id=f"olmo2_muon_16k_window{frac}", status="partial", n_docs=16000,
+#         attr_window_frac=frac, metasmoothness=ms, reusable="ms_only",
+#         notes="Window sweep, ms only. frac>0.833 loses doc coverage (bank would be invalid).")
+# for n, st, ms, loss in [(4000, 188, 0.0095, 4.98), (8000, 375, 0.0177, 3.95),
+#                         (32000, 1500, 0.0051, 3.09)]:
+#     add(OLMO2, run_id=f"olmo2_muon_{n//1000}k_full", status="partial", n_docs=n, steps=st,
+#         metasmoothness=ms, train_loss=loss, reusable="ms_only",
+#         notes="Full-run attribution flat at ~0 across 1.9 nats of loss.")
+# for knob, ms, loss, kw in [
+#         ("opt_adamw", 0.647, 6.18, dict(optimizer="adamw", lr=8e-4)),
+#         ("lr3e-3", 0.019, 2.69, dict(lr=3e-3)),
+#         ("wd0", 0.003, 3.27, dict(weight_decay=0.0)),
+#         ("epsroot1e-4", 0.004, 3.34, dict(eps_root=1e-4)),
+#         ("bs64", 0.005, 4.31, dict(batch_size=64, num_epochs=3)),
+#         ("bs256", 0.006, 1.34, dict(batch_size=256, num_epochs=12))]:
+#     add(OLMO2, run_id=f"olmo2_muon_16k_{knob}", status="partial", n_docs=16000,
+#         metasmoothness=ms, train_loss=loss, reusable="ms_only",
+#         notes="opt_adamw's 0.647 is at loss 6.18 — unusable." if knob == "opt_adamw" else "",
+#         **kw)
 
 # =====================================================================================
 # 3. FILL rows — measurements missing on configs whose artifacts already exist (cheap).

@@ -753,3 +753,55 @@ inverted at the anchor - so ms ordering is inconsistent across N and its
 magnitude is not a proxy for attributability. movement_l1 healthy on both
 probes (7577 / 19678); muon cell confirmed at direction_seed=1: 0.9302 (movement 20068) -
 the high-smoothness-at-collapse reading is direction-robust.
+
+## Archive: legacy-row values removed from experiments.csv
+
+experiments.csv carries only the paper's controlled grid (ruling 2026-08-22);
+the legacy eps-root-damping family and the OLMo2 from-scratch family moved out.
+Their bank metrics were struck with the invalid banks; the surviving
+bank-independent values (ms probes, loss backfills) are archived here:
+
+| run_id | ms | train_loss | heldout_loss |
+|---|---|---|---|
+| sm_adam_eps0_16k | 0.4269 | 2.6482 | 3.3517 |
+| sm_adam_eps0_4k | 0.7724 | 2.5846 | 3.4230 |
+| sm_adam_eps0_4k_ep4 | 0.6836 |  |  |
+| sm_adam_eps0_8k | 0.6226 | 2.5983 | 3.3856 |
+| sm_adam_eps1e10_4k | 0.7883 | 2.6896 | 3.3833 |
+| sm_adam_eps1e6_16k | 0.9954 |  |  |
+| sm_adam_eps1e6_32k | 0.9979 |  |  |
+| sm_adam_eps1e6_4k | 0.9952 | 3.1849 | 3.2946 |
+| sm_adam_eps1e6_4k_ep4 | 0.9989 |  |  |
+| sm_adam_eps1e6_8k | 0.9786 | 3.1836 | 3.2716 |
+| sm_adam_eps1e8_4k | 0.8755 | 3.0175 | 3.3065 |
+| sm_adam_eps1e8_4k_bs128 | 0.9822 | 2.9837 | 3.3153 |
+| sm_adam_eps1e8_4k_bs256 | 0.9984 |  |  |
+| sm_adam_eps1e8_4k_bs32_ep1 | 0.8370 | 3.0700 |  |
+| sm_adam_eps1e8_4k_rep2 | 0.8755 | 3.0175 | 3.3065 |
+| sm_muon_eps0_5e5_16k | 0.9951 |  |  |
+| sm_muon_eps0_5e5_4k | 0.9960 | 3.0901 | 3.2796 |
+| sm_muon_eps0_5e5_4k_bs16 | 0.9932 |  |  |
+| sm_muon_eps0_5e5_8k | 0.9956 |  |  |
+| sm_muon_eps1e6_5e5_16k | 0.9952 |  |  |
+| sm_muon_eps1e6_5e5_32k | 0.9947 |  |  |
+| sm_muon_eps1e6_5e5_4k | 0.9962 | 3.0912 | 3.2798 |
+| sm_muon_eps1e6_5e5_8k | 0.9957 |  |  |
+| sm_muon_eps1e8_5e5_4k | 0.9961 |  |  |
+| olmo2_muon_16k_bs256 | 0.0060 | 1.3400 |  |
+| olmo2_muon_16k_bs64 | 0.0050 | 4.3100 |  |
+| olmo2_muon_16k_epsroot1e-4 | 0.0040 | 3.3400 |  |
+| olmo2_muon_16k_full | -0.0000 | 2.9200 |  |
+| olmo2_muon_16k_lr3e-3 | 0.0190 | 2.6900 |  |
+| olmo2_muon_16k_opt_adamw | 0.6470 | 6.1800 |  |
+| olmo2_muon_16k_tail083 | 0.9840 | 3.2300 |  |
+| olmo2_muon_16k_wd0 | 0.0030 | 3.2700 |  |
+| olmo2_muon_16k_window0.25 | 0.0250 |  |  |
+| olmo2_muon_16k_window0.5 | 0.3550 |  |  |
+| olmo2_muon_16k_window0.6 | 0.6690 |  |  |
+| olmo2_muon_16k_window0.75 | 0.7930 |  |  |
+| olmo2_muon_16k_window0.896 | 0.9860 |  |  |
+| olmo2_muon_16k_window0.95 | 0.9930 |  |  |
+| olmo2_muon_16k_window0.99 | 0.9900 |  |  |
+| olmo2_muon_32k_full | 0.0051 | 3.0900 |  |
+| olmo2_muon_4k_full | 0.0095 | 4.9800 |  |
+| olmo2_muon_8k_full | 0.0177 | 3.9500 |  |
