@@ -38,6 +38,7 @@ steps:
     weight_decay: 0.01
     loss_reduction: mean
     train_mode: false
+    skip_validation: false
     num_subsets: 100
     subset_fraction: 0.01
     query_method: none
