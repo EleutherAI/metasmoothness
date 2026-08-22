@@ -67,7 +67,6 @@ def main() -> None:
         "model": row["model"],
         "model_kwargs": DROPOUT_OFF,
         "precision": "fp32",
-        "logit_scale": float(row["logit_scale"]),
         "use_tf32_matmuls": False,
         "seed": int(row["seed"]),
         "cleanup_ckpts": False,
@@ -106,6 +105,15 @@ def main() -> None:
         # ssd-2 and not.
         "save_mode": "log",
     }}]}
+
+    # Only emit logit_scale when it deviates from the 1.0 control. The field
+    # exists solely on bergson feat/logit-scale (PR #433); a config carrying it
+    # fails to parse on any older bergson with "Couldn't instantiate class
+    # ... Magic using init args", so unconditional emission would break every
+    # row that does not need it.
+    scale = float(row["logit_scale"])
+    if scale != 1.0:
+        cfg["steps"][0]["magic"]["logit_scale"] = scale
 
     os.makedirs(run_path, exist_ok=True)
     cfg_path = f"{run_path}/experiment.yaml"
