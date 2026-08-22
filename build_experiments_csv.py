@@ -334,6 +334,20 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    "plan_muon_eps1e17_16k_bs128": dict(
+        status="done",
+        magic_lds=0.8480, magic_ci_lo=0.8307, magic_ci_hi=0.8620,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs128",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs128",
+        notes="Batch-size axis, muon at bs128. First muon row completed by the A40 "
+              "fleet. nproc 4, NVIDIA A40, secret-ord-0; pinned venv (python 3.11.15 / "
+              "torch 2.13.0+cu126 / nccl 2.29.3 / triton 3.7.1 / transformers 5.15.1 / "
+              "datasets 5.0.1). 100 models, 20/20 queries, 2001-row validation.csv. "
+              "CI half-width 0.0157, well inside the D6 threshold of 0.06 and much "
+              "tighter than the adamw rows measured so far -- per-query Spearman spans "
+              "only 0.78-0.97. Tuned lr 1e-4."),
     "plan_adam_eps1e17_16k_bs64": dict(
         status="done",
         magic_lds=0.7811, magic_ci_lo=0.7272, magic_ci_hi=0.8295,
