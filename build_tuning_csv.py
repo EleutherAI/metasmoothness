@@ -120,6 +120,9 @@ sweep("tune_adamw_16k_ep4", selects_lr_for="plan_adam_eps1e17_16k_ep4", lrs=[5e-
 sweep("tune_adamw_16k_bs512", selects_lr_for="plan_adam_eps1e17_16k_bs512", priority=1,
       batch_size=512, grad_accum_steps=32,
       notes="D2: uncontrolled double-batch arm (63 steps).")
+sweep("tune_adamw_16k_scale0.25", selects_lr_for="plan_adam_eps1e17_16k_scale0.25",
+      lrs=[8e-4], priority=2, logit_scale=0.25,
+      notes="Endpoint extension: 4e-4 won by 0.064; optimum above the grid.")
 # D12 eps_root eval-loss control (not an lr sweep: single point per optimizer)
 for opt in ["adamw", "muon"]:
     sweep(f"tune_{opt}_16k_eps0_control", selects_lr_for=f"sm_{opt}_eps1e17_16k_bs256",
@@ -183,6 +186,24 @@ for mod in ["none", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_16k_scale0.5_lr0.0001": dict(status="measured", heldout_loss=3.3168,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_scale0.5_lr0.0001_s42"),
+    "tune_adamw_16k_scale0.5_lr0.0002": dict(status="measured", heldout_loss=3.3020,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_scale0.5_lr0.0002_s42",
+        notes="Group complete: 4e-4 leads by 0.0008 (tie); center 2e-4 selected. Heldout "
+              "evaluated WITH --logit-scale 0.5 (raw logits are miscalibrated by design)."),
+    "tune_adamw_16k_scale0.5_lr0.0004": dict(status="measured", heldout_loss=3.3012,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_scale0.5_lr0.0004_s42"),
+    "tune_adamw_16k_scale0.25_lr0.0001": dict(status="measured", heldout_loss=3.6272,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_scale0.25_lr0.0001_s42"),
+    "tune_adamw_16k_scale0.25_lr0.0002": dict(status="measured", heldout_loss=3.5374,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_scale0.25_lr0.0002_s42"),
+    "tune_adamw_16k_scale0.25_lr0.0004": dict(status="measured", heldout_loss=3.4733,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_scale0.25_lr0.0004_s42",
+        notes="ENDPOINT win by 0.064 - optimum above the grid; 8e-4 extension registered. "
+              "Note: only this point beats untrained (3.4981), and barely - strong scaling "
+              "flattens head gradients, shifting the effective lr far up. CONTROLS rule 4 "
+              "may bite this row."),
     "tune_adamw_16k_ep4_lr5e-05": dict(
         status="measured", heldout_loss=3.2521,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_ep4_lr5e-05_s42",
