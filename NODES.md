@@ -98,8 +98,13 @@ the commands. Rules specific to experiment rows:
   runs; see messages/2026-08-21-env-standardisation.md):
 
       cd /tmp && CUDA_VISIBLE_DEVICES=<gpus> MASTER_PORT=<unique-per-run> \
-        PYTHONNOUSERSITE=1 PYTHONPATH=/mnt/ssd-1/lucia/bergson-main-paper \
+        PYTHONNOUSERSITE=1 PYTHONPATH=/mnt/ssd-1/lucia/bergson-main-paper-429 \
         /mnt/ssd-2/lucia/envs/paper/bin/python -s -P -m bergson <config>
+
+  Worktree rule: `bergson-main-paper-429` (post-#429 main, 79c08dce) is for new
+  runs; the older `bergson-main-paper` (3c66bb51) stays frozen for rows already
+  in flight - never mutate a pinned worktree under running processes; add a new
+  one and adopt at run boundaries.
 
   Verify the env before first use: `build_env.sh` (in paper_runs/_orchestration) ends
   with a leak check asserting every core module resolves inside the env prefix.
