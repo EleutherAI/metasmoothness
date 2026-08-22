@@ -202,7 +202,16 @@ removed. Two unfixable conflicts with the control set:
 
 The architecture axis keeps `qk_norm` and `preact_layernorm` (both per-sample operations).
 
-### D15. Reproducibility tuple includes the environment (measured); D9 consequence open
+### D16. QK-norm experiments cut
+
+**Ruling:** the QK-norm rows are cut from the grid. The fine-tune-graft design
+measures "attribution after splicing a norm into a pretrained model", and the
+native question requires pre-training the modification in - out of scope for
+now. The `preact_layernorm` and `arch_control` rows stay registered but blocked,
+carrying the same graft-vs-pretrain design question, to be resolved before any
+arch run.
+
+### D15. Reproducibility tuple includes the environment (measured); RESOLVED by ruling
 
 **Finding (gate series, lotus-0):** bergson training is bit-deterministic within an
 environment — two fresh runs of the s16k anchor bank config (its own commit `410aee93`,
@@ -232,7 +241,14 @@ factor. Snapshot-gradient scoring is measured immune to the resulting ~0.7% mode
 banks hold only in their original environments. MAGIC fill rollouts and the D9 anchor
 retrain cannot be bit-faithful to the stored trajectories/bases from today's environment.
 
-**Open (needs Lucia):** D9's replication path. Options: (a) rebuild the anchor bank fresh
+**Ruling (final):** no further environment forensics. The pinned venv
+(ENVIRONMENT.md) is the sole valid environment; every bank measured outside it
+is INVALID - struck from experiments.csv (historical values remain in the
+narrative docs) and the artifacts deleted. Configs the paper needs are re-run
+in the venv. This supersedes the salvage options below, which are kept for the
+record only.
+
+**Superseded options (historical):** D9's replication path. Options: (a) rebuild the anchor bank fresh
 in the current environment (base + 100 retrains, ~10 4-GPU-hours, ~55 GB — also refreshes
 the anchor MAGIC number on one consistent environment; the fresh base + trajectory already
 exist at `/mnt/ssd-2/lucia/paper_runs/d9_magic_base`); or (b) accept a mixed-provenance
