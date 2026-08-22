@@ -104,6 +104,13 @@ def main() -> None:
         # sqrt mode's 30-45 — the difference between 12 banks fitting on
         # ssd-2 and not.
         "save_mode": "log",
+        # The MAGIC double backward is what actually bounds memory on a 47.5 GB
+        # A40: adamw at bs256 holds ~44 GB there and dies at Backward 0-1% at
+        # every world size, while muon (smaller optimizer state) fits. Re-splitting
+        # the double backward drops it to ~29 GB. The gradient sum is exact under
+        # any split (bergson/magic/grad_accum.py), so this is a memory knob, not an
+        # approximation -- it only requires train_mode false, which CONTROLS pins.
+        **({"double_backward_batch_size": 4} if int(row["batch_size"]) >= 256 else {}),
     }}]}
 
     # Only emit logit_scale when it deviates from the 1.0 control. The field
