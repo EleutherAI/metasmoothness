@@ -18,7 +18,7 @@ import yaml
 
 EXPERIMENTS = Path("/mnt/ssd-2/lucia/paper_runs/experiments")
 BERGSON = "/mnt/ssd-1/lucia/bergson-main-paper-429"
-PYTHON = "/mnt/ssd-2/lucia/envs/paper/bin/python"
+PYTHON = "/home/lucia/envs/paper/bin/python"
 
 
 def magic_block(cfg: dict) -> dict:
