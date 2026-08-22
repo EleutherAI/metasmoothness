@@ -12,7 +12,7 @@ steps:
     cleanup_ckpts: false
     distributed:
       nnode: 1
-      nproc_per_node: 4
+      nproc_per_node: 8
     data:
       dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_16k.hf
       split: train
@@ -22,7 +22,7 @@ steps:
       split: train
       chunk_length: 0
     batch_size: 256
-    grad_accum_steps: 4
+    grad_accum_steps: 2
     num_epochs: 2
     lr_schedule:
       lr: 0.0002
