@@ -45,3 +45,4 @@ steps:
     save_models: true
     save_optimizer_state: none
     save_mode: log
+    double_backward_batch_size: 4
