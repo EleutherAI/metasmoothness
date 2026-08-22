@@ -123,6 +123,9 @@ sweep("tune_adamw_16k_bs512", selects_lr_for="plan_adam_eps1e17_16k_bs512", prio
 sweep("tune_adamw_16k_scale0.25", selects_lr_for="plan_adam_eps1e17_16k_scale0.25",
       lrs=[8e-4], priority=2, logit_scale=0.25,
       notes="Endpoint extension: 4e-4 won by 0.064; optimum above the grid.")
+sweep("tune_adamw_16k_scale0.25", selects_lr_for="plan_adam_eps1e17_16k_scale0.25",
+      lrs=[1.6e-3], priority=2, logit_scale=0.25,
+      notes="Second endpoint extension (procedure limit): 8e-4 won by 0.0395.")
 # D12 eps_root eval-loss control (not an lr sweep: single point per optimizer)
 for opt in ["adamw", "muon"]:
     sweep(f"tune_{opt}_16k_eps0_control", selects_lr_for=f"sm_{opt}_eps1e17_16k_bs256",
@@ -186,6 +189,11 @@ for mod in ["none", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_16k_scale0.25_lr0.0008": dict(status="measured", heldout_loss=3.4338,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_scale0.25_lr0.0008_s42",
+        notes="Second endpoint win (0.0395 over 4e-4); 1.6e-3 extension is the LAST allowed "
+              "before the procedure mandates investigation (optimum >4x from center). Now "
+              "clears untrained by 0.064."),
     "tune_adamw_16k_scale0.5_lr0.0001": dict(status="measured", heldout_loss=3.3168,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_scale0.5_lr0.0001_s42"),
     "tune_adamw_16k_scale0.5_lr0.0002": dict(status="measured", heldout_loss=3.3020,
