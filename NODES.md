@@ -109,12 +109,15 @@ the commands. Rules specific to experiment rows:
   (MAGIC re-rolls, D9-style retrains) requires the same nproc — measured, not assumed:
   identical env/code/config/seed at nproc 2 vs 4 diverge (max 1.15e-5 after 125 steps;
   only constant buffers match).
-- **Memory rule (measured): the MAGIC backward's peak scales with grad_accum_steps,
-  not global batch or nproc.** The generator holds micro-batch 16, so ga =
-  bs/(16*nproc). On 47.5 GB A40s, ga <= 2 survives and ga >= 4 dies: a bs256 row
-  needs nproc 8 (a whole node); bs512 is impossible on A40 at any on-node nproc
-  (A100-80GB rows to date ran up to ga 16). Evidence and retractions:
-  messages/2026-08-22-bellflower-0-ga-is-the-governing-quantity.md.
+- **Memory rule (measured): the MAGIC backward's peak scales with the PER-RANK
+  batch (batch_size / nproc).** On 47.5 GB A40s: per-rank batch <= 32 survives,
+  >= 64 dies - so a bs256 row needs nproc 8 (a whole node) and bs512 is
+  impossible on A40 at any on-node nproc. For generator configs (micro-batch
+  16) this is equivalently "ga <= 2", but per-rank batch is the governing
+  quantity: hand-setting ga without changing batch/nproc does NOT help. The
+  A100-80GB bound: 256 per rank survived rollouts (barely). Evidence:
+  messages/2026-08-22-bellflower-0-ga-is-the-governing-quantity.md and the
+  per-rank-batch precision note.
 - **Relaunch tooling must not wipe the run dir** - resume restarts from
   per_query/*.pt and checkpoints; a launcher that clears them turns resumes into
   silent from-zero restarts (this destroyed 16 scored queries once; wiping is
