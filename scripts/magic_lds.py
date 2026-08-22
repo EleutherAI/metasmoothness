@@ -20,6 +20,7 @@ for ``magic_lds``/``magic_ci_*`` cells makes CIs incomparable across rows.
 """
 
 import argparse
+import re
 from pathlib import Path
 
 import numpy as np
@@ -54,13 +55,40 @@ def magic_lds(validation_csv: Path, n_boot: int = 10000, seed: int = 0):
     return point, lo, hi, per_q, n_sub
 
 
+def merge_slices(run_dir: Path) -> Path:
+    """Concatenate validation.csv and any validation_<a>_<b>.csv slices.
+
+    Sharded banks (NODES.md "Sharding a bank's retrains") write one CSV per
+    process; subset indices are global, so the union is the full bank. Writes
+    ``validation_merged.csv`` and fails if any subset is missing or duplicated.
+    """
+    parts = sorted(run_dir.glob("validation_*_*.csv"))
+    if (run_dir / "validation.csv").exists():
+        parts.insert(0, run_dir / "validation.csv")
+    if len(parts) == 1:
+        return parts[0]
+    v = pd.concat([pd.read_csv(p) for p in parts]).drop_duplicates()
+    seen = v.groupby("subset")["query"].count()
+    n_q = v["query"].nunique()
+    bad = seen[seen != n_q]
+    assert bad.empty, f"subsets with duplicate/partial rows: {bad.index.tolist()}"
+    cfg = run_dir / "experiment.yaml"
+    expected = int(re.search(r"num_subsets: (\d+)", cfg.read_text()).group(1))
+    missing = sorted(set(range(expected)) - set(seen.index))
+    assert not missing, f"missing subsets: {missing}"
+    out = run_dir / "validation_merged.csv"
+    v.sort_values(["subset", "query"]).to_csv(out, index=False)
+    print(f"merged {len(parts)} slice CSVs -> {out}")
+    return out
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("path", type=Path, help="run dir or validation.csv")
     ap.add_argument("--n-boot", type=int, default=10000)
     ap.add_argument("--seed", type=int, default=0)
     args = ap.parse_args()
-    csv = args.path if args.path.suffix == ".csv" else args.path / "validation.csv"
+    csv = args.path if args.path.suffix == ".csv" else merge_slices(args.path)
     point, lo, hi, per_q, n_sub = magic_lds(csv, args.n_boot, args.seed)
     print(f"magic_lds {point:.4f} [{lo:.4f}, {hi:.4f}]  n_subsets={n_sub} n_queries={len(per_q)}")
     print("per-query:", np.round(per_q, 4).tolist())

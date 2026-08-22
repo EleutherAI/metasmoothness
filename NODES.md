@@ -133,6 +133,36 @@ the commands. Rules specific to experiment rows:
 - The `fill_*` rows and the blocked rows (arch, logit-scale, model-size) are NOT claimable
   by this path — see their notes.
 
+## Sharding a bank's retrains across GPUs or nodes
+
+The 100 leave-1%-out retrains are the long tail of every bank (8 min each at
+bs256, ~16x that at bs16) and they are independent, so split them. Bergson's
+`ValidationConfig` has `subset_start` / `subset_stop`: a process retrains only
+`[start, stop)` and writes `validation_<start>_<stop>.csv`; the subsets are
+drawn from `seed`, so every process agrees on the full list, and a sliced
+process leaves `retrained/base` and `subsets.json` to the process that owns
+subset 0.
+
+1. Wait until scoring is complete (`per_query/` holds every `q<i>.pt`); a
+   slice resumes scoring and would otherwise race the main process on queries.
+2. `python scripts/slice_bank.py <run_id> --start <first unretrained subset> --slices N`
+   writes `slice_<a>_<b>.yaml` next to `experiment.yaml` (identical except the
+   range) and prints one canonical launch command per slice. Use the bank's
+   nproc (D15: a different world size gives a different base trajectory).
+   Slices run on any node that sees the run dir.
+3. **Launch slices one at a time**: start the next only after `Validating`
+   appears in the previous slice's log. Each slice resumes from the last
+   checkpoint and re-saves it on the way through; two doing that at once
+   corrupt the file (`PytorchStreamReader ... miniz error`, seen on 8k).
+4. If a main process is still retraining below `--start`, stop it once
+   `retrained/subset_<start-1>/model.safetensors` exists and row
+   `<start-1>,<last query>` is in `validation.csv` (rows flush as written).
+   Never let two processes retrain the same subset index.
+5. `python scripts/magic_lds.py <run_dir>` merges `validation.csv` with every
+   `validation_*_*.csv`, asserts all `num_subsets` are present exactly once,
+   writes `validation_merged.csv`, and reports the LDS. `scripts/ekfac_lds.py`
+   takes the merged file.
+
 ## Destructive operations on shared infrastructure
 
 Anything that resets or rewrites state other nodes depend on - the paper env
