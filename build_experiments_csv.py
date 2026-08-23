@@ -334,6 +334,91 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    "plan_adam_eps1e17_16k_wd0.0": dict(
+        status="done",
+        magic_lds=0.941, magic_ci_lo=0.9326, magic_ci_hi=0.9476,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_wd0.0",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_wd0.0",
+        notes="Weight-decay axis, wd=0.0. nproc 2, NVIDIA A40, allium-0. 100 models, "
+              "20/20 queries. WEIGHT DECAY IS A NULL, as pre-registered: "
+              "wd 0.0 -> 0.9410, wd 0.01 (the anchor) -> 0.9411, wd 0.1 -> "
+              "0.9414. All three within 0.0004 of each other, against CI "
+              "half-widths of ~0.008. Tuned lr 2e-4."),
+    "plan_adam_eps1e17_16k_wd0.1": dict(
+        status="done",
+        magic_lds=0.9414, magic_ci_lo=0.933, magic_ci_hi=0.9482,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_wd0.1",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_wd0.1",
+        notes="Weight-decay axis, wd=0.1. nproc 2, NVIDIA A40, iris-0. 100 models, "
+              "20/20 queries. See wd0.0: the three weight-decay points span "
+              "0.0004 and the axis is a null. Tuned lr 2e-4."),
+    "plan_adam_eps1e17_16k_clip1.0": dict(
+        status="done",
+        magic_lds=0.8982, magic_ci_lo=0.8757, magic_ci_hi=0.9169,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_clip1.0",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_clip1.0",
+        notes="Grad-clip axis, max_grad_norm=1.0. nproc 2, NVIDIA A40, allium-0. 100 "
+              "models, 20/20 queries. Drops attribution from the anchor 0.9411 "
+              "to 0.8982; the intervals do not overlap (anchor [0.9326, 0.9477] "
+              "vs [0.8757, 0.9169]), so clipping costs a real ~0.043 -- about "
+              "the size of the bs32 optimizer effect. Tuned lr 2e-4."),
+    "plan_adam_eps1e17_16k_scale0.5": dict(
+        status="done",
+        magic_lds=0.9448, magic_ci_lo=0.9353, magic_ci_hi=0.9521,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_scale0.5",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_scale0.5",
+        notes="Logit-scale axis, logit_scale=0.5. nproc 2, NVIDIA A40, secret-ord-0. "
+              "Ran against bergson feat/logit-scale (PR #433), NOT the pinned "
+              "-429 worktree, which has no logit_scale field. 100 models, 20/20 "
+              "queries. NO EFFECT: 0.9448 vs the anchor 0.9411, intervals "
+              "overlapping. Halving the logits is harmless. Tuned lr 2e-4."),
+    "plan_adam_eps1e17_16k_scale0.25": dict(
+        status="done",
+        magic_lds=0.0456, magic_ci_lo=0.0038, magic_ci_hi=0.0861,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_scale0.25",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_scale0.25",
+        notes="Logit-scale axis, logit_scale=0.25. nproc 2, NVIDIA A40, allium-0. Ran "
+              "against bergson feat/logit-scale (PR #433). 100 models, 20/20 "
+              "queries. ATTRIBUTION COLLAPSES: 0.0456 [0.0038, 0.0861], against "
+              "0.9448 at scale 0.5 and 0.9411 at the anchor. The per-query "
+              "Spearmans scatter around zero (-0.106 to +0.285), so this is a "
+              "uniform loss of signal, not one broken query. "
+              "THE GROUND TRUTH IS HEALTHY: the diff std is 2.4e-3, LARGER than "
+              "the anchor 1.39e-3, so removing data still moves the model a lot "
+              "-- MAGIC simply stops predicting which data. "
+              "CAVEAT, do not report the scale effect alone: this row is the "
+              "only one in the grid at tuned lr 8e-4 (every other adamw row is "
+              "2e-4 or lower), because the sweep picked 8e-4 for this config. "
+              "Logit scale and learning rate are therefore not separable from "
+              "this single row; a scale-0.25 run at 2e-4, or a scale-1.0 run at "
+              "8e-4, would separate them."),
+    "plan_adam_eps1e17_16k_bs128": dict(
+        status="done",
+        magic_lds=0.9441, magic_ci_lo=0.9334, magic_ci_hi=0.9523,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs128",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs128",
+        notes="Batch-size axis, adamw at bs128. nproc 4, NVIDIA A100-80GB, marisa-0 -- "
+              "the ONLY adamw batch-size point not measured on A40. 100 models, "
+              "20/20 queries. "
+              "D17 CONFOUND, read before using the pair: its partner "
+              "plan_muon_eps1e17_16k_bs128 (0.8480) was measured on A40, and "
+              "GPU type demonstrably changes the retrained models (6.9e-4 vs "
+              "2.5e-7 within-hardware, against a 1.1e-3 signal). The apparent "
+              "+0.096 optimizer gap here is confounded with hardware and must "
+              "not be quoted as an optimizer effect until one arm is re-run. "
+              "The row is internally valid. Tuned lr 1e-4."),
     "sm_adamw_eps1e17_16k_bs256": dict(
         status="done",
         magic_lds=0.9411, magic_ci_lo=0.9326, magic_ci_hi=0.9477,
