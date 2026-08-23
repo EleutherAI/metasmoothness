@@ -116,6 +116,34 @@ from `per_query/`, so scoring must complete first); if it overruns, the bank is 
 squeezed. If the sweep's winner lands on an endpoint, extend one octave and re-check per the
 CONTROLS tuning protocol.
 
+**Measured against the plan (2026-08-23, shivam2-0, 4x A100-80GB, nproc 4).** The
+stage the plan called least certain is the one that broke it.
+
+| stage | estimate | measured | note |
+|---|---|---|---|
+| lr mini-sweep | ~1.5 h | ~0.4 h | three points ran concurrently on three pods |
+| MAGIC scoring | ~10 h | **~26 h** | ~78 min per query x 20, one reverse pass each |
+| retrain bank | ~4.5 h sharded | ~7 h sharded (est) | base train is 125 steps in ~13 min |
+
+MAGIC is **2.6x the estimate**, and the plan already recorded that it cannot be
+sharded -- `ValidationConfig` exposes `subset_start`/`subset_stop` but no query
+range, so the 20 queries are strictly serial no matter how many pods are free.
+Total is ~33 h against the ~19 h left on the borrowed pods, so **gpt2-medium
+will not finish there**, and no amount of extra hardware changes that while
+scoring is the binding stage.
+
+Plan of record: keep it on the A100s for the remaining window (fastest hardware
+available, and `per_query/*.pt` is the resume unit, so completed queries
+survive), then migrate the run directory from ssd-4 to ssd-2 before the pods are
+returned and finish on the A40 fleet at a slower rate. **ssd-4 is mounted only on
+the A100 pods -- if the run is left there when they go back, it is stranded.**
+
+The open question this raises for Lucia is whether a 355M scaling point is worth
+~33 GPU-days of a shared cluster, or whether the model-size axis is better
+served by a cheaper design (fewer queries, fewer subsets, or a smaller step
+count) that keeps the comparison honest against the 124M anchor. D6 governs
+query count, so cutting it is a controls change, not a scheduling one.
+
 Batch size stays at the anchor's 256. The control for a model-size comparison is the *same
 batch size in both arms*, not bs256 specifically -- the 124M batch-size sweep means any
 measured batch would serve -- but at fixed epochs bs256 is 125 steps against bs32's 1000, so
