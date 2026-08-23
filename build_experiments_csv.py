@@ -460,6 +460,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.7811, magic_ci_lo=0.7272, magic_ci_hi=0.8295,
         magic_n_queries=20,
+        ekfac_lds=0.4239, ekfac_ci_lo=0.3854, ekfac_ci_hi=0.4593,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs64",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs64",
