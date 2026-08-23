@@ -358,6 +358,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.8737, magic_ci_lo=0.8574, magic_ci_hi=0.8869,
         magic_n_queries=20,
+        ekfac_lds=0.4567, ekfac_ci_lo=0.4161, ekfac_ci_hi=0.4918,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs32",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs32",
@@ -370,7 +372,20 @@ BANK_RESULTS = {
               "CLOSES THE bs32 OPTIMIZER PAIR: paired adamw-muon = +0.0464 "
               "[+0.0169, +0.0724], 17/20 query wins -- a real but small gap, and the "
               "narrowest optimizer effect measured anywhere in the grid so far. "
-              "Tuned lr 5e-5."),
+              "Tuned lr 5e-5. "
+              "EK-FAC measured 2026-08-23 on the same bank: 0.4567 "
+              "[0.4161, 0.4918], half-width 0.038, 100/100 subsets. "
+              "READ THIS NEXT TO adam bs32 EK-FAC (0.4586): the two optimizers "
+              "are indistinguishable under EK-FAC (0.4586 vs 0.4567, a gap of "
+              "0.002 against half-widths of ~0.04), while MAGIC separates them "
+              "on the SAME two banks (0.9201 vs 0.8737, paired +0.0464 with "
+              "17/20 query wins). EK-FAC appears blind to the optimizer "
+              "contrast this paper is about; a second pair should confirm "
+              "before that is claimed. "
+              "First value here was 0.4512 on 22 subsets -- ekfac_lds.py was "
+              "reading the pre-shard validation.csv prefix rather than "
+              "validation_merged.csv; fixed, and the 4k pair is unaffected "
+              "because neither 4k bank was sharded."),
     "plan_adam_eps1e17_16k_bs32": dict(
         status="done",
         magic_lds=0.9201, magic_ci_lo=0.9088, magic_ci_hi=0.9296,

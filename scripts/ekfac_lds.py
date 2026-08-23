@@ -41,7 +41,13 @@ def main() -> None:
 
     scores = load_scores(args.scores)
     subsets = json.loads(next(args.bank.rglob("subsets.json")).read_text())
-    val = pd.read_csv(next(args.bank.rglob("validation.csv")))
+    # A sharded bank keeps only the pre-shard prefix in validation.csv; the
+    # merged file is the complete ground truth. Prefer it whenever it exists.
+    merged = sorted(args.bank.rglob("validation_merged.csv"))
+    val_path = merged[0] if merged else next(args.bank.rglob("validation.csv"))
+    val = pd.read_csv(val_path)
+    print(f"bank ground truth: {val_path.name} "
+          f"({val['subset'].nunique()} subsets, {val['query'].nunique()} queries)")
     n_sub = val.subset.nunique()
     n_q = val["query"].nunique()
     assert scores.shape[1] == n_q, (scores.shape, n_q)
