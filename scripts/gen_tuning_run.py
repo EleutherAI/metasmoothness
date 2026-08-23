@@ -71,9 +71,6 @@ def main() -> None:
             "num_epochs": ep,
             "seed": args.seed,
             "optimizer": row["optimizer"],
-            # Requires the logit-scale hook (bergson feat/logit-scale, PR #433);
-            # 1.0 is a no-op on any code.
-            "logit_scale": float(row["logit_scale"]),
             "adam_beta1": 0.95, "adam_beta2": 0.975,
             "adam_eps": 1e-8, "eps_root": float(row["eps_root"]),
             "weight_decay": float(row["weight_decay"]),
@@ -89,6 +86,15 @@ def main() -> None:
             "save_interval": 10**9,
         }}],
     }
+
+    # logit_scale exists only on bergson feat/logit-scale (PR #433). Emitting it
+    # unconditionally breaks EVERY row on older bergson: a no-op *value* does not
+    # help when the *field* is unknown -- simple_parsing rejects the whole config
+    # with "Couldn't instantiate class Train using init args". Emit only when it
+    # actually deviates from the 1.0 control.
+    scale = float(row["logit_scale"])
+    if scale != 1.0:
+        cfg["steps"][0]["train"]["logit_scale"] = scale
 
     os.makedirs(run_path, exist_ok=True)
     cfg_path = f"{run_path}/tune.yaml"
