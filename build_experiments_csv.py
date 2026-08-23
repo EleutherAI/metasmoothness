@@ -334,6 +334,26 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    "plan_muon_eps1e17_16k_bs64": dict(
+        status="done",
+        magic_lds=0.8690, magic_ci_lo=0.8514, magic_ci_hi=0.8837,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs64",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs64",
+        notes="Batch-size axis, muon at bs64 (500 steps). nproc 2, NVIDIA A40, "
+              "allium-0; pinned venv. 100 models, 20/20 queries. Half-width 0.0162. "
+              "CLOSES THE bs64 PAIR, and it REVERSES: paired adamw-muon = -0.0879 "
+              "[-0.1406, -0.0380], adamw wins only 7/20 queries. This is the only "
+              "negative optimizer gap in the grid -- everywhere else adamw leads "
+              "(+0.6275 at 4k, +0.1451 at 8k, +0.0464 at bs32). "
+              "Muon at bs64 is unremarkable (0.8690, between its bs32 0.8737 and "
+              "bs128 0.8480); it is plan_adam_eps1e17_16k_bs64 that is anomalously "
+              "LOW at 0.7811 with the widest per-query spread in the grid (0.53-0.97). "
+              "The reversal is therefore evidence the adamw bs64 row is the outlier, "
+              "not evidence of a batch-size effect on the optimizer contrast. Suggest "
+              "a repeat of the adamw bs64 row before any batch-size claim. "
+              "Tuned lr 1e-4."),
     "plan_muon_eps1e17_16k_bs32": dict(
         status="done",
         magic_lds=0.8737, magic_ci_lo=0.8574, magic_ci_hi=0.8869,
