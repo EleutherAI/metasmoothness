@@ -149,6 +149,20 @@ for mdl in ["gpt2-medium", "gpt2-large"]:
                  if mdl == "gpt2-medium" else
                  "D11: deferred — runs only if gpt2-medium proves informative."))
 
+# Measured 2026-08-23 on the borrowed A100 pods (marisa-0 / maria-1 / shivam2-0),
+# nproc 2, pinned venv, 125 steps. Held-out CE on the fixed 4k set.
+#
+# The interior point wins, so the optimum is bracketed and the sweep does not need
+# extending. But the whole 4x range spans 0.0066 nats -- gpt2-medium is far flatter
+# in lr than gpt2-small was (the anchor sweep moved 0.14 nats over the same span),
+# so treat 1e-4 as "no worse than its neighbours" rather than a sharp optimum.
+GPT2_MEDIUM_HELDOUT = {5e-5: 3.0062, 1e-4: 3.0019, 2e-4: 3.0085}
+for r in rows:
+    if r["sweep_group"] == "tune_adamw_16k_gpt2-medium":
+        r["heldout_loss"] = GPT2_MEDIUM_HELDOUT[r["lr"]]
+        r["status"] = "measured"
+        r["run_dir"] = f"/mnt/ssd-2/lucia/paper_runs/tuning/{r['run_id']}_s42"
+
 # D1 (2026-08-20): the former warm-start section is gone — warm start = attribution window,
 # a pre-training axis; no lr-warmup sweeps exist.
 

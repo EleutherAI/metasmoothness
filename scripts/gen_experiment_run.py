@@ -53,6 +53,15 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("run_id")
     ap.add_argument("--nproc", type=int, default=4)
+    ap.add_argument(
+        "--run-root",
+        default=None,
+        help="Parent directory for the run dir, overriding the ssd-2/ssd-1 "
+             "policy. Use only for rows too large for the shared volumes, and "
+             "record the volume in the row notes -- ssd-3/ssd-4 are mounted on "
+             "the A100 pods only, so a run placed there is unreachable from the "
+             "A40 fleet.",
+    )
     args = ap.parse_args()
 
     with open(REPO / "experiments.csv", newline="") as f:
@@ -71,7 +80,7 @@ def main() -> None:
 
     n = int(row["n_docs"])
     lr = float(row["lr"])
-    run_path = f"{_run_root(args.run_id)}/{args.run_id}"
+    run_path = f"{args.run_root or _run_root(args.run_id)}/{args.run_id}"
 
     cfg = {"run_path": run_path, "steps": [{"magic": {
         "run_path": run_path,
