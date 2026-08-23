@@ -511,7 +511,7 @@ add(BASE17, run_id="plan_adam_eps1e17_16k_ckptavg4", ckpt_avg_k=4,
           "first. D15: the stored anchor base is NOT bit-reachable from the current "
           "environment; a fresh deterministic base + trajectory exist at "
           "/mnt/ssd-2/lucia/paper_runs/d9_magic_base — the replication path awaits the "
-          "D15 ruling. Eval-side: exempt from lr gating.")
+          "D15 ruling. Eval-side: exempt from lr gating. NOT RUNNABLE as generated (2026-08-23): bergson has no query-gradient checkpoint-averaging code (no ckpt_avg_k/avg_k/averaged_gradient anywhere in the package) and gen_experiment_run.py never reads the ckpt_avg_k column, so the generated config is byte-equivalent to a plain bs256 anchor. Launching it spends ~69 GB and a full bank reproducing the anchor and answers nothing. Needs the bergson eval-side feature first.")
 # preact_batchnorm dropped (D14) — see DECISIONS.md.
 # qk_norm cut per D16 (graft-vs-pretrain design question; out of scope).
 for mod in ["preact_layernorm"]:
@@ -522,7 +522,10 @@ add(BASE17, run_id="plan_adam_eps1e17_16k_arch_control", arch_mod="none", model=
     notes="Control for the arch_mod rows: custom model, no modification.")
 for s in [0.5, 0.25]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_scale{s}", logit_scale=s,
-        notes="Blocked on the bergson logit-scale hook (tuning group blocked too). Rep-era "
+        notes="Unblocked 2026-08-23: the logit-scale hook exists on bergson feat/logit-scale "
+              "(PR #433, worktree /mnt/ssd-1/lucia/bergson-logit-scale); this row runs "
+              "against that checkout, NOT the pinned -429 worktree, so record code_commit. "
+              "Rep-era "
               "4k/eps1e-8 data (excluded) moved ms 0.876->0.609 but also delta_l2 — "
               "not a clean isolate; re-measure here.")
 for wd in [0.0, 0.1]:
