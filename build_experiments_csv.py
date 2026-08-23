@@ -334,6 +334,46 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    "sm_adamw_eps1e17_16k_bs256": dict(
+        status="done",
+        magic_lds=0.9411, magic_ci_lo=0.9326, magic_ci_hi=0.9477,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/sm_adamw_eps1e17_16k_bs256",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/sm_adamw_eps1e17_16k_bs256",
+        notes="THE ADAMW ANCHOR. nproc 2, NVIDIA A40, bellflower-0; pinned venv. "
+              "100 models, 20/20 queries, CI half-width 0.0076 -- the tightest row "
+              "in the grid. Per-query Spearman 0.90-0.99. "
+              "HARDWARE: every retrain ran on A40. Two A100 slices (subsets 40-70 "
+              "and 70-100) were computed during sharding and are QUARANTINED as "
+              "validation_*.csv.a100, NOT merged -- see the GPU-type finding below. "
+              "The A40 main process completed all 100 subsets by itself, so no "
+              "recomputation was needed."),
+    "sm_muon_eps1e17_16k_bs256": dict(
+        status="done",
+        magic_lds=0.8379, magic_ci_lo=0.8205, magic_ci_hi=0.8519,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/sm_muon_eps1e17_16k_bs256",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/sm_muon_eps1e17_16k_bs256",
+        notes="THE MUON ANCHOR. nproc 2, NVIDIA A40; pinned venv. 100 models, "
+              "20/20 queries, CI half-width 0.0157. validation_merged.csv is "
+              "subsets 0-17 from the original bellflower-0 run plus 18-45/45-73/ "
+              "73-100 from three A40 slices. "
+              "CLOSES THE ANCHOR PAIR, the reference contrast for the whole grid: "
+              "paired adamw-muon = +0.1032 [+0.0851, +0.1213], half-width 0.0181, "
+              "and adamw wins 20/20 queries -- the only unanimous contrast measured. "
+              "GPU-TYPE FINDING (2026-08-23): this bank was accidentally sharded "
+              "across A40 and A100 nodes, and the two hardware types do NOT produce "
+              "the same retrained models. Where both sets ran on A40 they agree to "
+              "2.5e-7 (matching the 8k shard boundary, i.e. retraining is "
+              "deterministic on identical hardware); across A40 vs A100 they differ "
+              "by 6.9e-4 mean / 2.1e-3 max, against a within-query spread of `diff` "
+              "of only 1.1e-3 -- the disagreement is 43% of the signal LDS ranks. "
+              "The consequence is not subtle: scoring this bank from the mixed set "
+              "gives 0.7828, from the homogeneous A40 set 0.8379, a gap of 0.055 "
+              "that is LARGER than most optimizer effects in the grid. A bank's "
+              "retrains must all run on one GPU type."),
     "plan_muon_eps1e17_16k_bs64": dict(
         status="done",
         magic_lds=0.8690, magic_ci_lo=0.8514, magic_ci_hi=0.8837,
