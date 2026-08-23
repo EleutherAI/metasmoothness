@@ -1,7 +1,7 @@
-run_path: /mnt/ssd-4/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_gpt2-medium
+run_path: /mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_gpt2-medium
 steps:
 - magic:
-    run_path: /mnt/ssd-4/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_gpt2-medium
+    run_path: /mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_gpt2-medium
     overwrite: false
     resume: true
     model: gpt2-medium
