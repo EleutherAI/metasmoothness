@@ -135,8 +135,16 @@ scoring is the binding stage.
 Plan of record: keep it on the A100s for the remaining window (fastest hardware
 available, and `per_query/*.pt` is the resume unit, so completed queries
 survive), then migrate the run directory from ssd-4 to ssd-2 before the pods are
-returned and finish on the A40 fleet at a slower rate. **ssd-4 is mounted only on
-the A100 pods -- if the run is left there when they go back, it is stranded.**
+returned and finish on the A40 fleet at a slower rate.
+
+**Migration done 2026-08-23, ahead of the deadline rather than at it.** The run
+directory now lives on ssd-2 (fleet-wide) instead of ssd-4 (A100 pods only), so
+an early reclaim of the borrowed pods can no longer strand it. It was moved
+while the footprint was still ~40 GB -- during MAGIC the run only accumulates
+small `per_query/*.pt` files, so moving early cost the same copy as moving late
+and bought the whole window of insurance. Copy was verified file-for-file (51
+entries, 39.2 GiB) before the source was deleted, and the run resumed on
+shivam2-0 with query 1 intact rather than restarting from scratch.
 
 The open question this raises for Lucia is whether a 355M scaling point is worth
 ~33 GPU-days of a shared cluster, or whether the model-size axis is better
