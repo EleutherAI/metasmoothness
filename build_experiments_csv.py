@@ -375,6 +375,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.9201, magic_ci_lo=0.9088, magic_ci_hi=0.9296,
         magic_n_queries=20,
+        ekfac_lds=0.4586, ekfac_ci_lo=0.4194, ekfac_ci_hi=0.4934,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs32",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs32",
@@ -385,7 +387,14 @@ BANK_RESULTS = {
               "HIGHER at the smaller batch, and the intervals do not overlap. bs64 is "
               "the outlier of the two -- low value and by far the widest per-query "
               "spread (0.53-0.97) of any row measured. Do not read a batch-size trend "
-              "until bs128 and the re-measured bs256 anchor land. Tuned lr 5e-5."),
+              "until bs128 and the re-measured bs256 anchor land. Tuned lr 5e-5. "
+              "EK-FAC measured 2026-08-23 on the SAME bank (reuse rule 1; D7 "
+              "config inherited from the accepted 4k template): 0.4586 "
+              "[0.4194, 0.4934], half-width 0.037, 100/100 subsets, 20 queries, "
+              "2216 s on marisa-0. MAGIC beats EK-FAC by 0.46 on identical "
+              "ground truth -- the largest scorer gap measured so far, and far "
+              "outside either interval. The EK-FAC per-query spread (0.23-0.65) "
+              "is also much wider than the MAGIC spread on this row (0.77-0.97)."),
     "plan_adam_eps1e17_8k_bs256": dict(
         status="done",
         magic_lds=0.9163, magic_ci_lo=0.9013, magic_ci_hi=0.9280,
