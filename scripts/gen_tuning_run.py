@@ -23,8 +23,11 @@ from pathlib import Path
 import yaml
 
 REPO = Path(__file__).resolve().parent.parent
-BERGSON = "/mnt/ssd-1/lucia/bergson-damping"
-DATA = f"{BERGSON}/runs/ekfac_vs_n/datasets"
+BERGSON = "/mnt/ssd-1/lucia/bergson-main-paper-429"
+# Datasets are gitignored, so they live only in the original checkout -- deriving
+# DATA from BERGSON breaks every config the moment BERGSON is repointed.
+DATA = "/mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets"
+PYTHON = "/home/lucia/envs/paper/bin/python"
 RUNS = "/mnt/ssd-2/lucia/paper_runs/tuning"
 # gpt2-family dropout knobs, pinned off (the control): configuring 0.0 beats relying on eval mode.
 DROPOUT_OFF = "resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0"
@@ -101,9 +104,10 @@ def main() -> None:
     print(f"wrote {cfg_path}   ({steps} steps; ga={ga} at nproc={args.nproc})")
     print(f"mirrored to {mirror} — commit it with the claim")
     print("\n# 1. train:")
-    print(f"PYTHONPATH={BERGSON} bergson {cfg_path}")
+    print(f"cd /tmp && PYTHONNOUSERSITE=1 PYTHONPATH={BERGSON} "
+          f"{PYTHON} -s -P -m bergson {cfg_path}")
     print("\n# 2. held-out loss (fill heldout_loss in tuning.csv via the builder):")
-    print(f"python {REPO}/scripts/heldout_eval.py {run_path}/model")
+    print(f"PYTHONNOUSERSITE=1 {PYTHON} -s -P {REPO}/scripts/heldout_eval.py {run_path}/model")
     print("\n# 3. free the space (tuning runs never reuse checkpoints):")
     print(f"rm -rf {run_path}/checkpoints")
 
