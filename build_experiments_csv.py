@@ -338,11 +338,26 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.8690, magic_ci_lo=0.8514, magic_ci_hi=0.8837,
         magic_n_queries=20,
+        ekfac_lds=0.4284, ekfac_ci_lo=0.3868, ekfac_ci_hi=0.4646,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs64",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs64",
         notes="Batch-size axis, muon at bs64 (500 steps). nproc 2, NVIDIA A40, "
               "allium-0; pinned venv. 100 models, 20/20 queries. Half-width 0.0162. "
+              "EK-FAC on the same bank: 0.4284 [0.3868, 0.4646]. "
+              "SCORER FINDING (both bs32 and bs64 pairs, paired over queries, "
+              "scripts/ekfac_paired.py): MAGIC resolves the optimizer contrast "
+              "and EK-FAC does not. MAGIC bs32 +0.0464 [+0.0169, +0.0724] 17/20 "
+              "wins; MAGIC bs64 -0.0879 [-0.1406, -0.0380] 7/20 -- two "
+              "significant effects of OPPOSITE sign. EK-FAC bs32 +0.0019 "
+              "[-0.0274, +0.0321] 9/20; EK-FAC bs64 -0.0045 [-0.0359, +0.0270] "
+              "8/20 -- both straddle zero at coin-flip query wins. This is not "
+              "a power problem: the EK-FAC half-widths (~0.030) match the MAGIC "
+              "bs32 half-width (0.028), so EK-FAC has the resolution to see a "
+              "+0.046 effect and does not. EK-FAC does track BATCH size "
+              "(~0.457 at bs32 vs ~0.426 at bs64 in both arms), so it is "
+              "responding to something -- just not the optimizer. "
               "CLOSES THE bs64 PAIR, and it REVERSES: paired adamw-muon = -0.0879 "
               "[-0.1406, -0.0380], adamw wins only 7/20 queries. This is the only "
               "negative optimizer gap in the grid -- everywhere else adamw leads "
