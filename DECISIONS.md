@@ -277,6 +277,49 @@ removed. Two unfixable conflicts with the control set:
 
 The architecture axis keeps `qk_norm` and `preact_layernorm` (both per-sample operations).
 
+### D17. GPU type is part of run identity — OPEN, needs Lucia
+
+**Measured 2026-08-23/24.** sm_muon was accidentally sharded across A40 and A100
+nodes at the *same* nproc (2, verified in both slice configs, so this is not the
+world-size effect constraint 2 already covers). Retrains agree to **2.5e-7**
+A40-vs-A40 — matching the 8k shard-boundary check, so retraining is
+deterministic on fixed hardware — and differ by **6.9e-4 mean / 2.1e-3 max**
+across GPU types.
+
+The within-query spread of `diff`, the quantity LDS ranks, has median std
+**1.1e-3**. The cross-hardware disagreement is therefore **43% of the signal**,
+and it moves the answer: the same bank scores **0.7828** from the mixed set and
+**0.8379** from the homogeneous A40 set. That 0.055 gap is larger than most
+optimizer effects in the grid.
+
+**Settled, and already applied:** a bank's retrains must all run on one GPU
+type. Both anchors were rebuilt from homogeneous A40 data; the A100 slices are
+quarantined as `validation_*.csv.a100`.
+
+**Open question, which is a controls decision rather than a scheduling one.**
+Three rows are being produced entirely on A100 while the rest of the grid is
+A40. Each is internally homogeneous, so each is a valid measurement — but the
+comparison each exists to support is confounded with hardware:
+
+| row | node | the comparison it feeds | confound |
+|---|---|---|---|
+| `plan_adam_eps1e17_16k_bs128` | marisa-0 (A100) | pairs against muon bs128, measured on A40 | optimizer contrast vs GPU type |
+| `plan_adam_eps1e17_16k_bs512` | maria-1 (A100) | batch axis against bs32/64/256, all A40 | batch size vs GPU type |
+| `plan_adam_eps1e17_16k_gpt2-medium` | shivam2-0 (A100) | model size against the 124M anchor, A40 | the entire D11 axis vs GPU type |
+
+Note the confound is only demonstrated for the *retrain* half of the pipeline.
+The attribution scores could not be compared here: slices resume MAGIC from
+`per_query/`, so both slice sets reused scores computed once by the original A40
+run, which is why `score_sum` matched to exactly 0.0. A fresh A100 run computes
+both halves on A100, so its exposure is at least as large, not smaller.
+
+**Options, none taken unilaterally:** (a) re-run these three arms on A40 so every
+comparison is within-hardware — costly, and gpt2-medium is ~50 h on A100 and
+worse on A40; (b) keep them and re-measure their A40 partners on A100 instead;
+(c) accept them with the confound recorded, and treat cross-hardware contrasts
+as indicative only. Rows are being left running meanwhile: the data is valid for
+any within-hardware comparison either way.
+
 ### D16. QK-norm experiments cut
 
 **Ruling:** the QK-norm rows are cut from the current grid and registered as
