@@ -102,6 +102,30 @@ deferred and runs only if medium proves informative. A concrete cost-and-feasibi
 still goes to Lucia for sign-off **before** any model-size run starts, including the tuning
 sweeps; the tuning groups stay registered but are not claimable until sign-off.
 
+**Cost plan signed off (Lucia, 2026-08-23).** gpt2-medium is claimable. Plan as costed,
+on three borrowed A100-80GB pods (marisa-0, maria-1, shivam2-0) available ~24 h:
+
+| stage | work | estimate |
+|---|---|---|
+| lr mini-sweep | 3 train-only runs {5e-5, 1e-4, 2e-4}, no banks, selected on heldout_4k | ~1.5 h |
+| MAGIC scoring | 20 queries, one reverse pass each, scales with params | ~10 h |
+| retrain bank | 100 retrains x 125 steps, sharded across the three pods | ~4.5 h |
+
+~190 GB disk. Scoring is the least certain estimate and **cannot be sharded** (slices resume
+from `per_query/`, so scoring must complete first); if it overruns, the bank is what gets
+squeezed. If the sweep's winner lands on an endpoint, extend one octave and re-check per the
+CONTROLS tuning protocol.
+
+Batch size stays at the anchor's 256. The control for a model-size comparison is the *same
+batch size in both arms*, not bs256 specifically -- the 124M batch-size sweep means any
+measured batch would serve -- but at fixed epochs bs256 is 125 steps against bs32's 1000, so
+it is 8x cheaper per retrain and the only setting where a 100-model bank fits the window.
+Dependency to watch: bs256 is the one batch size whose 124M counterpart is not yet
+re-measured in the pinned venv (`sm_adamw_eps1e17_16k_bs256` is scoring). If that anchor
+fails, bs128 is the hedge -- 2x cost, and its 124M arm is already scoring.
+
+`gpt2-large` remains deferred pending medium's result.
+
 ### D12. eps_root: a handful of anchor twins, eval-loss check only
 
 Run the minimum needed to show eps_root 1e-17 does not make eval loss non-negligibly worse:
