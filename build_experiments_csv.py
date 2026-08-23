@@ -334,6 +334,23 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    "plan_muon_eps1e17_16k_bs32": dict(
+        status="done",
+        magic_lds=0.8737, magic_ci_lo=0.8574, magic_ci_hi=0.8869,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs32",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs32",
+        notes="Batch-size axis, muon at bs32 (1000 steps). nproc 2, NVIDIA A40, "
+              "pinned venv. FIRST SHARDED BANK: subsets 0-21 from the original run, "
+              "22-48/48-74/74-100 from three slices on lucia-ord-0, bellflower-0 and "
+              "secret-ord-0; merged by magic_lds.py into validation_merged.csv, which "
+              "asserts each subset appears exactly once. Sharding cut it from ~19 h to "
+              "~6 h. CI half-width 0.0148. "
+              "CLOSES THE bs32 OPTIMIZER PAIR: paired adamw-muon = +0.0464 "
+              "[+0.0169, +0.0724], 17/20 query wins -- a real but small gap, and the "
+              "narrowest optimizer effect measured anywhere in the grid so far. "
+              "Tuned lr 5e-5."),
     "plan_adam_eps1e17_16k_bs32": dict(
         status="done",
         magic_lds=0.9201, magic_ci_lo=0.9088, magic_ci_hi=0.9296,

@@ -18,8 +18,16 @@ from scipy.stats import spearmanr
 
 
 def per_query_rho(run_dir):
+    # A sharded bank's rows live in validation_merged.csv, written by
+    # magic_lds.py after it merges the slices and asserts each subset appears
+    # exactly once. Reading validation.csv there would silently use only the
+    # pre-shard prefix -- 22 subsets instead of 100 for muon bs32.
+    import os
+    path = f"{run_dir}/validation_merged.csv"
+    if not os.path.isfile(path):
+        path = f"{run_dir}/validation.csv"
     diffs, scores = defaultdict(list), defaultdict(list)
-    with open(f"{run_dir}/validation.csv") as f:
+    with open(path) as f:
         for r in csv.DictReader(f):
             q = int(r["query"])
             diffs[q].append(float(r["diff"]))
