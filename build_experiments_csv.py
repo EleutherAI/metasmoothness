@@ -366,6 +366,23 @@ BANK_RESULTS = {
               "the outlier of the two -- low value and by far the widest per-query "
               "spread (0.53-0.97) of any row measured. Do not read a batch-size trend "
               "until bs128 and the re-measured bs256 anchor land. Tuned lr 5e-5."),
+    "plan_adam_eps1e17_8k_bs256": dict(
+        status="done",
+        magic_lds=0.9163, magic_ci_lo=0.9013, magic_ci_hi=0.9280,
+        magic_n_queries=20,
+        code_commit="3c66bb51", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_8k_bs256",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_8k_bs256",
+        notes="Token axis, adamw at N=8k. nproc 1, A100, lotus-0; pinned venv. "
+              "Training and scoring at 3c66bb51, retrains at 5b03b7b1 (subset_start "
+              "worktree). 100 models, 20/20 queries. Retrains sharded: subsets 0-86 "
+              "from the main process, 87-99 from a slice; the main overran its "
+              "intended stop at 72 so 72-86 were computed twice, the duplicates agree "
+              "exactly (score_sum delta 0, diff delta < 3e-6) and validation.csv holds "
+              "each subset once (merge by bellflower-0, original kept as "
+              "validation.csv.premerge). CI half-width 0.0134. Token axis for adamw is "
+              "flat: 0.9295 at 4k, 0.9163 at 8k, intervals nearly overlapping. "
+              "Tuned lr 2e-4."),
     "plan_muon_eps1e17_8k_bs256": dict(
         status="done",
         magic_lds=0.7712, magic_ci_lo=0.7477, magic_ci_hi=0.7904,
