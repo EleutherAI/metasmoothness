@@ -334,6 +334,21 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    "plan_adam_eps1e17_16k_bs32": dict(
+        status="done",
+        magic_lds=0.9201, magic_ci_lo=0.9088, magic_ci_hi=0.9296,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs32",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs32",
+        notes="Batch-size axis, adamw at bs32 (1000 steps). nproc 4, NVIDIA A40, "
+              "lucia-ord-0; pinned venv. 100 models, 20/20 queries. CI half-width "
+              "0.0104, the tightest adamw row so far; per-query Spearman 0.77-0.97. "
+              "NON-MONOTONE against bs64 (0.7811, half-width 0.0512): attribution is "
+              "HIGHER at the smaller batch, and the intervals do not overlap. bs64 is "
+              "the outlier of the two -- low value and by far the widest per-query "
+              "spread (0.53-0.97) of any row measured. Do not read a batch-size trend "
+              "until bs128 and the re-measured bs256 anchor land. Tuned lr 5e-5."),
     "plan_muon_eps1e17_8k_bs256": dict(
         status="done",
         magic_lds=0.7712, magic_ci_lo=0.7477, magic_ci_hi=0.7904,
