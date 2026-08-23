@@ -139,10 +139,13 @@ for opt in ["adamw", "muon"]:
 # ---------------------------------------------------------------------------------
 for mdl in ["gpt2-medium", "gpt2-large"]:
     sweep(f"tune_adamw_16k_{mdl}", selects_lr_for=f"plan_adam_eps1e17_16k_{mdl}",
-          lrs=[5e-5, 1e-4, 2e-4], status="blocked", priority=2, model=mdl,
-          notes=("D11: gpt2-medium is the registered scaling target; BLOCKED "
-                 "until the cost plan is signed off. Center one octave down (larger models "
-                 "prefer lower lr). Adjust grad_accum to fit; record it."
+          lrs=[5e-5, 1e-4, 2e-4],
+          status="" if mdl == "gpt2-medium" else "blocked",
+          priority=2, model=mdl,
+          notes=("D11: gpt2-medium is the registered scaling target. Cost plan "
+                 "signed off 2026-08-23 (see DECISIONS D11), so this group is now "
+                 "claimable. Center one octave down (larger models prefer lower lr). "
+                 "Adjust grad_accum to fit; record it."
                  if mdl == "gpt2-medium" else
                  "D11: deferred — runs only if gpt2-medium proves informative."))
 
