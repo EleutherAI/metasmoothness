@@ -556,6 +556,26 @@ def _preserve_claims(out_path, rows):
             r["node_checkin_date"] = prev.get("node_checkin_date", "") or r.get("node_checkin_date", "")
 
 
+# Step-scaling sweep results, measured 2026-08-25 (bs32, ga 2, nproc 2, pinned venv).
+# Both 32k arms win on the INTERIOR point, so the CONTROLS batch-16-32 centre of
+# 5e-5 was right and no endpoint extension is needed. Note how flat they are --
+# 0.004 nats across a 4x lr range -- so 5e-5 is "no worse than its neighbours"
+# rather than a sharp optimum, the same pattern gpt2-medium showed.
+BS32_STEP_HELDOUT = {
+    "tune_adamw_32k_bs32_lr2.5e-05": 3.2380,
+    "tune_adamw_32k_bs32_lr5e-05":   3.2342,
+    "tune_adamw_32k_bs32_lr0.0001":  3.2380,
+    "tune_muon_32k_bs32_lr2.5e-05":  3.2351,
+    "tune_muon_32k_bs32_lr5e-05":    3.2310,
+    "tune_muon_32k_bs32_lr0.0001":   3.2359,
+}
+for _r in rows:
+    _hl = BS32_STEP_HELDOUT.get(_r["run_id"])
+    if _hl is not None:
+        _r["heldout_loss"] = _hl
+        _r["status"] = "measured"
+        _r["run_dir"] = f"/mnt/ssd-2/lucia/paper_runs/tuning/{_r['run_id']}_s42"
+
 def main():
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tuning.csv")
     for r in rows:

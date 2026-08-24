@@ -890,7 +890,11 @@ TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e
             # gpt2-medium sweep measured 2026-08-23: 5e-5 -> 3.0062,
             # 1e-4 -> 3.0019, 2e-4 -> 3.0085. Interior optimum, but a very flat
             # one (0.0066 nats across 4x).
-            "plan_adam_eps1e17_16k_gpt2-medium": 1e-4}
+            "plan_adam_eps1e17_16k_gpt2-medium": 1e-4,
+            # Step-scaling axis, measured 2026-08-25. Both arms won on the
+            # interior 5e-5, so no endpoint extension.
+            "plan_adam_eps1e17_32k_bs32": 5e-5,
+            "plan_muon_eps1e17_32k_bs32": 5e-5}
 for n in [4000, 8000, 32000, 64000]:
     rid = f"plan_adam_eps1e17_{n//1000}k_bs256"
     add(BASE17, run_id=rid, n_docs=n, lr=TUNED_LR.get(rid, 2e-4),
