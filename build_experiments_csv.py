@@ -937,6 +937,35 @@ for r in rows:
     if r["run_id"] in HELDOUT_FROM_TUNING and not r.get("heldout_loss"):
         r["heldout_loss"] = HELDOUT_FROM_TUNING[r["run_id"]]
 
+# Parameter-update norms ||theta_final - theta_0||, measured 2026-08-24 by
+# scripts/param_delta.py off each run's own checkpoints/step_0.ckpt + final step.
+# Backfills delta_l1/delta_l2, empty for the whole paper grid since the legacy
+# eps-root-damping family (their only prior source) was excluded 2026-08-22.
+PARAM_DELTA = {  # run_id: (delta_l1, delta_l2)
+    'plan_adam_eps1e17_16k_bs128': (193413.66, 19.7569),
+    'plan_adam_eps1e17_16k_bs16': (348194.47, 39.7689),
+    'plan_adam_eps1e17_16k_bs32': (210982.72, 22.4480),
+    'plan_adam_eps1e17_16k_bs512': (212847.68, 20.8284),
+    'plan_adam_eps1e17_16k_bs64': (265789.81, 27.6407),
+    'plan_adam_eps1e17_16k_clip1.0': (272470.56, 27.6564),
+    'plan_adam_eps1e17_16k_scale0.25': (1203035.62, 123.6988),
+    'plan_adam_eps1e17_16k_scale0.5': (311806.22, 30.7536),
+    'plan_adam_eps1e17_16k_wd0.0': (269325.49, 27.2168),
+    'plan_adam_eps1e17_16k_wd0.1': (272205.80, 27.5385),
+    'plan_adam_eps1e17_4k_bs256': (84519.52, 8.0537),
+    'plan_adam_eps1e17_8k_bs256': (207300.80, 20.5766),
+    'plan_muon_eps1e17_16k_bs128': (146470.01, 16.7994),
+    'plan_muon_eps1e17_16k_bs32': (166584.71, 19.2377),
+    'plan_muon_eps1e17_16k_bs64': (218493.93, 24.6993),
+    'plan_muon_eps1e17_4k_bs256': (116069.64, 13.6399),
+    'plan_muon_eps1e17_8k_bs256': (105998.97, 12.4096),
+    'sm_adamw_eps1e17_16k_bs256': (269398.60, 27.2259),
+    'sm_muon_eps1e17_16k_bs256': (176717.07, 20.1913),
+}
+for r in rows:
+    if r["run_id"] in PARAM_DELTA:
+        r["delta_l1"], r["delta_l2"] = PARAM_DELTA[r["run_id"]]
+
 # TUNED_LR is applied here, to EVERY row, in one place. It was previously consumed
 # only by the N-axis loops, which shipped 9 batch-size/ep4 rows at the 2e-4 default
 # instead of their tuned 5e-5/1e-4 values - caught by bellflower-0 after 9 banks
@@ -1022,6 +1051,52 @@ def _apply_ms(rows):
             r["ms_fd_step"] = 0.1
 
 
+# Standing requirement (2026-08-24): every `done` row carries the tuned lr, the parameter
+# update norm, and both losses. These are the cells that quietly emptied when the legacy
+# eps-root-damping family was excluded (2026-08-22) — delta_l1/delta_l2 and train_loss were
+# populated ONLY by rep-era rows, so the whole paper grid went blank without anything
+# failing, and the columns survived in the schema looking like measurements that were
+# skipped. Same failure shape as the wrong-lr incident, so it gets the same treatment: a
+# build-time assert. KNOWN_GAPS is the shrinking allowlist of cells not yet backfilled;
+# a cell that is NOT listed there fails the build, so new rows cannot ship incomplete.
+REQUIRED_WHEN_DONE = ("lr", "delta_l1", "delta_l2", "train_loss", "heldout_loss")
+KNOWN_GAPS = {
+    # train_loss was never collected on the pinned pipeline. Backfill:
+    #   scripts/heldout_eval.py --heldout <the run's own train set> <run>/model
+    ("*", "train_loss"),
+    # The logit-scale rows need `heldout_eval.py --logit-scale <scale>`: the scale is
+    # run-config state, never persisted in the checkpoint, so an unscaled eval reads
+    # ~4.6 instead of ~3.3 (see the docstring in scripts/heldout_eval.py).
+    ("plan_adam_eps1e17_16k_scale0.25", "heldout_loss"),
+    ("plan_adam_eps1e17_16k_scale0.5", "heldout_loss"),
+}
+
+
+def _assert_per_run_diagnostics(rows):
+    missing, excused = [], []
+    for r in rows:
+        if r.get("status") != "done":
+            continue
+        for col in REQUIRED_WHEN_DONE:
+            if str(r.get(col, "")) not in ("", "None"):
+                continue
+            if ("*", col) in KNOWN_GAPS or (r["run_id"], col) in KNOWN_GAPS:
+                excused.append((r["run_id"], col))
+            else:
+                missing.append((r["run_id"], col))
+    assert not missing, (
+        "done rows missing required per-run diagnostics: "
+        + ", ".join(f"{rid}.{col}" for rid, col in missing)
+        + " — measure it (scripts/param_delta.py for delta_l*, scripts/heldout_eval.py "
+          "for the losses) or add it to KNOWN_GAPS with the reason")
+    if excused:
+        cols = {}
+        for rid, col in excused:
+            cols.setdefault(col, []).append(rid)
+        for col, rids in sorted(cols.items()):
+            print(f"  KNOWN GAP  {col:14} {len(rids)} done rows awaiting backfill")
+
+
 def main():
     _apply_ms(rows)
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments.csv")
@@ -1033,6 +1108,7 @@ def main():
         assert r["dataset"] == "smollm2", (
             f"non-smollm2 row admitted: {r['run_id']} — paper runs use the SmolLM2 "
             "pipeline only (WikiText does not scale)")
+    _assert_per_run_diagnostics(rows)
     order = {"done": 0, "partial": 1, "planned": 2}
     rows.sort(key=lambda r: (order.get(r["status"], 3), r["family"], r["run_id"]))
     _preserve_claims(out, rows)

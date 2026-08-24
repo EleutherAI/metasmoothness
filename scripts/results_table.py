@@ -13,6 +13,7 @@ from pathlib import Path
 COLS = [  # (header, csv column, formatter)
     ("run",            "run_id",         str),
     ("optimizer",      "optimizer",      str),
+    ("lr",             "lr",             lambda v: f"{float(v):.0e}"),
     ("N docs",         "n_docs",         lambda v: f"{int(float(v)):,}"),
     ("bs",             "batch_size",     str),
     ("N epochs",       "num_epochs",     str),
@@ -20,8 +21,12 @@ COLS = [  # (header, csv column, formatter)
     ("metasmoothness", "metasmoothness", lambda v: f"{float(v):.4f}"),
     ("EK-FAC LDS",     "ekfac_lds",      lambda v: f"{float(v):.4f}"),
     ("MAGIC LDS",      "magic_lds",      lambda v: f"{float(v):.4f}"),
+    ("train loss",     "train_loss",     lambda v: f"{float(v):.4f}"),
+    ("heldout loss",   "heldout_loss",   lambda v: f"{float(v):.4f}"),
+    ("delta L2",       "delta_l2",       lambda v: f"{float(v):.2f}"),
     ("status",         "status",         str),
 ]
+IDX = {c: i for i, (_, c, _) in enumerate(COLS)}  # name -> column index
 RESULT_COLS = ("metasmoothness", "ekfac_lds", "magic_lds")
 
 def fmt(r, col, f):
@@ -54,12 +59,15 @@ def main():
     for r in rows:
         line = [fmt(r, c, f) for _, c, f in COLS]
         if a.ci:
-            line[7] += ci(r, "ekfac"); line[8] += ci(r, "magic")
+            line[IDX["ekfac_lds"]] += ci(r, "ekfac")
+            line[IDX["magic_lds"]] += ci(r, "magic")
         table.append(line)
 
     hdr = [h for h, _, _ in COLS]
     w = [max(len(h), *(len(t[i]) for t in table)) if table else len(h) for i, h in enumerate(hdr)]
-    right = {2, 3, 4, 5, 6, 7, 8}
+    right = {IDX[c] for c in ("n_docs", "batch_size", "num_epochs", "steps", "metasmoothness",
+                              "ekfac_lds", "magic_lds", "train_loss", "heldout_loss",
+                              "lr", "delta_l2")}
     def row(cells): return " | ".join(c.rjust(w[i]) if i in right else c.ljust(w[i]) for i, c in enumerate(cells))
     lines = [row(hdr), "-+-".join("-" * x for x in w)] + [row(t) for t in table]
     n_done = sum(all(r.get(c) for c in RESULT_COLS) for r in rows)
