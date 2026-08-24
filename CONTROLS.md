@@ -89,6 +89,20 @@ protocol, not an afterthought:
    the ablation is then "axis + retuned lr", which is the standard tuned-baseline convention (an
    optimizer or batch-size comparison at a fixed, mistuned lr would be the real confound).
 
+
+**What may set a sweep centre (clarified 2026-08-25).** An *established trend* may be
+used: longer training preferring a lower learning rate is the example that prompted
+this, and the square-root batch rule is another. What may not is a single measurement
+lying around — one run's number is where mistakes come from, since at n=1 nothing
+separates a real effect from noise or a misconfigured run. The endpoint-extension rule
+stays the mechanism for correcting a centre that turns out wrong; applying a known
+trend up front is that same correction made before paying for it rather than after.
+
+Applied to the step-scaling axis: the optimum halved as steps doubled (1000 and 2000
+steps chose 5e-5, 4000 chose 2.5e-5 at its low endpoint), so the 128k grid was centred
+at 2.5e-5 and 256k at 1.25e-5 instead of letting both land on an endpoint and paying
+for a 10h and a 20h extension run.
+
 ## Training mechanics
 
 | control | value | why |

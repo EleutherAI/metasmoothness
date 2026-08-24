@@ -95,12 +95,25 @@ for opt in ["adamw", "muon"]:
 #
 # Centre is 5e-5, the CONTROLS centre for batch size 16-32 (sqrt(32/256) of the
 # 2e-4 reference), NOT the 2e-4 used for the bs256 token axis.
+# DRIFT RE-CENTRING (2026-08-25). The lr optimum halves as steps double:
+#   1000 steps -> 5e-5, 2000 -> 5e-5 (interior), 4000 -> 2.5e-5 (low endpoint).
+# So 8000 steps is predicted at ~1.25e-5 and a grid centred at 5e-5 would land on
+# its low endpoint and need an extension run -- 10h at 128k, 20h at 256k. The
+# 128k grid therefore drops one step to {1.25e-5, 2.5e-5, 5e-5}.
+#
+# Longer training preferring a lower lr is an established trend, not a reading
+# off one lucky run, so centring on it is allowed (Lucia, 2026-08-25): it is the
+# endpoint extension we already know is coming, applied up front. If 1.25e-5
+# wins its own endpoint, extend as normal.
+GRID = {32000: [2.5e-5, 5e-5, 1e-4],
+        64000: [2.5e-5, 5e-5, 1e-4],
+        128000: [1.25e-5, 2.5e-5, 5e-5]}
 for opt in ["adamw", "muon"]:
     for n in [32000, 64000, 128000]:
         k = f"{n // 1000}k"
         sweep(f"tune_{opt}_{k}_bs32",
               selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_{k}_bs32",
-              lrs=[2.5e-5, 5e-5, 1e-4], priority=2, optimizer=opt, n_docs=n,
+              lrs=GRID[n], priority=2, optimizer=opt, n_docs=n,
               batch_size=32, grad_accum_steps=2,
               notes="ms-only step-scaling point at fixed bs32; no retrain bank planned.")
 
@@ -565,7 +578,7 @@ def _preserve_claims(out_path, rows):
 for opt in ["adamw", "muon"]:
     sweep(f"tune_{opt}_256k_bs32",
           selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_256k_bs32",
-          lrs=[1.25e-5, 2.5e-5, 5e-5], priority=3, optimizer=opt, n_docs=256000,
+          lrs=[6.25e-6, 1.25e-5, 2.5e-5], priority=3, optimizer=opt, n_docs=256000,
           batch_size=32, grad_accum_steps=2,
           notes="ms-only step-scaling point at fixed bs32 (16000 steps); no bank planned.")
 
