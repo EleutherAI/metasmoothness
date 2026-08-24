@@ -533,7 +533,25 @@ BANK_RESULTS = {
               "that is LARGER than most optimizer effects in the grid. A bank's "
               "retrains must all run on one GPU type. "
               "EK-FAC 0.4237 [0.3814, 0.4616], reproducing the 0.4285 in ANCHOR_FILL (older code 10874f93, separate s16k_muon assets) to 0.005 -- the adamw anchor reproduced to 0.0002. "
-              "THE ANCHOR PAIR IS THE FOURTH AND CLEANEST SCORER CONTRAST: MAGIC paired adamw-muon = +0.1032 [+0.0851, +0.1213] with 20/20 query wins, while EK-FAC on the SAME two banks gives +0.0016 [-0.0248, +0.0258] with 12/20 -- a coin flip. Four pairs now: bs32, bs64, 8k and the anchor. MAGIC produces effects of +0.145, +0.103, +0.046 and -0.088; EK-FAC returns -0.001, +0.002, -0.004 and +0.002, never distinguishable from zero."),
+              "THE ANCHOR PAIR IS THE FOURTH AND CLEANEST SCORER CONTRAST: MAGIC paired adamw-muon = +0.1032 [+0.0851, +0.1213] with 20/20 query wins, while EK-FAC on the SAME two banks gives +0.0016 [-0.0248, +0.0258] with 12/20 -- a coin flip. Four pairs now: bs32, bs64, 8k and the anchor. MAGIC produces effects of +0.145, +0.103, +0.046 and -0.088; EK-FAC returns -0.001, +0.002, -0.004 and +0.002, never distinguishable from zero. "
+              "SCALE CAVEAT (added after review, and it corrects an earlier version "
+              "of this note): do NOT read this as EK-FAC being UNABLE to resolve "
+              "the contrast. The scorers sit on different scales -- across the 19 "
+              "measured rows MAGIC spans 0.046-0.945 and EK-FAC only 0.173-0.459, "
+              "about a third the dynamic range -- so a contrast worth +0.10 in "
+              "MAGIC units should not be expected at +0.10 in EK-FAC units. The "
+              "earlier not-a-power-problem argument compared CI widths, which is "
+              "estimate precision, and ignored this. Simple compression does not "
+              "explain it either: on the logit-scale axis EK-FAC moves 0.25 "
+              "(0.4253 -> 0.1760) where MAGIC does not move at all (0.9411 -> "
+              "0.9448), so the two are not related by any monotone rescaling and "
+              "cross-scorer effect sizes are not directly comparable in either "
+              "direction. What the data supports is the OBSERVATION, not a "
+              "mechanism: on identical ground truth MAGIC separates the optimizers "
+              "in 4/4 pairs and EK-FAC does not, which flips the conclusion a "
+              "reader would draw about which optimizer is more attributable. To "
+              "settle the mechanism, normalise each scorer contrast by that "
+              "scorer spread across the grid before comparing."),
     "plan_muon_eps1e17_16k_bs64": dict(
         status="done",
         magic_lds=0.8690, magic_ci_lo=0.8514, magic_ci_hi=0.8837,
