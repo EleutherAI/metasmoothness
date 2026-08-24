@@ -72,6 +72,17 @@ COLUMNS = [
     "attr_window_frac", "n_subsets", "subset_fraction", "n_queries",
     # --- results ---
     "metasmoothness", "ms_direction_seed", "ms_fd_step", "ms_total_movement_l1",
+    # Tail-filter ("filter power"): per query, remove the top filter_frac of
+    # documents the scorer ranks most influential, retrain once, measure that
+    # query's loss change against the row's own bank subsets (random removals
+    # of the same size). Raw loss deltas shrink as the training set grows, so
+    # they are NOT comparable across dataset sizes -- the normalized columns
+    # are the ones to compare. percentile is nonparametric and the safest.
+    # Per-query raw data lives in data/filter_raw/ and data/filter_power.csv;
+    # these columns are a summary of a score design that may still change.
+    "filter_frac", "filter_n_queries",
+    "filter_prop_magic_raw", "filter_prop_magic_z", "filter_prop_magic_pctile",
+    "filter_prop_ekfac_raw", "filter_prop_ekfac_z", "filter_prop_ekfac_pctile",
     "magic_lds", "magic_ci_lo", "magic_ci_hi", "magic_n_queries",
     "ekfac_lds", "ekfac_ci_lo", "ekfac_ci_hi", "ekfac_n_subsets",
     "train_loss", "heldout_loss", "delta_l1", "delta_l2",

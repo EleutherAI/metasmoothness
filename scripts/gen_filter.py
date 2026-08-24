@@ -56,6 +56,11 @@ if not fraction:
     sys.exit("run has no subset_fraction; pass --fraction explicitly")
 
 valid = {f.name for f in dataclasses.fields(Validate)}
+# save_mode stays at bergson's "sqrt" default rather than inheriting the row's
+# "log": sqrt is O(sqrt N) space but the FASTEST mode for a later MAGIC replay,
+# which is the point of keeping these checkpoints at all. Do not substitute
+# save_mode: interval to save disk -- the config docstring says interval is NOT
+# SUPPORTED BY MAGIC, so it would make the checkpoints useless for replay.
 skip = {"run_path", "num_subsets", "skip_validation", "save_models", "save_mode",
         "save_optimizer_state", "cleanup_ckpts", "resume", "overwrite",
         "double_backward_batch_size", "train_mode", "scores", "method",
