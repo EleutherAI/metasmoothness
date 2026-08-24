@@ -797,6 +797,18 @@ MS_MEASURED = {
     # NOTE hardware: this ms ran on A40 (secret-ord-0) while the bs16 bank is
     # A100 (lotus-0). Labelled per the D17 accept-and-label ruling.
     "plan_adam_eps1e17_16k_bs16":     (0.913300, None),
+    "plan_muon_eps1e17_16k_bs32":    (0.995200, None),
+    "plan_adam_eps1e17_16k_bs512":   (0.995000, None),
+    # PRE-REGISTERED PREDICTION (2026-08-24, before its MAGIC exists).
+    # gpt2-medium has the LOWEST ms in the grid, below all three known
+    # collapsed rows (muon 4k 0.9037, bs16 0.9133, scale0.25 0.9150). Its
+    # bank is still scoring (13/20 queries), so nothing about its
+    # attributability informed this number.
+    #   detector claim holds  => MAGIC should land BELOW ~0.31
+    #   MAGIC lands above 0.77 => the claim is falsified on its first
+    #                             forward prediction
+    # ms ran on A100 (maria-1), matching its A100 bank -- no D17 mismatch.
+    "plan_adam_eps1e17_16k_gpt2-medium": (0.858000, None),
 }
 
 TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e-4,
