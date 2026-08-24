@@ -786,6 +786,11 @@ MS_MEASURED = {
     # ms drops sharply exactly where attributability collapses.
     "plan_adam_eps1e17_16k_scale0.5":  (0.987800, None),
     "plan_adam_eps1e17_16k_scale0.25": (0.915000, None),
+    # Batch-size axis. Not monotone against MAGIC: bs64 has the higher ms
+    # (0.9853 vs 0.9800) and the LOWER attributability (0.7811 vs 0.9201).
+    "plan_adam_eps1e17_16k_bs32":     (0.980000, None),
+    "plan_adam_eps1e17_16k_bs64":     (0.985300, None),
+    "plan_muon_eps1e17_16k_bs64":     (0.993900, None),
 }
 
 TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e-4,
