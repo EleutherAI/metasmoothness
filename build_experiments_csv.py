@@ -71,7 +71,7 @@ COLUMNS = [
     # --- attribution / estimator ---
     "attr_window_frac", "n_subsets", "subset_fraction", "n_queries",
     # --- results ---
-    "metasmoothness", "ms_direction_seed", "ms_fd_step",
+    "metasmoothness", "ms_direction_seed", "ms_fd_step", "ms_total_movement_l1",
     "magic_lds", "magic_ci_lo", "magic_ci_hi", "magic_n_queries",
     "ekfac_lds", "ekfac_ci_lo", "ekfac_ci_hi", "ekfac_n_subsets",
     "train_loss", "heldout_loss", "delta_l1", "delta_l2",
@@ -753,6 +753,32 @@ BANK_RESULTS = {
 }
 
 # Tuned lr per completed sweep group (procedure step 5); 2e-4 until the group completes.
+# ---------------------------------------------------------------------------------
+# Metasmoothness probe, measured 2026-08-24 via scripts/gen_ms.py (bergson
+# Metasmoothness command, three trainings per row; no retraining bank).
+# CONTROLS: fd_step 0.1, direction_seed 0, always record total_movement_l1.
+#
+# The four rows that already had a value reproduce it: sm_adamw 0.9930 vs 0.9928
+# recorded, sm_muon 0.996358 vs 0.9963, adam 4k 0.994613 vs 0.9946, muon 4k
+# 0.903657 vs 0.9037 -- so this path agrees with the older msfill_* runs.
+#
+# CONTROLS also says to confirm any cell that is surprising or < 0.9 at
+# direction_seed 1. Every value here is >= 0.9036, and muon 4k (0.9037) sits
+# right at that line -- it is the one to re-confirm at seed 1.
+MS_MEASURED = {
+    "sm_adamw_eps1e17_16k_bs256":     (0.993036, 34078.5),
+    "sm_muon_eps1e17_16k_bs256":      (0.996358, 29223.4),
+    "plan_adam_eps1e17_8k_bs256":     (0.992400, 22937.3),
+    "plan_muon_eps1e17_8k_bs256":     (0.996233, 16996.5),
+    "plan_adam_eps1e17_16k_bs128":    (0.993474, 25212.8),
+    "plan_muon_eps1e17_16k_bs128":    (0.994376, 24160.2),
+    "plan_adam_eps1e17_16k_clip1.0":  (0.989642, 36087.6),
+    "plan_adam_eps1e17_16k_wd0.0":    (0.993033, 34082.1),
+    "plan_adam_eps1e17_16k_wd0.1":    (0.993050, 34045.5),
+    "plan_adam_eps1e17_4k_bs256":     (0.994613,  7576.98),
+    "plan_muon_eps1e17_4k_bs256":     (0.903657, 19677.5),
+}
+
 TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e-4,
             "plan_muon_eps1e17_4k_bs256": 4e-4, "plan_muon_eps1e17_8k_bs256": 2e-4, "plan_adam_eps1e17_32k_bs256": 2e-4, "plan_muon_eps1e17_32k_bs256": 2e-4, "plan_adam_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs64": 1e-4, "plan_adam_eps1e17_16k_bs64": 1e-4, "plan_adam_eps1e17_16k_bs128": 1e-4, "plan_muon_eps1e17_16k_bs128": 1e-4, "plan_adam_eps1e17_16k_ep4": 1e-4,
             # Selections that landed on the anchor value - recorded explicitly so
@@ -909,7 +935,18 @@ def _preserve_claims(out_path, rows):
             r["node_checkin_date"] = prev.get("node_checkin_date", "") or r.get("node_checkin_date", "")
 
 
+def _apply_ms(rows):
+    """Fill the metasmoothness cells. Must run after EVERY row is added."""
+    for r in rows:
+        hit = MS_MEASURED.get(r["run_id"])
+        if hit:
+            r["metasmoothness"], r["ms_total_movement_l1"] = hit
+            r["ms_direction_seed"] = 0
+            r["ms_fd_step"] = 0.1
+
+
 def main():
+    _apply_ms(rows)
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments.csv")
     for r in rows:
         for c in COLUMNS:
