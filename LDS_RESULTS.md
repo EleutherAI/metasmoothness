@@ -713,6 +713,7 @@ properly tuned (the tuned 1e-4, not the anchor's 2e-4).
 
 | muon 4k bs256 | 4e-4 | 0.3020 | [0.2537, 0.3487] | 100 | 20 | lotus-0 A100, nproc 2 | 3c66bb51 |
 | adamw 8k bs256 | 2e-4 | 0.9163 | [0.9013, 0.9280] | 100 | 20 | lotus-0 A100, nproc 1; retrains 87-99 sliced | 3c66bb51 / 5b03b7b1 |
+| muon 16k bs16 | 5e-5 | 0.8850 | [0.8708, 0.8967] | 100 | 20 | lotus-0 A100, nproc 2; retrains 92-99 sliced | 79c08dce |
 
 **Headline of the campaign so far:** the optimizer effect on MAGIC fidelity is
 strongly dataset-size-dependent. Paired adamw-muon at 4k (each arm at its tuned
