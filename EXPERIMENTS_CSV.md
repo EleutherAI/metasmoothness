@@ -30,6 +30,31 @@ filters on every row.
    the rate is inert; both facts are recorded (`dropout_cfg=0.1, dropout_effective=0.0`). All
    planned rows set `dropout_cfg=0.0` explicitly so the ambiguity cannot recur in new runs.
 
+## Required per-run diagnostics (2026-08-24)
+
+Every `done` row must carry **`lr`, `delta_l1`, `delta_l2`, `train_loss`, `heldout_loss`**
+alongside the three metrics. `_assert_per_run_diagnostics` in the builder fails the build on
+any missing cell that is not in its `KNOWN_GAPS` allowlist, so a new row cannot ship
+incomplete.
+
+This exists because the columns emptied silently. `delta_l1`/`delta_l2` and `train_loss` were
+populated *only* by the legacy eps-root-damping family; when that family was excluded
+(2026-08-22) every value went with it, the whole grid went blank, and nothing failed — the
+columns stayed in the schema looking like measurements that had been skipped rather than
+retired. Same failure shape as the wrong-lr incident, so it gets the same treatment: a
+build-time assert rather than a convention.
+
+How to fill each:
+
+| cell | tool |
+|---|---|
+| `delta_l1`, `delta_l2` | `scripts/param_delta.py --csv experiments.csv` — `‖θ_final − θ_0‖` from each run's own `checkpoints/step_0.ckpt`, so it is the true update applied by training (correct for `gpt2-medium` and the logit-scale rows too). Paste into `PARAM_DELTA`. |
+| `heldout_loss` | `scripts/heldout_eval.py` against `heldout_4k`. Logit-scale rows need `--logit-scale`: the scale is run-config state, never persisted in the checkpoint, and an unscaled eval reads ~4.6 instead of ~3.3. |
+| `train_loss` | the same script with `--heldout` pointed at the run's own train set. |
+
+Open gaps, reported by the builder on every run: `train_loss` on all 19 done rows, and
+`heldout_loss` on the two logit-scale rows.
+
 ## What was excluded, and where it still lives
 
 Nothing was deleted — the numbers remain in the narrative docs. They are out of the CSV because
