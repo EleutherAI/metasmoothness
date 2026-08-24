@@ -226,12 +226,17 @@ sweep("tune_adamw_16k_clip1.0", selects_lr_for="plan_adam_eps1e17_16k_clip1.0", 
 #    preact_batchnorm dropped (D14): eval-mode training makes BN stats stale and
 #    batch coupling makes per-doc gradients ill-defined.
 # ---------------------------------------------------------------------------------
-# qk_norm cut per D16.
+# The whole architecture axis is cut per D16, qk_norm included. These rows stay
+# registered as future work, but "cut" rather than "blocked": nothing is pending
+# that would open them. preact_layernorm is the same fine-tune-graft design the
+# ruling rejects, and arch_control exists only to control the arch_mod rows.
 for mod in ["none", "preact_layernorm"]:
     tag = "arch_control" if mod == "none" else mod
     sweep(f"tune_adamw_16k_{tag}", selects_lr_for=f"plan_adam_eps1e17_16k_{tag}",
-          status="blocked", priority=3, model="gpt2_custom", arch_mod=mod,
-          notes="Blocked on the gpt2_custom implementation (D10).")
+          status="cut", priority=3, model="gpt2_custom", arch_mod=mod,
+          notes="Cut with the architecture axis (D16, applied 2026-08-24). "
+                "Future work: the native question needs the modification "
+                "pre-trained in, not grafted into a pretrained model.")
 
 
 # ---------------------------------------------------------------------------------
