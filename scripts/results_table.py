@@ -23,8 +23,9 @@ COLS = [  # (header, csv column, formatter)
     ("MAGIC LDS",      "magic_lds",      lambda v: f"{float(v):.4f}"),
     # Tail-filter power, z against the row's own bank as the random control.
     # The raw nat deltas are not comparable across dataset sizes; z is.
-    ("MAGIC filt z",   "filter_prop_magic_z", lambda v: f"{float(v):.1f}"),
-    ("EK-FAC filt z",  "filter_prop_ekfac_z", lambda v: f"{float(v):.1f}"),
+    ("rand filt Δ",    "filter_random_delta", lambda v: f"{float(v):.5f}"),
+    ("EK-FAC filt Δ",  "filter_ekfac_delta",  lambda v: f"{float(v):.5f}"),
+    ("MAGIC filt Δ",   "filter_magic_delta",  lambda v: f"{float(v):.5f}"),
     ("train loss",     "train_loss",     lambda v: f"{float(v):.4f}"),
     ("heldout loss",   "heldout_loss",   lambda v: f"{float(v):.4f}"),
     ("delta L2",       "delta_l2",       lambda v: f"{float(v):.2f}"),
@@ -70,8 +71,8 @@ def main():
     hdr = [h for h, _, _ in COLS]
     w = [max(len(h), *(len(t[i]) for t in table)) if table else len(h) for i, h in enumerate(hdr)]
     right = {IDX[c] for c in ("n_docs", "batch_size", "num_epochs", "steps", "metasmoothness",
-                              "ekfac_lds", "magic_lds", "filter_prop_magic_z",
-                              "filter_prop_ekfac_z", "train_loss", "heldout_loss",
+                              "ekfac_lds", "magic_lds", "filter_random_delta",
+                              "filter_ekfac_delta", "filter_magic_delta", "train_loss", "heldout_loss",
                               "lr", "delta_l2")}
     def row(cells): return " | ".join(c.rjust(w[i]) if i in right else c.ljust(w[i]) for i, c in enumerate(cells))
     lines = [row(hdr), "-+-".join("-" * x for x in w)] + [row(t) for t in table]

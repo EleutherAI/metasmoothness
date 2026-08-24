@@ -80,9 +80,16 @@ COLUMNS = [
     # are the ones to compare. percentile is nonparametric and the safest.
     # Per-query raw data lives in data/filter_raw/ and data/filter_power.csv;
     # these columns are a summary of a score design that may still change.
+    # Tail filter: the mean query-loss delta under each way of choosing which 1%
+    # of the training data to remove, in nats, with a 10k bootstrap CI over
+    # queries. Three directly comparable quantities rather than a derived score --
+    # z was dropped because within a run both scorers share the same bank as
+    # their control, so random_sd is identical and z is just the raw delta times
+    # a constant. Raw per-query data: data/filter_raw/, data/filter_deltas.csv.
     "filter_frac", "filter_n_queries",
-    "filter_prop_magic_raw", "filter_prop_magic_z", "filter_prop_magic_pctile",
-    "filter_prop_ekfac_raw", "filter_prop_ekfac_z", "filter_prop_ekfac_pctile",
+    "filter_random_delta", "filter_random_lo", "filter_random_hi",
+    "filter_ekfac_delta", "filter_ekfac_lo", "filter_ekfac_hi",
+    "filter_magic_delta", "filter_magic_lo", "filter_magic_hi",
     "magic_lds", "magic_ci_lo", "magic_ci_hi", "magic_n_queries",
     "ekfac_lds", "ekfac_ci_lo", "ekfac_ci_hi", "ekfac_n_subsets",
     "train_loss", "heldout_loss", "delta_l1", "delta_l2",
@@ -1143,23 +1150,32 @@ def _preserve_claims(out_path, rows):
 # dataset sizes. pctile saturates at 0.990 (rank 1 of 101) whenever the filter
 # beats every random removal, which it does on every query measured so far, so
 # it is recorded but carries no resolution at this fraction.
-FILTER_POWER = {
-    # run_id: (magic_raw, magic_z, magic_pctile, ekfac_raw, ekfac_z, ekfac_pctile)
-    "plan_adam_eps1e17_4k_bs256": (0.02505, 30.357, 0.990, 0.01153, 13.566, 0.990),
-    "plan_adam_eps1e17_8k_bs256": (0.07060, 55.157, 0.990, 0.02923, 21.528, 0.990),
+FILTER_DELTAS = {
+    # run_id: (random, ekfac, magic) each (mean, lo, hi) in nats
+    "plan_adam_eps1e17_4k_bs256": (
+        (0.00004, -0.00001, 0.00008),
+        (0.01153, 0.00887, 0.01516),
+        (0.02505, 0.02250, 0.02840)),
+    "plan_adam_eps1e17_8k_bs256": (
+        (0.00018, 0.00007, 0.00028),
+        (0.02923, 0.01914, 0.04618),
+        (0.07060, 0.05936, 0.08580)),
 }
 
 
 def _apply_filter_power(rows):
     """Fill the tail-filter cells. Must run after every row is added."""
     for r in rows:
-        hit = FILTER_POWER.get(r["run_id"])
-        if hit:
-            (r["filter_prop_magic_raw"], r["filter_prop_magic_z"],
-             r["filter_prop_magic_pctile"], r["filter_prop_ekfac_raw"],
-             r["filter_prop_ekfac_z"], r["filter_prop_ekfac_pctile"]) = hit
-            r["filter_frac"] = 0.01
-            r["filter_n_queries"] = 20
+        hit = FILTER_DELTAS.get(r["run_id"])
+        if not hit:
+            continue
+        for label, (m, lo, hi) in zip(("random", "ekfac", "magic"), hit):
+            r[f"filter_{label}_delta"] = m
+            r[f"filter_{label}_lo"] = lo
+            r[f"filter_{label}_hi"] = hi
+        r["filter_frac"] = 0.01
+        r["filter_n_queries"] = 20
+
 
 def _apply_ms(rows):
     """Fill the metasmoothness cells. Must run after EVERY row is added."""
