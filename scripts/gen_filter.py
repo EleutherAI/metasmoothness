@@ -73,16 +73,20 @@ out_dir = root / f"filter_{args.method.replace('filter-', '')}_{args.source}"
 # retrained models directly, which drops this from ~120 retrains per row to 20
 # AND makes the comparator the bank's own randoms rather than a new draw.
 # bergson asserts the bank removes the same number of docs as the filter.
+# retrained_dir is the RUN directory, not the retrained/ subdir: bergson's
+# load_and_validate_subsets_match asserts (d / "retrained" / "base").exists(),
+# so it appends "retrained" itself. Passing the subdir makes it look for
+# retrained/retrained/base and fail AFTER all 20 per-query retrains are done.
 retrained = root / "retrained"
-if not retrained.is_dir():
-    sys.exit(f"no bank at {retrained}; the random control needs it")
+if not (retrained / "base").is_dir():
+    sys.exit(f"no bank base at {retrained / 'base'}; the random control needs it")
 
 cfg.update(
     run_path=str(out_dir),
     scores=str(scores),
     method=args.method,
     subset_fraction=float(fraction),
-    retrained_dir=str(retrained),
+    retrained_dir=str(root),
 )
 cfg["distributed"] = dict(cfg.get("distributed") or {}, nproc_per_node=args.nproc, nnode=1)
 
@@ -94,7 +98,7 @@ path.write_text(yaml.safe_dump({"steps": [{"validate": cfg}]}, sort_keys=False))
 print(f"wrote {path}")
 print(f"  source={args.source} scores={scores}")
 print(f"  method={args.method} subset_fraction={fraction} nproc={args.nproc}")
-print(f"  random control: bank at {retrained}")
+print(f"  random control: bank at {retrained} (passed as run dir {root})")
 print(f"  queries={(cfg.get('query') or {}).get('dataset','?').split('/')[-1]}")
 if dropped:
     print(f"  not accepted by Validate, omitted: {dropped}")
