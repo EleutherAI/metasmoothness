@@ -436,6 +436,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.9411, magic_ci_lo=0.9326, magic_ci_hi=0.9477,
         magic_n_queries=20,
+        ekfac_lds=0.4253, ekfac_ci_lo=0.3772, ekfac_ci_hi=0.4697,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/sm_adamw_eps1e17_16k_bs256",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/sm_adamw_eps1e17_16k_bs256",
@@ -446,7 +448,14 @@ BANK_RESULTS = {
               "and 70-100) were computed during sharding and are QUARANTINED as "
               "validation_*.csv.a100, NOT merged -- see the GPU-type finding below. "
               "The A40 main process completed all 100 subsets by itself, so no "
-              "recomputation was needed."),
+              "recomputation was needed. "
+              "EK-FAC 0.4253 [0.3772, 0.4697], and this is a REPRODUCTION: "
+              "ANCHOR_FILL already recorded 0.4251 [0.3772, 0.4693] for the adamw "
+              "anchor, measured on a different bergson commit (10874f93) against "
+              "the separate s16k_adamw assets. Fresh bank, pinned env 79c08dce, "
+              "same number to 2e-4. "
+              "Contrast MAGIC on the same comparison: the anchor was previously "
+              "quoted as 0.9333 (see the bs256/16k references in other row notes) and measures 0.9411 here, a shift of 0.008 -- just outside this row half-width of 0.0076. EK-FAC depends only on the final model, while MAGIC depends on the whole training trajectory, which is rebuilt per bank; the asymmetry in how well each reproduces across banks is expected, and worth stating explicitly for D15."),
     "sm_muon_eps1e17_16k_bs256": dict(
         status="done",
         magic_lds=0.8379, magic_ci_lo=0.8205, magic_ci_hi=0.8519,
