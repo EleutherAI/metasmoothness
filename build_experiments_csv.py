@@ -1131,6 +1131,36 @@ def _preserve_claims(out_path, rows):
             r["node_checkin_date"] = prev.get("node_checkin_date", "") or r.get("node_checkin_date", "")
 
 
+
+# Tail-filter ("proponent filter") results, measured 2026-08-25 via
+# scripts/gen_filter.py + scripts/filter_power.py. Per query: remove the top 1%
+# of docs the scorer ranks most influential, retrain once, measure that query's
+# loss change against the row's own leave-k-out bank (random removals of the
+# same size). Raw per-query data in data/filter_raw/ and data/filter_power.csv.
+#
+# z = (filter_change - random_mean) / random_sd is the comparable number: raw
+# loss deltas are in nats and grow with N, so they are not comparable across
+# dataset sizes. pctile saturates at 0.990 (rank 1 of 101) whenever the filter
+# beats every random removal, which it does on every query measured so far, so
+# it is recorded but carries no resolution at this fraction.
+FILTER_POWER = {
+    # run_id: (magic_raw, magic_z, magic_pctile, ekfac_raw, ekfac_z, ekfac_pctile)
+    "plan_adam_eps1e17_4k_bs256": (0.02505, 30.357, 0.990, 0.01153, 13.566, 0.990),
+    "plan_adam_eps1e17_8k_bs256": (0.07060, 55.157, 0.990, 0.02923, 21.528, 0.990),
+}
+
+
+def _apply_filter_power(rows):
+    """Fill the tail-filter cells. Must run after every row is added."""
+    for r in rows:
+        hit = FILTER_POWER.get(r["run_id"])
+        if hit:
+            (r["filter_prop_magic_raw"], r["filter_prop_magic_z"],
+             r["filter_prop_magic_pctile"], r["filter_prop_ekfac_raw"],
+             r["filter_prop_ekfac_z"], r["filter_prop_ekfac_pctile"]) = hit
+            r["filter_frac"] = 0.01
+            r["filter_n_queries"] = 20
+
 def _apply_ms(rows):
     """Fill the metasmoothness cells. Must run after EVERY row is added."""
     for r in rows:
@@ -1183,6 +1213,7 @@ def _assert_per_run_diagnostics(rows):
 
 def main():
     _apply_ms(rows)
+    _apply_filter_power(rows)
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "experiments.csv")
     for r in rows:
         for c in COLUMNS:
