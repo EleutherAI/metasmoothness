@@ -292,8 +292,35 @@ and it moves the answer: the same bank scores **0.7828** from the mixed set and
 **0.8379** from the homogeneous A40 set. That 0.055 gap is larger than most
 optimizer effects in the grid.
 
-**Settled, and already applied:** a bank's retrains must all run on one GPU
-type. Both anchors were rebuilt from homogeneous A40 data; the A100 slices are
+**CONFOUND IN THIS MEASUREMENT (found 2026-08-24, after Lucia asked whether the
+nodes differ in torch/nccl).** Every numerically relevant package is identical
+fleet-wide -- torch 2.13.0+cu126, CUDA 12.6, NCCL 2.29.3, triton 3.7.1,
+transformers 5.15.1, datasets 5.0.1, numpy 2.4.6, `tf32_matmul=False` -- and all
+runs are inside a pinned venv. But **Python patch version tracks the GPU split
+exactly** for the nodes compared: A40 nodes are 3.11.15 and the three borrowed
+A100 pods are 3.11.16. The slices compared were A40/3.11.15 against
+A100-pod/3.11.16, so GPU architecture and Python version are **not separated by
+this experiment**, and the original wording here attributed it to hardware
+without checking.
+
+Hardware remains the likely cause -- the arithmetic happens in identical
+compiled CUDA kernels, and sm_86 vs sm_80 select different cuBLAS reduction
+orders, whereas a CPython patch release should not alter kernel numerics -- but
+that is an argument, not a measurement.
+
+**The control that settles it:** lotus-0 is an A100 (sm_80) running Python
+3.11.15, via `/mnt/ssd-2/lucia/envs/paper` (same package versions, different
+prefix). Retraining a handful of subsets of an existing A40 bank there costs a
+few retrains rather than a new bank: agreement to ~1e-7 means Python was the
+cause, a ~7e-4 gap means it is the GPU.
+
+Note also `tf32_cudnn=True` fleet-wide while `tf32_matmul=False`. CONTROLS asks
+for tf32 off; the matmul path is the one that matters for a transformer and it
+is off, and GPT-2 has no convolutions, so this is not believed to affect any
+result -- but it does not match the stated intent and should be set explicitly.
+
+**Settled regardless of which cause it is, and already applied:** a bank's
+retrains must all run on one node type. Both anchors were rebuilt from homogeneous A40 data; the A100 slices are
 quarantined as `validation_*.csv.a100`.
 
 **Open question, which is a controls decision rather than a scheduling one.**
