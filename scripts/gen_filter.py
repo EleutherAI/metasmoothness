@@ -23,6 +23,12 @@ BERGSON = "/mnt/ssd-1/lucia/bergson-filter"
 sys.path.insert(0, BERGSON)
 from bergson.cli.commands import Validate  # noqa: E402
 
+# `python -P` keeps a bergson checkout's cwd off sys.path, but it also drops
+# this script's own directory -- put just that one entry back for the import.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import run_config  # noqa: E402
+
 EXP = ["/mnt/ssd-2/lucia/paper_runs/experiments",
        "/mnt/ssd-1/lucia/paper_runs/experiments"]
 
@@ -42,7 +48,7 @@ for base in EXP:
 if root is None:
     sys.exit(f"run dir not found: {args.run_id}")
 
-exp = yaml.safe_load((root / "experiment.yaml").read_text())
+exp = run_config.load(root)
 magic = next(s["magic"] for s in exp["steps"] if "magic" in s)
 
 scores = root / ("scores" if args.source == "magic" else "ekfac_scores/scores")

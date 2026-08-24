@@ -16,17 +16,28 @@ REPO=$(cd "$(dirname "$0")/.." && pwd)
 BERGSON=/mnt/ssd-1/lucia/bergson-damping
 RUNS=/mnt/ssd-2/lucia/paper_runs/tuning
 NPROC=$(awk -F, '{print NF}' <<<"$DEVS")
+# D15: the pinned venv is the only valid environment, and bergson must not
+# run with a checkout as cwd -- Python puts cwd first on sys.path, which
+# silently shadows PYTHONPATH with whatever branch that checkout is on.
+ENVPY=/mnt/ssd-2/lucia/envs/paper/bin/python
+# Distinct rendezvous port per slot -- concurrent slots sharing the default
+# 29500 hang in distributed init before CUDA is ever touched.
+PORT=$((29500 + ${DEVS%%,*}))
 LOG=$RUNS/slot_${DEVS//,/-}.log
 
 for RID in "$@"; do
   echo "=== $RID (GPUs $DEVS) $(date -u +%H:%M:%S) ==="
-  python "$REPO/scripts/gen_tuning_run.py" "$RID" --nproc "$NPROC" || { echo "$RID GENFAIL" | tee -a "$LOG"; continue; }
-  CFG=$RUNS/${RID}_s42/tune.yaml
-  echo "CMD: PYTHONPATH=$BERGSON CUDA_VISIBLE_DEVICES=$DEVS bergson $CFG"
-  timeout 7200 env PYTHONPATH="$BERGSON" CUDA_VISIBLE_DEVICES="$DEVS" bergson "$CFG"
+  $ENVPY -s -P "$REPO/scripts/gen_tuning_run.py" "$RID" --nproc "$NPROC" || { echo "$RID GENFAIL" | tee -a "$LOG"; continue; }
+  # Launch from the git-tracked config, not the copy inside the run
+  # directory -- that copy is disposable and gets swept.
+  CFG=$REPO/configs/tuning/${RID}_s42.yaml
+  [ -f "$CFG" ] || { echo "$RID NOCONFIG $CFG" | tee -a "$LOG"; continue; }
+  echo "CMD: (cd /tmp) PYTHONPATH=$BERGSON CUDA_VISIBLE_DEVICES=$DEVS MASTER_PORT=$PORT $ENVPY -s -P -m bergson $CFG"
+  (cd /tmp && timeout 7200 env PYTHONNOUSERSITE=1 PYTHONPATH="$BERGSON" MASTER_PORT="$PORT" \
+     CUDA_VISIBLE_DEVICES="$DEVS" "$ENVPY" -s -P -m bergson "$CFG")
   RC=$?
   if [ $RC -ne 0 ]; then echo "$RID FAILED rc=$RC" | tee -a "$LOG"; continue; fi
-  H=$(CUDA_VISIBLE_DEVICES=${DEVS%%,*} timeout 1800 python "$REPO/scripts/heldout_eval.py" "$RUNS/${RID}_s42/model" | tail -1)
+  H=$(CUDA_VISIBLE_DEVICES=${DEVS%%,*} timeout 1800 $ENVPY -s -P "$REPO/scripts/heldout_eval.py" "$RUNS/${RID}_s42/model" | tail -1)
   echo "$RID $H" | tee -a "$LOG"
   rm -rf "$RUNS/${RID}_s42/checkpoints"
 done

@@ -33,6 +33,12 @@ _known, _ = _pre.parse_known_args()
 sys.path.insert(0, _known.bergson)
 from bergson.config.config import MetasmoothnessConfig  # noqa: E402
 
+# `python -P` keeps a bergson checkout's cwd off sys.path, but it also drops
+# this script's own directory -- put just that one entry back for the import.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import run_config  # noqa: E402
+
 EXP = ["/mnt/ssd-2/lucia/paper_runs/experiments",
        "/mnt/ssd-1/lucia/paper_runs/experiments"]
 
@@ -51,7 +57,7 @@ for base in EXP:
 if root is None:
     sys.exit(f"run dir not found: {args.run_id}")
 
-exp = yaml.safe_load((root / "experiment.yaml").read_text())
+exp = run_config.load(root)
 magic = next(s["magic"] for s in exp["steps"] if "magic" in s)
 
 valid = {f.name for f in dataclasses.fields(MetasmoothnessConfig)}

@@ -16,6 +16,12 @@ from pathlib import Path
 
 import yaml
 
+# `python -P` keeps a bergson checkout's cwd off sys.path, but it also drops
+# this script's own directory -- put just that one entry back for the import.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import run_config  # noqa: E402
+
 TEMPLATE = Path(
     "/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_4k_bs256"
     "/ekfac_scores/config.yaml"
@@ -44,7 +50,7 @@ if not base_model.is_dir():
 
 # The training dataset and world size come from the row's own magic config, so
 # EK-FAC scores the same data the bank was built on.
-exp = yaml.safe_load((root / "experiment.yaml").read_text())
+exp = run_config.load(root)
 magic = next(s["magic"] for s in exp["steps"] if "magic" in s)
 train_ds = magic["data"]["dataset"]
 query_ds = magic["query"]["dataset"]

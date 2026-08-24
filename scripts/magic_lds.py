@@ -27,6 +27,13 @@ import numpy as np
 import pandas as pd
 from scipy.stats import rankdata, spearmanr
 
+import sys
+# `python -P` keeps a bergson checkout's cwd off sys.path, but it also drops
+# this script's own directory -- put just that one entry back for the import.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import run_config  # noqa: E402
+
 
 def magic_lds(validation_csv: Path, n_boot: int = 10000, seed: int = 0):
     v = pd.read_csv(validation_csv)
@@ -72,7 +79,7 @@ def merge_slices(run_dir: Path) -> Path:
     n_q = v["query"].nunique()
     bad = seen[seen != n_q]
     assert bad.empty, f"subsets with duplicate/partial rows: {bad.index.tolist()}"
-    cfg = run_dir / "experiment.yaml"
+    cfg = run_config.resolve(run_dir)
     expected = int(re.search(r"num_subsets: (\d+)", cfg.read_text()).group(1))
     missing = sorted(set(range(expected)) - set(seen.index))
     assert not missing, f"missing subsets: {missing}"

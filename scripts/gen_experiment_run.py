@@ -25,6 +25,13 @@ from pathlib import Path
 
 import yaml
 
+import sys
+# `python -P` keeps a bergson checkout's cwd off sys.path, but it also drops
+# this script's own directory -- put just that one entry back for the import.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import run_config  # noqa: E402
+
 REPO = Path(__file__).resolve().parent.parent
 BERGSON = "/mnt/ssd-1/lucia/bergson-main-paper-429"
 # Datasets are gitignored, so they exist ONLY in the original checkout -- a fresh
@@ -144,17 +151,13 @@ def main() -> None:
     if scale != 1.0:
         cfg["steps"][0]["magic"]["logit_scale"] = scale
 
-    os.makedirs(run_path, exist_ok=True)
-    cfg_path = f"{run_path}/experiment.yaml"
-    with open(cfg_path, "w") as f:
-        yaml.safe_dump(cfg, f, sort_keys=False)
-    mirror = REPO / "configs" / "experiments" / f"{args.run_id}.yaml"
-    mirror.parent.mkdir(parents=True, exist_ok=True)
-    with open(mirror, "w") as f:
-        yaml.safe_dump(cfg, f, sort_keys=False)
+    # Launch from the tracked copy under configs/: a run directory is
+    # disposable and has twice been swept out from under its own config.
+    mirror = run_config.save(cfg, run_path)
+    cfg_path = mirror
 
     print(f"wrote {cfg_path} (lr={lr:g}, nproc={args.nproc} — record nproc in the row notes)")
-    print(f"mirrored to {mirror} — commit it with the claim")
+    print("tracked under configs/ — commit it with the claim")
     print("\n# Canonical invocation (pinned env; -s -P + NOUSERSITE close the shadowing traps):")
     print(f"cd /tmp && CUDA_VISIBLE_DEVICES=<gpus> MASTER_PORT=<unique> PYTHONNOUSERSITE=1 \\\n"
           f"  PYTHONPATH={BERGSON} \\\n"

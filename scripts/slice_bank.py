@@ -16,6 +16,13 @@ from pathlib import Path
 
 import yaml
 
+import sys
+# `python -P` keeps a bergson checkout's cwd off sys.path, but it also drops
+# this script's own directory -- put just that one entry back for the import.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import run_config  # noqa: E402
+
 EXPERIMENTS = Path("/mnt/ssd-2/lucia/paper_runs/experiments")
 BERGSON = "/mnt/ssd-1/lucia/bergson-main-paper-429"
 PYTHON = "/home/lucia/envs/paper/bin/python"
@@ -35,7 +42,7 @@ def main() -> None:
     args = ap.parse_args()
 
     run = EXPERIMENTS / args.run_id
-    cfg = yaml.safe_load((run / "experiment.yaml").read_text())
+    cfg = run_config.load(run)
     magic = magic_block(cfg)
     n = magic["num_subsets"]
     nproc = magic["distributed"]["nproc_per_node"]
@@ -47,7 +54,7 @@ def main() -> None:
 
     edges = [args.start + round(i * (n - args.start) / args.slices) for i in range(args.slices + 1)]
     for k, (a, b) in enumerate(zip(edges, edges[1:])):
-        sliced = yaml.safe_load((run / "experiment.yaml").read_text())
+        sliced = run_config.load(run)
         block = magic_block(sliced)
         block["subset_start"], block["subset_stop"] = a, b
         path = run / f"slice_{a}_{b}.yaml"

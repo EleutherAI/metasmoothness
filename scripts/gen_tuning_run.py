@@ -22,6 +22,13 @@ from pathlib import Path
 
 import yaml
 
+import sys
+# `python -P` keeps a bergson checkout's cwd off sys.path, but it also drops
+# this script's own directory -- put just that one entry back for the import.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import run_config  # noqa: E402
+
 REPO = Path(__file__).resolve().parent.parent
 BERGSON = "/mnt/ssd-1/lucia/bergson-main-paper-429"
 # Datasets are gitignored, so they live only in the original checkout -- deriving
@@ -96,19 +103,14 @@ def main() -> None:
     if scale != 1.0:
         cfg["steps"][0]["train"]["logit_scale"] = scale
 
-    os.makedirs(run_path, exist_ok=True)
-    cfg_path = f"{run_path}/tune.yaml"
-    with open(cfg_path, "w") as f:
-        yaml.safe_dump(cfg, f, sort_keys=False)
-
-    mirror = REPO / "configs" / "tuning" / f"{args.run_id}_s{args.seed}.yaml"
-    mirror.parent.mkdir(parents=True, exist_ok=True)
-    with open(mirror, "w") as f:
-        yaml.safe_dump(cfg, f, sort_keys=False)
+    # Launch from the tracked copy under configs/: a run directory is
+    # disposable and has twice been swept out from under its own config.
+    mirror = run_config.save(cfg, run_path, "tune.yaml")
+    cfg_path = mirror
 
     steps = math.ceil(n * ep / bs)
     print(f"wrote {cfg_path}   ({steps} steps; ga={ga} at nproc={args.nproc})")
-    print(f"mirrored to {mirror} — commit it with the claim")
+    print("tracked under configs/ — commit it with the claim")
     print("\n# 1. train:")
     print(f"cd /tmp && PYTHONNOUSERSITE=1 PYTHONPATH={BERGSON} "
           f"{PYTHON} -s -P -m bergson {cfg_path}")
