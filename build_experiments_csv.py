@@ -351,6 +351,8 @@ BANK_RESULTS = {
         magic_n_queries=20,
         # scripts/param_delta.py against this run's own checkpoints/step_0.ckpt
         delta_l1=226800.32, delta_l2=26.1277,
+        # scripts/run_losses.py against the run's own final checkpoint
+        train_loss=3.0518, heldout_loss=3.2440,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs16",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs16",
@@ -922,7 +924,7 @@ for n in [4000, 8000, 32000, 64000]:
 # grows, so steps scale directly: 32k -> 2000, 64k -> 4000, 128k -> 8000.
 # No bank: MAGIC would need one reverse pass per query over the whole corpus,
 # 150h+ per row. magic_lds/ekfac_lds stay empty by design.
-for n in [32000, 64000, 128000, 256000]:
+for n in [32000, 64000, 128000, 256000, 512000]:
     k = f"{n // 1000}k"
     for opt, pre in (("adamw", "adam"), ("muon", "muon")):
         rid = f"plan_{pre}_eps1e17_{k}_bs32"

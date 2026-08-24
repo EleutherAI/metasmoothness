@@ -576,6 +576,13 @@ def _preserve_claims(out_path, rows):
 # the batch-size heuristic: 32k chose 5e-5 and both 64k arms won at 2.5e-5, so a
 # grid centred at 5e-5 would almost certainly land on its low endpoint again.
 for opt in ["adamw", "muon"]:
+    sweep(f"tune_{opt}_512k_bs32",
+          selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_512k_bs32",
+          lrs=[3.125e-6, 6.25e-6, 1.25e-5], priority=3, optimizer=opt, n_docs=512000,
+          batch_size=32, grad_accum_steps=2,
+          notes="ms-only step-scaling point at fixed bs32 (32000 steps); no bank planned.")
+
+for opt in ["adamw", "muon"]:
     sweep(f"tune_{opt}_256k_bs32",
           selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_256k_bs32",
           lrs=[6.25e-6, 1.25e-5, 2.5e-5], priority=3, optimizer=opt, n_docs=256000,
