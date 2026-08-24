@@ -38,8 +38,23 @@ for RID in "$@"; do
   # directory -- that copy is disposable and gets swept.
   CFG=$REPO/configs/tuning/${RID}_s42.yaml
   [ -f "$CFG" ] || { echo "$RID NOCONFIG $CFG" | tee -a "$LOG"; continue; }
-  echo "CMD: (cd /tmp) PYTHONPATH=$BERGSON CUDA_VISIBLE_DEVICES=$DEVS MASTER_PORT=$PORT $ENVPY -s -P -m bergson $CFG"
-  (cd /tmp && timeout 7200 env PYTHONNOUSERSITE=1 PYTHONPATH="$BERGSON" MASTER_PORT="$PORT" \
+  # Deadline from the run's own step count: a 256k row is 16000 steps and a
+  # flat 2h killed it at 4600 with no checkpoint to resume from. TIMEOUT=<secs>
+  # overrides.
+  STEPS=$($ENVPY -s -P -c "
+import csv, sys
+rid = sys.argv[1]
+with open(sys.argv[2]) as f:
+    for r in csv.DictReader(f):
+        if r['run_id'] == rid:
+            print(r['steps'] or 0); break
+    else:
+        print(0)
+" "$RID" "$REPO/tuning.csv" 2>/dev/null || echo 0)
+  DEADLINE=${TIMEOUT:-$(( STEPS > 0 ? STEPS * 2 + 1800 : 7200 ))}
+  [ "$DEADLINE" -lt 7200 ] && DEADLINE=7200
+  echo "CMD: (cd /tmp) PYTHONPATH=$BERGSON CUDA_VISIBLE_DEVICES=$DEVS MASTER_PORT=$PORT $ENVPY -s -P -m bergson $CFG  (deadline ${DEADLINE}s, ${STEPS} steps)"
+  (cd /tmp && timeout "$DEADLINE" env PYTHONNOUSERSITE=1 PYTHONPATH="$BERGSON" MASTER_PORT="$PORT" \
      HF_HUB_OFFLINE=1 \
      CUDA_VISIBLE_DEVICES="$DEVS" "$ENVPY" -s -P -m bergson "$CFG")
   RC=$?
