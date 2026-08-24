@@ -835,6 +835,11 @@ MS_MEASURED = {
     "plan_adam_eps1e17_16k_wd0.1":    (0.993050, 34045.5),
     "plan_adam_eps1e17_4k_bs256":     (0.994613,  7576.98),
     "plan_muon_eps1e17_4k_bs256":     (0.903657, 19677.5),
+    # Step-scaling axis at fixed bs32, lr 5e-05 for both optimizers (the
+    # interior minimum of the 32k bs32 sweep: adamw 3.2342 vs 3.238 either
+    # side, muon 3.231 vs 3.2351). 2000 steps, nproc 2, A40.
+    "plan_adam_eps1e17_32k_bs32":     (0.986618, 34054.9),
+    "plan_muon_eps1e17_32k_bs32":     (0.994085, 38738.9),
     # Logit-scale axis, measured on A40 (matching these banks):
     #   scale 1.0  (lr 2e-4) -> ms 0.9930 / MAGIC 0.9411
     #   scale 0.5  (lr 2e-4) -> ms 0.9878 / MAGIC 0.9448
