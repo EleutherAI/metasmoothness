@@ -66,8 +66,7 @@ MAGIC costs one reverse pass per query.  Bootstrapped confidence intervals of me
 | 15 | 18 / 21 |
 | 20 | 19 / 21 |
 
-Most rows are already well inside the threshold at 5 queries, e.g. the baseline model
-is 0.0163 at n=5 and 0.0083 at n=20. Low-LDS rows have higher query variance and need 
+The baseline model is 0.0163 at n=5 and 0.0083 at n=20. Low-LDS rows have higher query variance and need 
 more queries to get low CIs, e.g. a batch size 16 row has +/-0.1014 at n=20 and muon 4k 
 has +/-0.1244. Regenerate data with `scripts/ci_vs_queries.py`.
 
