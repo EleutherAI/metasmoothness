@@ -374,7 +374,25 @@ The attribution scores could not be compared here: slices resume MAGIC from
 run, which is why `score_sum` matched to exactly 0.0. A fresh A100 run computes
 both halves on A100, so its exposure is at least as large, not smaller.
 
-**Options, none taken unilaterally:** (a) re-run these three arms on A40 so every
+**SCOPE RULING (Lucia, 2026-08-24): accept and label. No re-runs.** The
+cross-hardware comparisons stay as measured and are reported as cross-hardware,
+carrying the unquantified error recorded in D13. Nothing is re-measured to
+unify hardware, and the A100 anchor control is NOT run.
+
+What this does and does not touch:
+
+| comparison | hardware | status under this ruling |
+|---|---|---|
+| four optimizer pairs (anchor, 8k, bs32, bs64) | all A40 | **unaffected** -- the EK-FAC vs MAGIC result is within-hardware |
+| bs16 optimizer pair | A100 both arms | **unaffected** -- internally consistent |
+| batch-size axis as a curve | bs16/bs128/bs512 A100, bs32/bs64/bs256 A40 | label cross-hardware |
+| bs128 optimizer pair | adam A100 vs muon A40 | label cross-hardware; do not quote as an optimizer effect |
+| model size (D11) | gpt2-medium A100 vs 124M anchor A40 | label cross-hardware |
+
+The rule that a single bank must not mix node types still stands and is
+enforced; this ruling is only about not repairing comparisons ACROSS rows.
+
+**Options considered, not taken:** (a) re-run these three arms on A40 so every
 comparison is within-hardware — costly, and gpt2-medium is ~50 h on A100 and
 worse on A40; (b) keep them and re-measure their A40 partners on A100 instead;
 (c) accept them with the confound recorded, and treat cross-hardware contrasts
