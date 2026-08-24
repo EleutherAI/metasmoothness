@@ -779,6 +779,13 @@ MS_MEASURED = {
     "plan_adam_eps1e17_16k_wd0.1":    (0.993050, 34045.5),
     "plan_adam_eps1e17_4k_bs256":     (0.994613,  7576.98),
     "plan_muon_eps1e17_4k_bs256":     (0.903657, 19677.5),
+    # Logit-scale axis, measured on A40 (matching these banks):
+    #   scale 1.0 -> ms 0.9930 / MAGIC 0.9411
+    #   scale 0.5 -> ms 0.9878 / MAGIC 0.9448
+    #   scale 0.25 -> ms 0.9150 / MAGIC 0.0456
+    # ms drops sharply exactly where attributability collapses.
+    "plan_adam_eps1e17_16k_scale0.5":  (0.987800, None),
+    "plan_adam_eps1e17_16k_scale0.25": (0.915000, None),
 }
 
 TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e-4,
@@ -942,7 +949,10 @@ def _apply_ms(rows):
     for r in rows:
         hit = MS_MEASURED.get(r["run_id"])
         if hit:
-            r["metasmoothness"], r["ms_total_movement_l1"] = hit
+            score, movement = hit
+            r["metasmoothness"] = score
+            if movement is not None:
+                r["ms_total_movement_l1"] = movement
             r["ms_direction_seed"] = 0
             r["ms_fd_step"] = 0.1
 
