@@ -69,3 +69,27 @@ plan_muon_eps1e17_64k_bs256       | muon      | 64,000 | 256 |        2 |     50
 are excluded from the paper CSVs (old shuffle implementation — see the exclusion table in
 EXPERIMENTS_CSV.md). They remain the provenance record; read them only when you need the
 history behind a decision.
+
+## Differences in final query loss across GPU types
+
+Loss query differences when re-training on the same subsets across GPUs, vs. between
+different subsets on the same GPUs.
+
+| varied | held fixed | comparisons | median | p90 | max |
+|---|---|---:|---:|---:|---:|
+| GPU type (A40 → A100) | run, subset, query | 240 | 6.7e-04 | 2.5e-03 | 3.3e-03 |
+| which subset was dropped | run, query, GPU | 720 | 6.8e-04 | 2.4e-03 | 8.1e-03 |
+
+Splitting each across-GPU difference into the offset shared by all four subsets of a query
+and the leftover that differs between them — only the leftover can reorder subsets, which is
+what LDS measures.
+
+| the across-GPU difference splits into | comparisons | median | p90 | max |
+|---|---:|---:|---:|---:|
+| an offset shared by all subsets of a query | 60 | 7.0e-04 | 2.4e-03 | 3.2e-03 |
+| a leftover that differs between subsets | 240 | 5.7e-05 | 1.3e-04 | 2.6e-04 |
+
+All values are in nats, and all are absolute changes in `diff` — the change in a query's loss
+when one 1% subset is dropped from training and the model is retrained. Source:
+`data/gpu_noise_floor.csv`, 3 runs (`wd0.0`, `wd0.1`, `clip1.0`) × 4 subsets × 20 queries,
+A40 vs. A100-SXM4-80GB, Python 3.11.15 and nproc 2 on both sides.
