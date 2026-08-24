@@ -385,6 +385,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.9414, magic_ci_lo=0.933, magic_ci_hi=0.9482,
         magic_n_queries=20,
+        ekfac_lds=0.4244, ekfac_ci_lo=0.3763, ekfac_ci_hi=0.4689,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_wd0.1",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_wd0.1",
@@ -409,6 +411,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.9448, magic_ci_lo=0.9353, magic_ci_hi=0.9521,
         magic_n_queries=20,
+        ekfac_lds=0.176, ekfac_ci_lo=0.1092, ekfac_ci_hi=0.2379,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_scale0.5",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_scale0.5",
@@ -416,7 +420,19 @@ BANK_RESULTS = {
               "Ran against bergson feat/logit-scale (PR #433), NOT the pinned "
               "-429 worktree, which has no logit_scale field. 100 models, 20/20 "
               "queries. NO EFFECT: 0.9448 vs the anchor 0.9411, intervals "
-              "overlapping. Halving the logits is harmless. Tuned lr 2e-4."),
+              "overlapping. Halving the logits is harmless TO MAGIC. Tuned lr 2e-4. "
+              "BUT NOT TO EK-FAC: 0.1760 [0.1092, 0.2379] here, against 0.4253 at "
+              "the scale-1.0 anchor. So the two scorers fail at different points "
+              "on this axis. EK-FAC has already lost more than half its "
+              "correlation at scale 0.5, where MAGIC is untouched (0.9448 vs "
+              "0.9411); at scale 0.25 EK-FAC is essentially unchanged again "
+              "(0.1733) while MAGIC collapses to 0.0456. EK-FAC degrades EARLIER "
+              "and MAGIC degrades LATER BUT HARDER. "
+              "This also corrects an over-broad reading of the EK-FAC numbers: "
+              "EK-FAC is flat near 0.42 across weight decay, gradient clipping, "
+              "batch size and token count, but it is NOT flat across logit scale, "
+              "so flatness is an axis-specific observation and not a property of "
+              "the scorer."),
     "plan_adam_eps1e17_16k_scale0.25": dict(
         status="done",
         magic_lds=0.0456, magic_ci_lo=0.0038, magic_ci_hi=0.0861,
