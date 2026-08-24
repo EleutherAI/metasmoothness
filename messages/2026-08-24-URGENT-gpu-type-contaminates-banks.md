@@ -17,10 +17,24 @@ A40-vs-A40 agreement (2.5e-7) matches the 8k shard-boundary check (2.1e-6), so
 retraining itself is reproducible. Across GPU types it is three orders of
 magnitude worse.
 
-**Why that matters more than it looks.** The within-query spread of `diff` --
-the quantity LDS actually ranks -- has median std **1.1e-3**. So a 6.9e-4
-disagreement is **43% of the signal**. LDS is a rank correlation, and a
-perturbation that size reorders subsets freely:
+**Why that matters more than it looks.** Split the A40-vs-A100 difference into
+the offset shared by every subset of a query and the leftover that differs
+between them (3 pairs, 240 measurements, `data/gpu_noise_floor.csv`):
+
+| part of the A40-vs-A100 difference | median | max |
+|---|---|---|
+| offset shared by all subsets of a query | **7.0e-04** | 3.2e-03 |
+| leftover that differs between subsets | **5.7e-05** | 2.6e-04 |
+
+LDS is a **within-query rank** correlation, so an offset that moves all of a
+query's subsets together cannot change it; only the leftover can. Against the
+subset signal it competes with -- each subset's deviation from its query mean,
+median **4.7e-04** -- the leftover is 12%. **A bank computed entirely on one GPU
+type is therefore fine, and either type gives the same score.**
+
+The damage comes from *mixing inside one query*. There the offset stops
+cancelling and becomes a between-subset difference of 7.0e-04: **1.5x the
+signal**, a perturbation that reorders subsets freely:
 
     sm_muon scored from the mixed A40/A100 set : 0.7828
     sm_muon scored from the homogeneous A40 set: 0.8379
@@ -31,7 +45,10 @@ not internally comparable, and neither number is trustworthy.
 
 ## What to do
 
-- **Shard a bank only across nodes of the same GPU type.** A40 fleet:
+- **Every subset of a given query must come from the same GPU type.** In
+  practice that means sharding a bank only across nodes of one type; splitting
+  *queries* across hardware would be safe, but nothing in the pipeline does
+  that. A40 fleet:
   bellflower-0, lucia-ord-0, secret-ord-0, allium-0, iris-0. A100: marisa-0,
   maria-1, shivam2-0. Do not mix, including the main process.
 - **Record the GPU type in the row notes**, next to nproc. Constraint 2 already
