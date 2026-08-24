@@ -791,6 +791,12 @@ MS_MEASURED = {
     "plan_adam_eps1e17_16k_bs32":     (0.980000, None),
     "plan_adam_eps1e17_16k_bs64":     (0.985300, None),
     "plan_muon_eps1e17_16k_bs64":     (0.993900, None),
+    # OUT-OF-SAMPLE TEST for the ms<0.95 collapse boundary, which was drawn
+    # from muon 4k and scale0.25 only. bs16 did not inform it: predicted low
+    # before measurement (MAGIC 0.1796), measured 0.9133. Three for three.
+    # NOTE hardware: this ms ran on A40 (secret-ord-0) while the bs16 bank is
+    # A100 (lotus-0). Labelled per the D17 accept-and-label ruling.
+    "plan_adam_eps1e17_16k_bs16":     (0.913300, None),
 }
 
 TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e-4,
