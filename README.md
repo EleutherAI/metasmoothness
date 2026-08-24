@@ -80,9 +80,8 @@ different subsets on the same GPUs.
 | GPU type (A40 → A100) | run, subset, query | 240 | 6.7e-04 | 2.5e-03 | 3.3e-03 |
 | which subset was dropped | run, query, GPU | 720 | 6.8e-04 | 2.4e-03 | 8.1e-03 |
 
-Splitting each difference into the offset shared by all four subsets of a query and the
-leftover that differs between them — only the leftover can reorder subsets, which is what LDS
-measures.
+Splitting each difference into the offset shared by all subsets of a query and a residual
+that differs between them. Only the leftover part affects subset query loss rank/LDS.
 
 | difference | part | comparisons | median | p90 | max |
 |---|---|---:|---:|---:|---:|
