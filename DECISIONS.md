@@ -370,8 +370,13 @@ any within-hardware comparison either way.
 FUTURE WORK (see EXPERIMENTS_CSV.md, optional future data). The fine-tune-graft
 design measures "attribution after splicing a norm into a pretrained model";
 the native question requires pre-training the modification in, which is out of
-scope for this campaign. The `preact_layernorm` and `arch_control` rows stay
-registered but blocked, carrying the same graft-vs-pretrain design question.
+scope for this campaign. **APPLIED 2026-08-24:** the ruling covers the whole architecture axis, so
+`preact_layernorm` (the same fine-tune-graft design) and `arch_control` (which
+exists only to control the arch_mod rows, and with those cut controls nothing)
+are cut from `build_experiments_csv.py` as well. `preact_batchnorm` was already
+dropped under D14. The architecture axis is therefore empty and there is no
+outstanding design question here -- the earlier wording ("registered but
+blocked") described their state, not an open decision.
 
 ### D15. Reproducibility tuple includes the environment (measured); RESOLVED by ruling
 

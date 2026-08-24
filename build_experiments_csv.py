@@ -796,13 +796,13 @@ add(BASE17, run_id="plan_adam_eps1e17_16k_ckptavg4", ckpt_avg_k=4,
           "/mnt/ssd-2/lucia/paper_runs/d9_magic_base — the replication path awaits the "
           "D15 ruling. Eval-side: exempt from lr gating. NOT RUNNABLE as generated (2026-08-23): bergson has no query-gradient checkpoint-averaging code (no ckpt_avg_k/avg_k/averaged_gradient anywhere in the package) and gen_experiment_run.py never reads the ckpt_avg_k column, so the generated config is byte-equivalent to a plain bs256 anchor. Launching it spends ~69 GB and a full bank reproducing the anchor and answers nothing. Needs the bergson eval-side feature first.")
 # preact_batchnorm dropped (D14) — see DECISIONS.md.
-# qk_norm cut per D16 (graft-vs-pretrain design question; out of scope).
-for mod in ["preact_layernorm"]:
-    add(BASE17, run_id=f"plan_adam_eps1e17_16k_{mod}", arch_mod=mod, model="gpt2_custom",
-        notes="Needs the GPT-2-like custom model. Compare ONLY against "
-              "plan_adam_eps1e17_16k_arch_control (same custom model, no mod), never stock gpt2.")
-add(BASE17, run_id="plan_adam_eps1e17_16k_arch_control", arch_mod="none", model="gpt2_custom",
-    notes="Control for the arch_mod rows: custom model, no modification.")
+# The whole architecture axis is cut per D16 (graft-vs-pretrain design question;
+# out of scope for this campaign):
+#   qk_norm           cut, registered as future work
+#   preact_layernorm  cut -- the same fine-tune-graft design D16 rejected
+#   arch_control      cut -- it exists only to control the arch_mod rows above,
+#                     and with those cut it controls nothing
+# preact_batchnorm was already dropped separately under D14.
 for s in [0.5, 0.25]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_scale{s}", logit_scale=s,
         notes="Unblocked 2026-08-23: the logit-scale hook exists on bergson feat/logit-scale "
