@@ -81,13 +81,13 @@ different subsets on the same GPUs.
 | which subset was dropped | run, query, GPU | 720 | 6.8e-04 | 2.4e-03 | 8.1e-03 |
 
 Splitting each difference into the offset shared by all subsets of a query and a residual
-that differs between them. Only the leftover part affects subset query loss rank/LDS.
+that differs between them. Only the residual part affects subset query loss rank/LDS.
 
 | difference | part | comparisons | median | p90 | max |
 |---|---|---:|---:|---:|---:|
 | GPU type (A40 → A100) | shared offset | 60 | 7.0e-04 | 2.4e-03 | 3.2e-03 |
-| GPU type (A40 → A100) | leftover | 240 | 5.7e-05 | 1.3e-04 | 2.6e-04 |
+| GPU type (A40 → A100) | residual | 240 | 5.7e-05 | 1.3e-04 | 2.6e-04 |
 | which subset was dropped | shared offset | 120 | 5.9e-04 | 2.0e-03 | 3.3e-03 |
-| which subset was dropped | leftover | 480 | 4.7e-04 | 1.5e-03 | 5.8e-03 |
+| which subset was dropped | residual | 480 | 4.7e-04 | 1.5e-03 | 5.8e-03 |
 
 This shows that LDS re-trains should not be sharded across different GPU types.

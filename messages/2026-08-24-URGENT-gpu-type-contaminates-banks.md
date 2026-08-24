@@ -18,18 +18,18 @@ retraining itself is reproducible. Across GPU types it is three orders of
 magnitude worse.
 
 **Why that matters more than it looks.** Split the A40-vs-A100 difference into
-the offset shared by every subset of a query and the leftover that differs
+the offset shared by every subset of a query and the residual that differs
 between them (3 pairs, 240 measurements, `data/gpu_noise_floor.csv`):
 
 | part of the A40-vs-A100 difference | median | max |
 |---|---|---|
 | offset shared by all subsets of a query | **7.0e-04** | 3.2e-03 |
-| leftover that differs between subsets | **5.7e-05** | 2.6e-04 |
+| residual that differs between subsets | **5.7e-05** | 2.6e-04 |
 
 LDS is a **within-query rank** correlation, so an offset that moves all of a
-query's subsets together cannot change it; only the leftover can. Against the
+query's subsets together cannot change it; only the residual can. Against the
 subset signal it competes with -- each subset's deviation from its query mean,
-median **4.7e-04** -- the leftover is 12%. **A bank computed entirely on one GPU
+median **4.7e-04** -- the residual is 12%. **A bank computed entirely on one GPU
 type is therefore fine, and either type gives the same score.**
 
 The damage comes from *mixing inside one query*. There the offset stops
