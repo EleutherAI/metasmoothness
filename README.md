@@ -1,9 +1,8 @@
 # Metasmoothness and LDS: Empirical Analysis
 
-Understanding how training-algorithm design choices affect data-weight **metasmoothness**
-(Chang et al. 2024, Def. 2), and in turn how metasmoothness affects the **Linear Datamodeling
+Understanding how training-algorithm design choices affect training function **smoothness** w.r.t data-weights and in turn how smoothness affects the **Linear Datamodeling
 Score (LDS)** of attribution methods (MAGIC, EK-FAC). Target setting: LLM post-training
-(GPT-2 fine-tuned on SmolLM2 512-token chunks), with token-scaling as a first-class axis.
+(GPT-2 fine-tuned on SmolLM2 512-token chunks), with token-scaling and batch size-scaling axes.
 
 ## Start here (in order)
 
