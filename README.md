@@ -4,7 +4,7 @@ Understanding how training-algorithm design choices affect training function **s
 Score (LDS)** of attribution methods (MAGIC, EK-FAC). Target setting: LLM post-training
 (GPT-2 fine-tuned on SmolLM2 512-token chunks), with token-scaling and batch size-scaling axes.
 
-## Start here (in order)
+## Start here
 
 | file | what it holds |
 |---|---|
@@ -13,14 +13,14 @@ Score (LDS)** of attribution methods (MAGIC, EK-FAC). Target setting: LLM post-t
 | [EXPERIMENTS_CSV.md](EXPERIMENTS_CSV.md) | Schema and admission policy for the data CSVs; what old data was excluded and why; planned pre-training experiments |
 | [NODES.md](NODES.md) | How multiple nodes claim rows, check in, and steal stale claims |
 
-## The data (source of truth)
+## Build data templates
 
 ```
 python build_tuning_csv.py        # tuning.csv      — stage 0: lr selection runs (run these first)
 python build_experiments_csv.py   # experiments.csv — stage 1: the metasmoothness/LDS grid
 ```
 
-One row per run; empty result cells are work to claim (see NODES.md). Edit results in the
+One row per run. Empty result cells are work to claim (see NODES.md). Edit results in the
 builder scripts and regenerate — never in the CSVs, except the two node-claim columns.
 Datasets: `EleutherAI/bergson-smollm2-scaling` on the Hub (verified nested train chain +
 disjoint held-out/query sets); tooling in `scripts/`.
