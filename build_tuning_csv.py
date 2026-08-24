@@ -556,6 +556,30 @@ def _preserve_claims(out_path, rows):
             r["node_checkin_date"] = prev.get("node_checkin_date", "") or r.get("node_checkin_date", "")
 
 
+# Next rung of the step-scaling ladder: 256k at bs32 = 16000 steps. Registered
+# now so the sweep can start the moment 128k reports; the goal is to keep
+# climbing until ms crosses the 0.95 collapse boundary for one optimizer.
+# Centre drops to 2.5e-5, following the measured endpoint extensions rather than
+# the batch-size heuristic: 32k chose 5e-5 and both 64k arms won at 2.5e-5, so a
+# grid centred at 5e-5 would almost certainly land on its low endpoint again.
+for opt in ["adamw", "muon"]:
+    sweep(f"tune_{opt}_256k_bs32",
+          selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_256k_bs32",
+          lrs=[1.25e-5, 2.5e-5, 5e-5], priority=3, optimizer=opt, n_docs=256000,
+          batch_size=32, grad_accum_steps=2,
+          notes="ms-only step-scaling point at fixed bs32 (16000 steps); no bank planned.")
+
+# Endpoint extensions on the step-scaling axis (procedure step 2). Both 64k arms
+# won at the LOW endpoint 2.5e-5, so each gets one 2x step outward. The optimum
+# is drifting down as steps grow -- 32k chose 5e-5, 64k wants 2.5e-5 or less --
+# which is the same downward drift the bs256 64k arms showed.
+for opt in ["adamw", "muon"]:
+    sweep(f"tune_{opt}_64k_bs32",
+          selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_64k_bs32",
+          lrs=[1.25e-5], priority=2, optimizer=opt, n_docs=64000,
+          batch_size=32, grad_accum_steps=2,
+          notes="Endpoint extension: 2.5e-5 won the 3-point grid.")
+
 # Step-scaling sweep results, measured 2026-08-25 (bs32, ga 2, nproc 2, pinned venv).
 # Both 32k arms win on the INTERIOR point, so the CONTROLS batch-16-32 centre of
 # 5e-5 was right and no endpoint extension is needed. Note how flat they are --

@@ -912,7 +912,7 @@ for n in [4000, 8000, 32000, 64000]:
 # grows, so steps scale directly: 32k -> 2000, 64k -> 4000, 128k -> 8000.
 # No bank: MAGIC would need one reverse pass per query over the whole corpus,
 # 150h+ per row. magic_lds/ekfac_lds stay empty by design.
-for n in [32000, 64000, 128000]:
+for n in [32000, 64000, 128000, 256000]:
     k = f"{n // 1000}k"
     for opt, pre in (("adamw", "adam"), ("muon", "muon")):
         rid = f"plan_{pre}_eps1e17_{k}_bs32"
