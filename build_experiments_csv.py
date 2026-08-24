@@ -913,6 +913,10 @@ TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e
             # 64k bs32 sweep complete on lotus-0: 1.25e-5 3.2365 / 2.5e-5 3.2322 /
             # 5e-5 3.2355 / 1e-4 3.2552 -- interior minimum, no extension needed.
             "plan_adam_eps1e17_64k_bs32": 2.5e-5,
+            # muon 64k bs32: 1.25e-5 3.2337 / 2.5e-5 3.2290 / 5e-5 3.2333 --
+            # the winner is bracketed on both sides, so the pending 1e-4 point
+            # cannot change the selection.
+            "plan_muon_eps1e17_64k_bs32": 2.5e-5,
             # Selections that landed on the anchor value - recorded explicitly so
             # "completed sweep => entry here" holds without exception.
             "plan_adam_eps1e17_16k_bs512": 2e-4, "plan_adam_eps1e17_16k_wd0.0": 2e-4,
