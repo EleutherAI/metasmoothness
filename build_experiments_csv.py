@@ -345,6 +345,33 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    "plan_muon_eps1e17_16k_bs16": dict(
+        status="done",
+        magic_lds=0.8850, magic_ci_lo=0.8708, magic_ci_hi=0.8967,
+        magic_n_queries=20,
+        # scripts/param_delta.py against this run's own checkpoints/step_0.ckpt
+        delta_l1=226800.32, delta_l2=26.1277,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs16",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs16",
+        notes="Batch-size axis, muon at bs16. Bank built by lotus-0 (A100), tail "
+              "sharded 92-95/95-97/97-100; validation_merged.csv is 100 subsets "
+              "exactly once. "
+              "RESOLVES THE SECOND PRE-REGISTERED PREDICTION. Its ms (0.9939) was "
+              "measured while the bank was at 73/100 and put it in the HEALTHY "
+              "band, against adam bs16 at ms 0.9133 (collapsed, MAGIC 0.1796). The "
+              "prediction recorded before this bank finished was MAGIC above ~0.77; "
+              "measured 0.8850. "
+              "THE LARGEST OPTIMIZER GAP IN THE GRID BY FAR: paired adamw-muon = "
+              "-0.7054 [-0.7995, -0.6014], and adamw wins 0/20 queries -- the only "
+              "unanimous loss anywhere. For scale, the anchor pair is +0.1032 and "
+              "the next largest is +0.1451 at 8k. "
+              "The pair is hardware-matched (both arms lotus-0/A100), so D17 does "
+              "not apply to this contrast. "
+              "Read with the bs16 lr caveat: at bs16 the tuned lr is 5e-5, and the "
+              "controlled probe shows adamw at bs16 scores ms 0.5127 at the anchor "
+              "lr, so adamw's collapse here is the batch size with its low lr only "
+              "partly rescuing it. Muon is evidently not harmed the same way."),
     "plan_adam_eps1e17_16k_bs512": dict(
         status="done",
         magic_lds=0.9233, magic_ci_lo=0.9115, magic_ci_hi=0.9331,

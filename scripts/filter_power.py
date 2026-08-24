@@ -25,10 +25,16 @@ ROOTS = ["/mnt/ssd-2/lucia/paper_runs/experiments",
          "/mnt/ssd-1/lucia/paper_runs/experiments"]
 
 rows = []
+# Migrated runs live on ssd-1 with a symlink left on ssd-2, so globbing both
+# roots finds the same run twice and silently doubles every count.
+seen_runs = set()
 for root in ROOTS:
     for summ in sorted(glob.glob(f"{root}/*/filter_*_*/filter_summary.csv")):
         run_dir = os.path.dirname(summ)
         run = os.path.basename(os.path.dirname(run_dir))
+        if (run, os.path.basename(run_dir)) in seen_runs:
+            continue
+        seen_runs.add((run, os.path.basename(run_dir)))
         tag = os.path.basename(run_dir)          # filter_proponents_magic
         parts = tag.split("_")
         method, source = parts[1], parts[2]
@@ -66,6 +72,8 @@ for k in sorted({key(r) for r in rows}):
     z = np.array([r["z"] for r in sub])
     p = np.array([r["percentile"] for r in sub])
     raw = np.array([r["filter_change"] for r in sub])
-    beat = float((p >= 1.0).mean())
+    # rank 1 means more damaging than every random removal; the percentile
+    # can never reach 1.0 because it is 1 - rank/(n+1).
+    beat = float((np.array([r["rank"] for r in sub]) == 1).mean())
     print(f"{k[0][:30]:30s} {k[1]:6s} {len(sub):3d} {raw.mean():10.5f} "
-          f"{z.mean():8.3f} {p.mean():8.3f} {beat:9.2f}")
+          f"{z.mean():8.3f} {p.mean():8.3f} {beat:7.2f}")

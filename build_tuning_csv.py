@@ -84,6 +84,26 @@ for opt in ["adamw", "muon"]:
         k = f"{n // 1000}k"
         sweep(f"tune_{opt}_{k}", selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_{k}_bs256",
               priority=1, optimizer=opt, n_docs=n)
+# STEP-SCALING axis, ms-ONLY (2026-08-25). The question is how metasmoothness
+# behaves as the number of OPTIMISER STEPS grows, so batch size is held at 32 --
+# the config that gives 1000 steps and ms 0.9800 at 16k -- and the corpus grows:
+#
+#     bs32, 2 epochs:  32k -> 2000 steps, 64k -> 4000, 128k -> 8000
+#
+# No retrain bank: MAGIC is one reverse pass per query over the whole corpus, so
+# these are 150h+ per row to score. ms needs no bank and costs three trainings.
+#
+# Centre is 5e-5, the CONTROLS centre for batch size 16-32 (sqrt(32/256) of the
+# 2e-4 reference), NOT the 2e-4 used for the bs256 token axis.
+for opt in ["adamw", "muon"]:
+    for n in [32000, 64000, 128000]:
+        k = f"{n // 1000}k"
+        sweep(f"tune_{opt}_{k}_bs32",
+              selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_{k}_bs32",
+              lrs=[2.5e-5, 5e-5, 1e-4], priority=2, optimizer=opt, n_docs=n,
+              batch_size=32, grad_accum_steps=2,
+              notes="ms-only step-scaling point at fixed bs32; no retrain bank planned.")
+
 # Endpoint extensions (procedure step 2: an endpoint win adds one 2x step outward).
 sweep("tune_adamw_4k", selects_lr_for="plan_adam_eps1e17_4k_bs256", lrs=[5e-5],
       priority=1, optimizer="adamw", n_docs=4000,
