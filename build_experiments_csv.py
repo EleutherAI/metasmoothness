@@ -460,6 +460,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.8379, magic_ci_lo=0.8205, magic_ci_hi=0.8519,
         magic_n_queries=20,
+        ekfac_lds=0.4237, ekfac_ci_lo=0.3814, ekfac_ci_hi=0.4616,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/sm_muon_eps1e17_16k_bs256",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/sm_muon_eps1e17_16k_bs256",
@@ -480,7 +482,9 @@ BANK_RESULTS = {
               "The consequence is not subtle: scoring this bank from the mixed set "
               "gives 0.7828, from the homogeneous A40 set 0.8379, a gap of 0.055 "
               "that is LARGER than most optimizer effects in the grid. A bank's "
-              "retrains must all run on one GPU type."),
+              "retrains must all run on one GPU type. "
+              "EK-FAC 0.4237 [0.3814, 0.4616], reproducing the 0.4285 in ANCHOR_FILL (older code 10874f93, separate s16k_muon assets) to 0.005 -- the adamw anchor reproduced to 0.0002. "
+              "THE ANCHOR PAIR IS THE FOURTH AND CLEANEST SCORER CONTRAST: MAGIC paired adamw-muon = +0.1032 [+0.0851, +0.1213] with 20/20 query wins, while EK-FAC on the SAME two banks gives +0.0016 [-0.0248, +0.0258] with 12/20 -- a coin flip. Four pairs now: bs32, bs64, 8k and the anchor. MAGIC produces effects of +0.145, +0.103, +0.046 and -0.088; EK-FAC returns -0.001, +0.002, -0.004 and +0.002, never distinguishable from zero."),
     "plan_muon_eps1e17_16k_bs64": dict(
         status="done",
         magic_lds=0.8690, magic_ci_lo=0.8514, magic_ci_hi=0.8837,
