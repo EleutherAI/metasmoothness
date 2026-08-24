@@ -1019,6 +1019,40 @@ PARAM_DELTA = {  # run_id: (delta_l1, delta_l2)
     'sm_adamw_eps1e17_16k_bs256': (269255.14, 27.2257),
     'sm_muon_eps1e17_16k_bs256': (173588.09, 20.0331),
 }
+# Final train and held-out CE, measured 2026-08-24 by scripts/run_losses.py off each run's
+# own final checkpoint (both 16k anchors' tuning models had already been cleaned up). The
+# logit-scale rows are evaluated WITH their scale applied. Reproduced the 17 recorded
+# heldout values to <=5e-4, so heldout is filled here only where it was missing —
+# the rest keep their reuse-rule-3 provenance from the tuning winners.
+RUN_LOSSES = {  # run_id: (train_loss, heldout_loss)
+    'plan_adam_eps1e17_16k_bs128': (3.1162, 3.2499),
+    'plan_adam_eps1e17_16k_bs16': (3.0698, 3.2498),
+    'plan_adam_eps1e17_16k_bs32': (3.1031, 3.2478),
+    'plan_adam_eps1e17_16k_bs512': (3.1700, 3.2754),
+    'plan_adam_eps1e17_16k_bs64': (3.0715, 3.2479),
+    'plan_adam_eps1e17_16k_clip1.0': (3.0919, 3.2544),
+    'plan_adam_eps1e17_16k_scale0.25': (3.2238, 3.4343),
+    'plan_adam_eps1e17_16k_scale0.5': (3.1896, 3.3022),
+    'plan_adam_eps1e17_16k_wd0.0': (3.1078, 3.2573),
+    'plan_adam_eps1e17_16k_wd0.1': (3.1077, 3.2573),
+    'plan_adam_eps1e17_4k_bs256': (3.2064, 3.3154),
+    'plan_adam_eps1e17_8k_bs256': (3.1309, 3.2853),
+    'plan_muon_eps1e17_16k_bs128': (3.1204, 3.2502),
+    'plan_muon_eps1e17_16k_bs16': (3.0518, 3.2440),
+    'plan_muon_eps1e17_16k_bs32': (3.0978, 3.2439),
+    'plan_muon_eps1e17_16k_bs64': (3.0648, 3.2463),
+    'plan_muon_eps1e17_4k_bs256': (3.1281, 3.3119),
+    'plan_muon_eps1e17_8k_bs256': (3.1560, 3.2844),
+    'sm_adamw_eps1e17_16k_bs256': (3.1078, 3.2573),
+    'sm_muon_eps1e17_16k_bs256': (3.1135, 3.2571),
+}
+for r in rows:
+    if r["run_id"] in RUN_LOSSES:
+        tr, ho = RUN_LOSSES[r["run_id"]]
+        r["train_loss"] = tr
+        if not r.get("heldout_loss"):
+            r["heldout_loss"] = ho
+
 for r in rows:
     if r["run_id"] in PARAM_DELTA:
         r["delta_l1"], r["delta_l2"] = PARAM_DELTA[r["run_id"]]
@@ -1117,16 +1151,7 @@ def _apply_ms(rows):
 # build-time assert. KNOWN_GAPS is the shrinking allowlist of cells not yet backfilled;
 # a cell that is NOT listed there fails the build, so new rows cannot ship incomplete.
 REQUIRED_WHEN_DONE = ("lr", "delta_l1", "delta_l2", "train_loss", "heldout_loss")
-KNOWN_GAPS = {
-    # train_loss was never collected on the pinned pipeline. Backfill:
-    #   scripts/heldout_eval.py --heldout <the run's own train set> <run>/model
-    ("*", "train_loss"),
-    # The logit-scale rows need `heldout_eval.py --logit-scale <scale>`: the scale is
-    # run-config state, never persisted in the checkpoint, so an unscaled eval reads
-    # ~4.6 instead of ~3.3 (see the docstring in scripts/heldout_eval.py).
-    ("plan_adam_eps1e17_16k_scale0.25", "heldout_loss"),
-    ("plan_adam_eps1e17_16k_scale0.5", "heldout_loss"),
-}
+KNOWN_GAPS = set()  # empty: every required cell is measured as of 2026-08-24
 
 
 def _assert_per_run_diagnostics(rows):
