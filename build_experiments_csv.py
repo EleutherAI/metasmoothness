@@ -477,7 +477,16 @@ BANK_RESULTS = {
               "~0.5. Logit scaling degrades both scorers but hits MAGIC far "
               "harder (-0.895 from its anchor, against about -0.25 for EK-FAC), "
               "which is what you would expect if the damage is to the gradient "
-              "trajectory MAGIC linearises around rather than to the data."),
+              "trajectory MAGIC linearises around rather than to the data. "
+              "CORRECTED 2026-08-24: that reading attributed the damage to logit "
+              "scaling, but this row also carries a 4x learning rate (tuned 8e-4 "
+              "vs the anchor 2e-4). An ms probe at logit_scale 0.25 with lr held "
+              "at 2e-4 scores 0.9812, i.e. healthy, so the pathology on this row "
+              "is the learning rate and not the logit scale. scale0.5, which runs "
+              "at the anchor lr, has MAGIC 0.9448 -- unharmed. The EK-FAC drop at "
+              "scale 0.5 (0.4253 -> 0.1760) is NOT explained by this, since that "
+              "row holds lr fixed, and remains a genuine logit-scale effect on "
+              "EK-FAC alone."),
     "plan_adam_eps1e17_16k_bs128": dict(
         status="done",
         magic_lds=0.9441, magic_ci_lo=0.9334, magic_ci_hi=0.9523,
@@ -780,10 +789,20 @@ MS_MEASURED = {
     "plan_adam_eps1e17_4k_bs256":     (0.994613,  7576.98),
     "plan_muon_eps1e17_4k_bs256":     (0.903657, 19677.5),
     # Logit-scale axis, measured on A40 (matching these banks):
-    #   scale 1.0 -> ms 0.9930 / MAGIC 0.9411
-    #   scale 0.5 -> ms 0.9878 / MAGIC 0.9448
-    #   scale 0.25 -> ms 0.9150 / MAGIC 0.0456
-    # ms drops sharply exactly where attributability collapses.
+    #   scale 1.0  (lr 2e-4) -> ms 0.9930 / MAGIC 0.9411
+    #   scale 0.5  (lr 2e-4) -> ms 0.9878 / MAGIC 0.9448
+    #   scale 0.25 (lr 8e-4) -> ms 0.9150 / MAGIC 0.0456
+    #
+    # DIAGNOSTIC 2026-08-24, paper_runs/diagnostics/ms_scale0.25_lr2e-4:
+    # the same logit_scale 0.25 with lr held at the ANCHOR 2e-4 gives
+    # ms = 0.9812 -- comfortably inside the healthy band.
+    #
+    # So the scale0.25 row IS collapsed, but the cause is its tuned lr of
+    # 8e-4, not the logit scaling. Holding lr fixed, halving the logits
+    # costs only ~0.006 of ms per halving (0.9930 -> 0.9878 -> 0.9812).
+    # Do NOT describe either the ms drop or the MAGIC collapse on this row
+    # as a logit-scale effect; the row varies two things at once and the
+    # diagnostic attributes the damage to the learning rate.
     "plan_adam_eps1e17_16k_scale0.5":  (0.987800, None),
     "plan_adam_eps1e17_16k_scale0.25": (0.915000, None),
     # Batch-size axis. Not monotone against MAGIC: bs64 has the higher ms
