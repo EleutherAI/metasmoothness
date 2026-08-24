@@ -277,7 +277,24 @@ removed. Two unfixable conflicts with the control set:
 
 The architecture axis keeps `qk_norm` and `preact_layernorm` (both per-sample operations).
 
-### D17. GPU type is part of run identity — OPEN, needs Lucia
+### D17. GPU type is part of run identity — CAUSE CONFIRMED; scope still needs Lucia
+
+**CONTROL RESULT (2026-08-24, lotus-0).** lotus-0 is an A100 running Python
+3.11.15 -- the same Python as the A40 fleet -- so retraining subsets of an
+A40-built bank there varies the GPU and nothing else. Subsets 0-2 of
+`plan_adam_eps1e17_16k_wd0.0`, 60 cells:
+
+| comparison | Python | mean disagreement |
+|---|---|---|
+| A40 vs A40 | same | 2.5e-07 |
+| **A40 vs A100 (this control)** | **same (3.11.15)** | **9.6e-04** |
+| A40 vs A100 pods (original) | differed (3.11.15 vs .16) | 6.9e-04 |
+| *diff signal being ranked* | | *1.2e-03* |
+
+Holding Python constant does not shrink the gap -- it is slightly larger. **The
+Python patch version contributed nothing; GPU architecture is the cause.** The
+rule now rests on a measurement rather than an argument about cuBLAS reduction
+orders.
 
 **Measured 2026-08-23/24.** sm_muon was accidentally sharded across A40 and A100
 nodes at the *same* nproc (2, verified in both slice configs, so this is not the
@@ -487,7 +504,7 @@ batch-size arms shift by sqrt(bs/256), and the model-size arms shift one 2x step
 | batch size 64-128 | 1e-4 | same rule; sqrt(64/256) = 1/2 |
 | double batch (bs512) | 2e-4 | same rule rounds back to the anchor value |
 | double epochs (ep4) | 2e-4 | longer runs sometimes prefer slightly lower lr; the grid's 1e-4 point covers that |
-| model size (medium/large) | 1e-4 | larger models under standard parameterisation usually prefer lower lr — pending D11 sign-off |
+| model size (medium/large) | 1e-4 | larger models under standard parameterisation usually prefer lower lr (D11 signed off 2026-08-23) |
 | logit scale, weight decay, clipping | 2e-4 | these knobs rarely move the lr optimum; their groups exist to verify that, not to hunt |
 | gpt2_custom (all variants) | 2e-4 | same model family; the D10 equivalence check validates the transfer |
 
