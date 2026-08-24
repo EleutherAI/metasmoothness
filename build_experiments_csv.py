@@ -699,6 +699,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.8480, magic_ci_lo=0.8307, magic_ci_hi=0.8620,
         magic_n_queries=20,
+        ekfac_lds=0.4635, ekfac_ci_lo=0.4233, ekfac_ci_hi=0.4995,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs128",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_16k_bs128",
