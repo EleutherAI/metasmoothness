@@ -241,6 +241,7 @@ section). Every measured repeat source:
 | replicate bank pair | second bank build + scoring, identical training | EK-FAC 0.3095 vs 0.3048 (0.005) | rows sm_adam_eps1e8_4k / _rep2 |
 | anchor split-half | LDS from subsets 0-49 vs 50-99 | adamw 0.9294 vs 0.9336 (0.004); muon 0.8451 vs 0.8429 (0.002) | /mnt/ssd-2/lucia/s16k_{opt}/eval_q20/validation.csv |
 | held-out loss, repeated seeds | training seed | sd ~0.001 nats | measured 2026-08-06 |
+| GPU architecture, same python | A40 vs A100, everything else held fixed | per-cell query-loss-diff mean 9.6e-4, max 3.3e-3, against a signal spread of 1.2e-3 | `data/gpu_noise_floor.csv`, D17 control |
 
 **Ruling (adopted):** run no dedicated repeat experiments. Treat **0.02 LDS** as the
 conservative run-to-run error bar (the worst case observed under a perturbation larger
@@ -249,6 +250,22 @@ claims must clear 0.02; an effect below that is reported as "within run-to-run
 variation". Revisit only if a key axis effect lands under 0.02. The bar is an internal
 heuristic for deciding when more data is needed — the paper does not discuss or justify
 it, and no caveat about its provenance is required there.
+
+**Amendment 2026-08-24 (D17).** The 0.02 bar was derived entirely from
+same-hardware evidence and does not cover GPU architecture. Measured: retrains
+on A40 vs A100 with python, code, venv, nproc, seed and bank held fixed disagree
+by 9.6e-4 per cell against a 1.2e-3 signal spread (`data/gpu_noise_floor.csv`).
+Scoring one bank whose subsets were split across both moved its LDS from 0.8379
+to 0.7828, i.e. **0.055 -- nearly 3x the 0.02 bar**.
+
+Two distinct quantities, and only the first is measured:
+- *mixed bank* (subsets from both GPU types in one bank): 0.055. D17 now
+  forbids this, so it should not recur.
+- *two clean banks, one all-A40 and one all-A100, same config*: **NOT YET
+  MEASURED.** This is the number that would apply to cross-hardware ROW
+  comparisons such as bs128 (A100) against bs32 (A40). Until it exists, treat
+  cross-hardware row comparisons as carrying an unquantified error at least as
+  large as the same-hardware 0.02, and prefer within-hardware contrasts.
 
 ### D7. Canonical EK-FAC configuration: the bergson default, `damped_inverse`
 
