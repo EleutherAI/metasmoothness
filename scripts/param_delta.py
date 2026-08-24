@@ -35,9 +35,18 @@ def ckpt_steps(ckpt_dir: Path):
 
 
 def load_params(ckpt: Path):
+    """Model parameters only.
+
+    Both step_0 and the final checkpoint carry optimizer state (D8:
+    save_optimizer_state=last) under `opt_state/...` plus rng/batch bookkeeping under
+    leading-dot keys. They are float tensors present in BOTH checkpoints, so a plain
+    key intersection does not drop them and the norm silently picks up the optimizer
+    moments -- roughly 2/3 of the keys are opt_state.
+    """
     sd = _load_state_dict_from_keys(checkpoint_id=str(ckpt))
     return {k: v for k, v in sd.items()
-            if isinstance(v, torch.Tensor) and v.is_floating_point()}
+            if isinstance(v, torch.Tensor) and v.is_floating_point()
+            and not k.startswith(("opt_state/", "."))}
 
 
 def delta_norms(run_dir: Path):

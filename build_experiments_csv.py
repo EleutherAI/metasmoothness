@@ -875,6 +875,22 @@ for n in [4000, 8000, 32000, 64000]:
     add(BASE17, run_id=rid, n_docs=n, optimizer="muon", lr=TUNED_LR.get(rid, 2e-4),
         notes="N axis, muon. 16k measured (MAGIC 0.8470). lr comes from tuning.csv "
               f"sweep_group tune_muon_{n//1000}k.")
+# STEP-SCALING axis: METASMOOTHNESS ONLY (2026-08-25).
+# How does ms behave as the number of OPTIMISER STEPS grows? Batch size is held
+# at 32 -- the config with 1000 steps and ms 0.9800 at 16k -- and the corpus
+# grows, so steps scale directly: 32k -> 2000, 64k -> 4000, 128k -> 8000.
+# No bank: MAGIC would need one reverse pass per query over the whole corpus,
+# 150h+ per row. magic_lds/ekfac_lds stay empty by design.
+for n in [32000, 64000, 128000]:
+    k = f"{n // 1000}k"
+    for opt, pre in (("adamw", "adam"), ("muon", "muon")):
+        rid = f"plan_{pre}_eps1e17_{k}_bs32"
+        add(BASE17, run_id=rid, n_docs=n, optimizer=opt, batch_size=32,
+            grad_accum_steps=2, lr=TUNED_LR.get(rid, 5e-5),
+            notes=f"ms-only step-scaling point: bs32, {n // 32 * 2} steps. No bank "
+                  "planned (MAGIC would cost 150h+ of scoring at this N). lr from "
+                  f"tuning.csv sweep_group tune_{opt}_{k}_bs32.")
+
 # D1 (2026-08-20): "warm start" = attribution window, a pre-training experiment —
 # removed from the fine-tuning grid. See EXPERIMENTS_CSV.md "Planned pre-training experiments".
 add(BASE17, run_id="plan_adam_eps1e17_16k_ep4", num_epochs=4,
@@ -942,25 +958,25 @@ for r in rows:
 # Backfills delta_l1/delta_l2, empty for the whole paper grid since the legacy
 # eps-root-damping family (their only prior source) was excluded 2026-08-22.
 PARAM_DELTA = {  # run_id: (delta_l1, delta_l2)
-    'plan_adam_eps1e17_16k_bs128': (193413.66, 19.7569),
-    'plan_adam_eps1e17_16k_bs16': (348194.47, 39.7689),
-    'plan_adam_eps1e17_16k_bs32': (210982.72, 22.4480),
-    'plan_adam_eps1e17_16k_bs512': (212847.68, 20.8284),
-    'plan_adam_eps1e17_16k_bs64': (265789.81, 27.6407),
-    'plan_adam_eps1e17_16k_clip1.0': (272470.56, 27.6564),
-    'plan_adam_eps1e17_16k_scale0.25': (1203035.62, 123.6988),
-    'plan_adam_eps1e17_16k_scale0.5': (311806.22, 30.7536),
-    'plan_adam_eps1e17_16k_wd0.0': (269325.49, 27.2168),
-    'plan_adam_eps1e17_16k_wd0.1': (272205.80, 27.5385),
-    'plan_adam_eps1e17_4k_bs256': (84519.52, 8.0537),
-    'plan_adam_eps1e17_8k_bs256': (207300.80, 20.5766),
-    'plan_muon_eps1e17_16k_bs128': (146470.01, 16.7994),
-    'plan_muon_eps1e17_16k_bs32': (166584.71, 19.2377),
-    'plan_muon_eps1e17_16k_bs64': (218493.93, 24.6993),
-    'plan_muon_eps1e17_4k_bs256': (116069.64, 13.6399),
-    'plan_muon_eps1e17_8k_bs256': (105998.97, 12.4096),
-    'sm_adamw_eps1e17_16k_bs256': (269398.60, 27.2259),
-    'sm_muon_eps1e17_16k_bs256': (176717.07, 20.1913),
+    'plan_adam_eps1e17_16k_bs128': (193213.92, 19.7564),
+    'plan_adam_eps1e17_16k_bs16': (347689.76, 39.7684),
+    'plan_adam_eps1e17_16k_bs32': (210602.27, 22.4467),
+    'plan_adam_eps1e17_16k_bs512': (212701.43, 20.8275),
+    'plan_adam_eps1e17_16k_bs64': (265521.33, 27.6404),
+    'plan_adam_eps1e17_16k_clip1.0': (272329.81, 27.6562),
+    'plan_adam_eps1e17_16k_scale0.25': (1202912.19, 123.6988),
+    'plan_adam_eps1e17_16k_scale0.5': (311640.88, 30.7532),
+    'plan_adam_eps1e17_16k_wd0.0': (269182.05, 27.2166),
+    'plan_adam_eps1e17_16k_wd0.1': (272062.23, 27.5383),
+    'plan_adam_eps1e17_4k_bs256': (84244.26, 8.0412),
+    'plan_adam_eps1e17_8k_bs256': (207123.55, 20.5755),
+    'plan_muon_eps1e17_16k_bs128': (142420.08, 16.4346),
+    'plan_muon_eps1e17_16k_bs32': (159088.47, 18.4238),
+    'plan_muon_eps1e17_16k_bs64': (213165.19, 24.4609),
+    'plan_muon_eps1e17_4k_bs256': (110034.62, 13.1686),
+    'plan_muon_eps1e17_8k_bs256': (101152.33, 11.9494),
+    'sm_adamw_eps1e17_16k_bs256': (269255.14, 27.2257),
+    'sm_muon_eps1e17_16k_bs256': (173588.09, 20.0331),
 }
 for r in rows:
     if r["run_id"] in PARAM_DELTA:
