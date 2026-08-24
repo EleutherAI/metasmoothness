@@ -1165,6 +1165,17 @@ FILTER_DELTAS = {
         (0.00018, 0.00007, 0.00028),
         (0.02923, 0.01914, 0.04618),
         (0.07060, 0.05936, 0.08580)),
+    # 16k completes the dataset-size axis this study was scoped to.
+    "sm_adamw_eps1e17_16k_bs256": (
+        (0.00023, 0.00012, 0.00034),
+        (0.05288, 0.03624, 0.07985),
+        (0.09090, 0.07530, 0.11606)),
+    # Off-axis, kept because the run had already finished: the muon arm at 8k,
+    # the one size where both optimizers have a filter measurement.
+    "plan_muon_eps1e17_8k_bs256": (
+        (0.00012, 0.00008, 0.00018),
+        (0.02258, 0.01320, 0.03866),
+        (0.03289, 0.02433, 0.04761)),
 }
 
 
