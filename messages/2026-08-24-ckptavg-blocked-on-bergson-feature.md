@@ -1,42 +1,50 @@
-# ckptavg needs a bergson feature that does not exist yet
+# ckptavg: MAGIC already has checkpoint averaging in main; EK-FAC does not
 
-`plan_adam_eps1e17_16k_ckptavg4` is the last unrun row that is neither cut nor
-waiting on a tuning sweep, so it is the obvious candidate for idle capacity. It
-cannot run today, and the reason is not the one recorded in D9.
+**This supersedes the earlier version of this note, which was wrong.** It said
+bergson implements no checkpoint averaging at all. That grep ran against the
+pinned `-429` worktree, not against main. Main has it for MAGIC.
 
-## The recorded blocker no longer applies
+## What actually exists
 
-D9 says the comparison is blocked because "the anchor's base-training
-checkpoints were deleted", which made the existing anchor bank's validity the
-D15 open question. That was about the old anchor. The current 16k anchor,
-`sm_adamw_eps1e17_16k_bs256`, is a venv-valid bank and **still has its
-checkpoints**:
+`bergson/config/config.py` — a real, documented field:
 
-    step_0  step_62  step_93  step_109  step_117  step_121  step_123  step_124
+    @dataclass
+    class ValidationConfig(TrainingConfig, ABC):
+        ckpt_avg_k: int = 1
+        """Average the query gradient over the last ``k`` saved trajectory checkpoints."""
 
-The last four (117, 121, 123, 124) are exactly what `ckpt_avg_k = 4` needs, and
-CONTROLS classes the axis as "eval-side only, same trained model" — a rescore,
-not a rebuild. So the expensive path D9 weighed (rebuild the bank, ~10 4-GPU-hours,
-~55 GB) is not required.
+`bergson/magic/cli.py` — implemented and wired end to end. `compute_query_gradients`
+loads the last `k` checkpoints, recomputes the query gradient at each, averages
+them, and restores the final state in a `finally`. It raises if fewer than `k`
+checkpoints were saved. The Magic path passes `run_cfg.ckpt_avg_k` through at the
+call site, so it is settable from a config today.
 
-## The actual blocker
+That is exactly D9's definition, for MAGIC.
 
-bergson has no checkpoint-averaging support at all:
+## What is missing
 
-    grep -rn 'ckpt_avg_k\|checkpoint_avg\|avg_k' bergson/   # no matches
-    (checked against bergson-main-paper-429)
+**EK-FAC.** D9 requires that *both* scorers use the averaged gradient — MAGIC
+seeds its reverse pass with it, EK-FAC preconditions it. EK-FAC runs a different
+pipeline (`hessians/pipeline.py`, driven by IndexConfig / HessianConfig /
+ScoreConfig), none of which inherit `ValidationConfig`, so `ckpt_avg_k` is not
+reachable from the EK-FAC path at all. `grep -rn ckpt_avg_k bergson/` returns
+only `config.py` and `magic/cli.py`.
 
-D9 defines the semantics — average the **query gradient** over the last k
-checkpoints, and **both** scorers use the averaged gradient: MAGIC seeds its
-reverse pass with it, EK-FAC preconditions it. Nothing implements that. The row
-needs a library feature and a PR, not GPU time.
+So the PR to raise is the EK-FAC side, not MAGIC.
 
-## What that means for the grid
+## The other blocker is the pinned environment
 
-`ckpt_avg_k` is a column in experiments.csv and a fixed control in CONTROLS.md,
-which reads as though the knob exists. Until the feature lands, every row is
-implicitly k=1 by absence rather than by setting.
+`-429` predates the feature entirely. Running the ckptavg row under the pinned
+venv is therefore not possible as things stand — the config field would be
+rejected, the same way `-429` rejects the filter estimator's config because it
+predates PR #430. Either the row runs against main (and is labelled as such, cf.
+scale0.5, which ran against the logit-scale PR rather than `-429`), or the pin
+moves. That is a D15 question, not a code one.
 
-Worth deciding explicitly: implement it, or cut the axis the way D16 cut the
-architecture axis. Right now it is neither, and it is the only thing standing in
-the "## Open" section of DECISIONS.
+## The bank is ready
+
+The current 16k anchor `sm_adamw_eps1e17_16k_bs256` is venv-valid and still has
+its checkpoints — steps 0 / 62 / 93 / 109 / 117 / 121 / 123 / 124 — so the last
+four exist and `ckpt_avg_k = 4` has something to average. CONTROLS classes the
+axis as eval-side only, same trained model, so no rebuild is needed. D9's
+recorded blocker (the old anchor's checkpoints were deleted) does not apply here.
