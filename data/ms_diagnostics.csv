@@ -6,3 +6,7 @@ scale0.25_at_anchor_lr,256,0.0002,0.25,logit scale alone,0.9811644554138184,2782
 bs16_row,16,5e-05,1.0,batch size AND 1/4 lr (confounded),0.9132707715034485,34851.1640625,0.1,0,/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs16/ms
 bs16_at_anchor_lr,16,0.0002,1.0,batch size alone,0.5126788020133972,168250.796875,0.1,0,/mnt/ssd-2/lucia/paper_runs/diagnostics/ms_bs16_lr2e-4
 anchor_at_bs16_lr,256,5e-05,1.0,low lr alone,0.9947990775108337,8739.7939453125,0.1,0,/mnt/ssd-2/lucia/paper_runs/diagnostics/ms_anchor_lr5e-5
+bs128_at_anchor_lr,128,0.0002,1.0,250 steps at fixed lr,0.9812867641448975,49681.15625,0.1,0,/mnt/ssd-2/lucia/paper_runs/diagnostics/ms_16k_bs128_lr2e-4
+bs64_at_anchor_lr,64,0.0002,1.0,500 steps at fixed lr,0.9612792134284973,71442.90625,0.1,0,/mnt/ssd-2/lucia/paper_runs/diagnostics/ms_16k_bs64_lr2e-4
+bs32_at_anchor_lr,32,0.0002,1.0,1000 steps at fixed lr,0.8062773942947388,106880.0703125,0.1,0,/mnt/ssd-2/lucia/paper_runs/diagnostics/ms_16k_bs32_lr2e-4
+ep4_at_anchor_lr,256,0.0002,1.0,250 steps via 4 epochs at fixed lr,0.9896047115325928,65950.40625,0.1,0,/mnt/ssd-2/lucia/paper_runs/diagnostics/ms_16k_ep4_lr2e-4
