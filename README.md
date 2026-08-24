@@ -55,52 +55,6 @@ sm_muon_eps1e17_16k_bs256         | muon      | 16,000 | 256 |        2 |     12
 21 rows shown, 19 with all three metrics. '-' = not yet measured.
 ```
 
-## What causes a collapse: learning rate or the named knob?
-
-Every row is tuned to its own learning rate, so a row that collapses differs from
-the anchor in **two** ways and the collapse cannot be attributed to the named knob
-without holding lr fixed. An ms probe costs three trainings and no retrain bank,
-so the control is cheap. Raw data: [data/ms_diagnostics.csv](data/ms_diagnostics.csv).
-
-| probe | bs | lr | logit scale | ms | isolates |
-|---|---:|---:|---:|---:|---|
-| anchor | 256 | 2e-4 | 1.00 | 0.9930 | reference |
-| scale0.5 row | 256 | 2e-4 | 0.50 | 0.9878 | logit scale at anchor lr |
-| scale0.25 row | 256 | 8e-4 | 0.25 | 0.9150 | scale **and** 4x lr |
-| scale0.25 probe | 256 | 2e-4 | 0.25 | **0.9812** | logit scale alone |
-| bs16 row | 16 | 5e-5 | 1.00 | 0.9133 | batch **and** 1/4 lr |
-| bs16 probe | 16 | 2e-4 | 1.00 | **0.5127** | batch size alone |
-| anchor probe | 256 | 5e-5 | 1.00 | **0.9948** | low lr alone |
-
-The two collapses have opposite causes. **scale0.25 is the learning rate**: at the
-anchor lr, logit scale 0.25 is healthy (0.9812), and scale0.5 — which already runs
-at the anchor lr — has MAGIC 0.9448, unharmed. **bs16 is genuinely the batch size**,
-and its tuned 5e-5 is *protecting* it: at the anchor lr it scores 0.5127, the lowest
-ms measured anywhere, while low lr alone is harmless (0.9948).
-
-Consequence for the batch axis: bs16's MAGIC of 0.1796 is the *rescued* number.
-"Attribution degrades at small batch" means "degrades at small batch, after lr
-tuning has already compensated".
-
-## Does metasmoothness predict attributability?
-
-Sorted by ms, the 17 rows with both metrics separate cleanly:
-
-    ms <  0.95  (n=3)    MAGIC  0.046 - 0.302
-    ms >= 0.95  (n=14)   MAGIC  0.771 - 0.945
-
-No overlap: the gap between groups (0.302 to 0.771) is wider than the spread within
-either. The three low-ms rows are exactly the three lowest-MAGIC rows, and one of
-them (bs16, ms 0.9133) was predicted before its ms was measured.
-
-**Do not quote `spearman(ms, MAGIC) = +0.060` as a null result.** Fourteen of
-seventeen rows sit inside a 0.017-wide ms band, so fourteen of seventeen ranks are
-noise and the correlation is uninformative in both directions. What the data
-supports is the narrow claim — ms **detects pathological configurations** — not the
-broad one, that it ranks attributability. Inside the healthy band the orderings are
-unrelated: bs64 has higher ms than bs32 (0.9853 vs 0.9800) and lower MAGIC (0.7811
-vs 0.9201), and muon 8k has the second-highest ms of all with MAGIC of 0.7712.
-
 ## How many queries does an LDS estimate need?
 
 MAGIC costs one reverse pass **per query**, so this is the largest cost lever in the
