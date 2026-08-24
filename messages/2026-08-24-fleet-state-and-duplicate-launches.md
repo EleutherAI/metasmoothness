@@ -25,6 +25,15 @@ mount does. See `2026-08-24-dataset-cache-unreadable-on-ssd1.md` for why the
 Do not start 128k work until `ls .../train_128k.hf` returns. Every other size
 reads fine: 16k 48 MB/s, 32k 65, 64k 134, 256k 260, 512k 299.
 
+Measured blast radius, checked on every node: opening a dataset **by name**
+still works -- `train_16k.hf` is fine everywhere. What blocks is *enumerating*
+the parent `datasets/` directory, because listing it stats `train_128k.hf`. So a
+job that globs the dataset directory hangs, while one that opens its dataset by
+path does not. An EK-FAC scoring job launched on marisa-0 hung exactly this way,
+in `walk_component`, and could not be killed -- marisa-0 holds the wedged `mv`,
+so prefer any other node until it clears. Runs already training are unaffected:
+they hold their files open, and marisa-0's two 256k runs passed 52% throughout.
+
 ## In flight
 
     maria-1        4x 256k bs32 tuning          8/8 GPUs
