@@ -338,6 +338,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.941, magic_ci_lo=0.9326, magic_ci_hi=0.9476,
         magic_n_queries=20,
+        ekfac_lds=0.4235, ekfac_ci_lo=0.375, ekfac_ci_hi=0.4684,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_wd0.0",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_wd0.0",
@@ -360,6 +362,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.8982, magic_ci_lo=0.8757, magic_ci_hi=0.9169,
         magic_n_queries=20,
+        ekfac_lds=0.4176, ekfac_ci_lo=0.3695, ekfac_ci_hi=0.4622,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_clip1.0",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_clip1.0",
@@ -384,6 +388,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.0456, magic_ci_lo=0.0038, magic_ci_hi=0.0861,
         magic_n_queries=20,
+        ekfac_lds=0.1733, ekfac_ci_lo=0.1115, ekfac_ci_hi=0.232,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_scale0.25",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_scale0.25",
@@ -401,7 +407,14 @@ BANK_RESULTS = {
               "2e-4 or lower), because the sweep picked 8e-4 for this config. "
               "Logit scale and learning rate are therefore not separable from "
               "this single row; a scale-0.25 run at 2e-4, or a scale-1.0 run at "
-              "8e-4, would separate them."),
+              "8e-4, would separate them. "
+              "FIRST INVERSION IN THE GRID: EK-FAC scores 0.1733 [0.1115, 0.2320] "
+              "on this same bank, ABOVE MAGIC 0.0456 [0.0038, 0.0861] with "
+              "non-overlapping intervals. Everywhere else MAGIC leads EK-FAC by "
+              "~0.5. Logit scaling degrades both scorers but hits MAGIC far "
+              "harder (-0.895 from its anchor, against about -0.25 for EK-FAC), "
+              "which is what you would expect if the damage is to the gradient "
+              "trajectory MAGIC linearises around rather than to the data."),
     "plan_adam_eps1e17_16k_bs128": dict(
         status="done",
         magic_lds=0.9441, magic_ci_lo=0.9334, magic_ci_hi=0.9523,
