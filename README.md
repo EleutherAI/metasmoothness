@@ -57,20 +57,20 @@ sm_muon_eps1e17_16k_bs256         | muon      | 2e-04 | 16,000 | 256 |        2 
 
 ## How many queries does an LDS estimate need?
 
-MAGIC costs one reverse pass **per query**, so this is the largest cost lever in the
-grid. Bootstrap half-width of the per-query Spearman mean, by query count:
+MAGIC costs one reverse pass **per query**. 
+Bootstrapping confidence intervals of the per-query Spearman mean:
 
-| queries | rows inside the D6 threshold (0.06) |
+| queries | fraction of rows with confidence intervals <= +/-0.06 |
 |---:|---|
 | 5 | 16 / 21 |
 | 10 | 16 / 21 |
 | 15 | 18 / 21 |
 | 20 | 19 / 21 |
 
-Most rows are already well inside the threshold at 5 queries — the anchor is 0.0163
-at n=5 against 0.0083 at n=20. The rows that genuinely need 20 are the low-LDS ones,
-where per-query variance is largest: bs16 (0.1014 even at n=20), muon 4k (0.1244),
-bs64 (0.0541). Regenerate with `scripts/ci_vs_queries.py`.
+Most rows are already well inside the threshold at 5 queries, e.g. the baseline model
+is 0.0163 at n=5 and 0.0083 at n=20. Low-LDS rows have higher query variance and need 
+more queries to get low CIs, e.g. a batch size 16 row has +/-0.1014 at n=20 and muon 4k 
+has +/-0.1244. Regenerate data with `scripts/ci_vs_queries.py`.
 
 ## History
 
