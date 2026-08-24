@@ -13,7 +13,10 @@ set -uo pipefail
 
 DEVS=$1; shift
 REPO=$(cd "$(dirname "$0")/.." && pwd)
-BERGSON=/mnt/ssd-1/lucia/bergson-damping
+# Match the generators (gen_tuning_run.py, gen_experiment_run.py): the pinned
+# paper checkout, not the shared bergson-damping working copy whose branch
+# state is not controlled.
+BERGSON=/mnt/ssd-1/lucia/bergson-main-paper-429
 RUNS=/mnt/ssd-2/lucia/paper_runs/tuning
 NPROC=$(awk -F, '{print NF}' <<<"$DEVS")
 # D15: the pinned venv is the only valid environment, and bergson must not
