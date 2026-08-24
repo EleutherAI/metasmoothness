@@ -837,7 +837,11 @@ MS_MEASURED = {
     "plan_muon_eps1e17_4k_bs256":     (0.903657, 19677.5),
     # Step-scaling axis at fixed bs32, lr 5e-05 for both optimizers (the
     # interior minimum of the 32k bs32 sweep: adamw 3.2342 vs 3.238 either
-    # side, muon 3.231 vs 3.2351). 2000 steps, nproc 2, A40.
+    # side, muon 3.231 vs 3.2351). 2000 steps, nproc 2 (from ms.yaml).
+    # GPU TYPE UNRECORDED: these runs leave no hardware trace in ms.log,
+    # ms.yaml or ms/config.yaml. D17 makes GPU type part of run identity, so it
+    # is left unstated rather than guessed -- an earlier version of this comment
+    # asserted A40 on no evidence.
     "plan_adam_eps1e17_32k_bs32":     (0.986618, 34054.9),
     "plan_muon_eps1e17_32k_bs32":     (0.994085, 38738.9),
     # Logit-scale axis, measured on A40 (matching these banks):
@@ -906,6 +910,9 @@ MS_MEASURED = {
 
 TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e-4,
             "plan_muon_eps1e17_4k_bs256": 4e-4, "plan_muon_eps1e17_8k_bs256": 2e-4, "plan_adam_eps1e17_32k_bs256": 2e-4, "plan_muon_eps1e17_32k_bs256": 2e-4, "plan_adam_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_16k_bs16": 5e-5, "plan_adam_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs32": 5e-5, "plan_muon_eps1e17_64k_bs256": 1e-4, "plan_muon_eps1e17_16k_bs64": 1e-4, "plan_adam_eps1e17_16k_bs64": 1e-4, "plan_adam_eps1e17_16k_bs128": 1e-4, "plan_muon_eps1e17_16k_bs128": 1e-4, "plan_adam_eps1e17_16k_ep4": 1e-4,
+            # 64k bs32 sweep complete on lotus-0: 1.25e-5 3.2365 / 2.5e-5 3.2322 /
+            # 5e-5 3.2355 / 1e-4 3.2552 -- interior minimum, no extension needed.
+            "plan_adam_eps1e17_64k_bs32": 2.5e-5,
             # Selections that landed on the anchor value - recorded explicitly so
             # "completed sweep => entry here" holds without exception.
             "plan_adam_eps1e17_16k_bs512": 2e-4, "plan_adam_eps1e17_16k_wd0.0": 2e-4,

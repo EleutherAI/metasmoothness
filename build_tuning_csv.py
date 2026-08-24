@@ -244,6 +244,24 @@ for mod in ["none", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_64k_bs32_lr1.25e-05": dict(status="measured", heldout_loss=3.2365,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_64k_bs32_lr1.25e-05_s42",
+        notes="Step-scaling sweep at fixed bs32 (4000 steps), nproc 1 ga 2, A100, lotus-0. GROUP COMPLETE, clean interior minimum: 1.25e-5 3.2365 / 2.5e-5 3.2322 / 5e-5 3.2355 / 1e-4 3.2552. 2.5e-5 selected for plan_adam_eps1e17_64k_bs32; both neighbours are higher, so no endpoint extension is needed."),
+    "tune_adamw_64k_bs32_lr2.5e-05": dict(status="measured", heldout_loss=3.2322,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_64k_bs32_lr2.5e-05_s42",
+        notes="Step-scaling sweep at fixed bs32 (4000 steps), nproc 1 ga 2, A100, lotus-0. GROUP COMPLETE, clean interior minimum: 1.25e-5 3.2365 / 2.5e-5 3.2322 / 5e-5 3.2355 / 1e-4 3.2552. 2.5e-5 selected for plan_adam_eps1e17_64k_bs32; both neighbours are higher, so no endpoint extension is needed."),
+    "tune_adamw_64k_bs32_lr5e-05": dict(status="measured", heldout_loss=3.2355,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_64k_bs32_lr5e-05_s42",
+        notes="Step-scaling sweep at fixed bs32 (4000 steps), nproc 1 ga 2, A100, lotus-0. GROUP COMPLETE, clean interior minimum: 1.25e-5 3.2365 / 2.5e-5 3.2322 / 5e-5 3.2355 / 1e-4 3.2552. 2.5e-5 selected for plan_adam_eps1e17_64k_bs32; both neighbours are higher, so no endpoint extension is needed."),
+    "tune_adamw_64k_bs32_lr0.0001": dict(status="measured", heldout_loss=3.2552,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_64k_bs32_lr0.0001_s42",
+        notes="Step-scaling sweep at fixed bs32 (4000 steps), nproc 1 ga 2, A100, lotus-0. GROUP COMPLETE, clean interior minimum: 1.25e-5 3.2365 / 2.5e-5 3.2322 / 5e-5 3.2355 / 1e-4 3.2552. 2.5e-5 selected for plan_adam_eps1e17_64k_bs32; both neighbours are higher, so no endpoint extension is needed."),
+    "tune_muon_64k_bs32_lr1.25e-05": dict(status="measured", heldout_loss=3.2337,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_64k_bs32_lr1.25e-05_s42",
+        notes="Step-scaling sweep at fixed bs32 (4000 steps), nproc 1 ga 2, A100, lotus-0. Group incomplete: 5e-5 and 1e-4 still training."),
+    "tune_muon_64k_bs32_lr2.5e-05": dict(status="measured", heldout_loss=3.229,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_64k_bs32_lr2.5e-05_s42",
+        notes="Step-scaling sweep at fixed bs32 (4000 steps), nproc 1 ga 2, A100, lotus-0. Group incomplete: 5e-5 and 1e-4 still training."),
     "tune_adamw_16k_scale0.25_lr0.0016": dict(status="measured", heldout_loss=3.4341,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_16k_scale0.25_lr0.0016_s42",
         notes="Group complete: 3.4341 vs 8e-4's 3.4338 is a 0.0003 tie - the curve "
