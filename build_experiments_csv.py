@@ -809,6 +809,18 @@ MS_MEASURED = {
     #                             forward prediction
     # ms ran on A100 (maria-1), matching its A100 bank -- no D17 mismatch.
     "plan_adam_eps1e17_16k_gpt2-medium": (0.858000, None),
+    # SECOND PRE-REGISTERED PREDICTION (2026-08-24). muon bs16 sits in the
+    # HEALTHY band (0.9939) while adam bs16 at the same batch size is
+    # collapsed (0.9133, MAGIC 0.1796). Its bank is at 73/100 models, so its
+    # attributability does not exist yet and cannot have informed this.
+    #   detector claim holds => muon bs16 MAGIC should land ABOVE ~0.77,
+    #                           i.e. a huge optimizer gap at bs16 that no
+    #                           other batch size shows
+    #   MAGIC lands below 0.31 => falsified in the other direction (a false
+    #                           negative: collapsed but high ms)
+    # Sharper than the gpt2-medium prediction because both arms share batch
+    # size, data, seed and node (lotus-0/A100), differing only in optimizer.
+    "plan_muon_eps1e17_16k_bs16":     (0.993900, None),
 }
 
 TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e-4,
