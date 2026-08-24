@@ -22,7 +22,10 @@ NPROC=$(awk -F, '{print NF}' <<<"$DEVS")
 # D15: the pinned venv is the only valid environment, and bergson must not
 # run with a checkout as cwd -- Python puts cwd first on sys.path, which
 # silently shadows PYTHONPATH with whatever branch that checkout is on.
-ENVPY=/mnt/ssd-2/lucia/envs/paper/bin/python
+# The interpreter every other run in the grid uses, and the one the
+# generators print (gen_tuning_run.PYTHON). /mnt/ssd-2/lucia/envs/paper is a
+# separate venv owned by another user -- same torch, but not the pinned one.
+ENVPY=/home/lucia/envs/paper/bin/python
 # Distinct rendezvous port per slot -- concurrent slots sharing the default
 # 29500 hang in distributed init before CUDA is ever touched.
 PORT=$((29500 + ${DEVS%%,*}))
@@ -37,6 +40,7 @@ for RID in "$@"; do
   [ -f "$CFG" ] || { echo "$RID NOCONFIG $CFG" | tee -a "$LOG"; continue; }
   echo "CMD: (cd /tmp) PYTHONPATH=$BERGSON CUDA_VISIBLE_DEVICES=$DEVS MASTER_PORT=$PORT $ENVPY -s -P -m bergson $CFG"
   (cd /tmp && timeout 7200 env PYTHONNOUSERSITE=1 PYTHONPATH="$BERGSON" MASTER_PORT="$PORT" \
+     HF_HUB_OFFLINE=1 \
      CUDA_VISIBLE_DEVICES="$DEVS" "$ENVPY" -s -P -m bergson "$CFG")
   RC=$?
   if [ $RC -ne 0 ]; then echo "$RID FAILED rc=$RC" | tee -a "$LOG"; continue; fi
