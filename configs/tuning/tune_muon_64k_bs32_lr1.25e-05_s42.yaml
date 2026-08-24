@@ -9,7 +9,7 @@ steps:
     use_tf32_matmuls: false
     distributed:
       nnode: 1
-      nproc_per_node: 2
+      nproc_per_node: 1
     data:
       dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_64k.hf
       split: train
@@ -21,7 +21,7 @@ steps:
       lr_end: 1.25e-06
       warmup_steps: 0.25
     batch_size: 32
-    grad_accum_steps: 1
+    grad_accum_steps: 2
     num_epochs: 2
     seed: 42
     optimizer: muon
