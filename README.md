@@ -28,9 +28,6 @@ disjoint held-out/query sets); tooling in `scripts/`.
 
 ## Results
 
-Regenerate with `python scripts/results_table.py --all` (drop `--all` for measured rows only,
-add `--ci` for 95% CIs on the LDS columns) any time `experiments.csv` changes.
-
 ```
 run                               | optimizer | N docs |  bs | N epochs | N steps | metasmoothness | EK-FAC LDS | MAGIC LDS | status 
 ----------------------------------+-----------+--------+-----+----------+---------+----------------+------------+-----------+--------
