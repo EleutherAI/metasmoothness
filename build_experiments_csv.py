@@ -334,6 +334,39 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    "plan_adam_eps1e17_16k_bs512": dict(
+        status="done",
+        magic_lds=0.9233, magic_ci_lo=0.9115, magic_ci_hi=0.9331,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-1/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs512",
+        bank_dir="/mnt/ssd-1/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs512",
+        notes="Batch-size axis, adamw at bs512 (63 steps, D2 uncontrolled double "
+              "batch). nproc 4, NVIDIA A100-80GB, maria-1; single node, no shards, "
+              "so internally homogeneous. 100 models, 20/20 queries, half-width "
+              "0.0108. Sits just below the anchor (0.9411) and bs128 (0.9441). "
+              "D17: A100, unlike the A40 anchor -- see the batch-axis hardware note "
+              "on bs16. Tuned lr 2e-4."),
+    "plan_adam_eps1e17_16k_bs16": dict(
+        status="done",
+        magic_lds=0.1796, magic_ci_lo=0.1249, magic_ci_hi=0.2324,
+        magic_n_queries=20,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs16",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs16",
+        notes="Batch-size axis, adamw at bs16. Bank built by lotus-0 (NVIDIA "
+              "A100-80GB), which runs independently; scored here because the bank "
+              "was complete and unrecorded. 100 models, 20/20 queries. "
+              "ATTRIBUTION LARGELY COLLAPSES AT THE SMALL-BATCH END: 0.1796 "
+              "[0.1249, 0.2324], against 0.9201 at bs32 and 0.9411 at the bs256 "
+              "anchor. Second-largest collapse in the grid after scale0.25 (0.0456). "
+              "D17 CAVEAT ON THE AXIS AS A WHOLE: the batch sweep now interleaves "
+              "hardware -- bs16 A100 (lotus-0), bs32 A40, bs64 A40, bs128 A100, "
+              "bs256 A40, bs512 A100 -- and GPU type is worth ~0.055 on its own. "
+              "That is far too small to explain 0.18 vs 0.92, so the small-batch "
+              "collapse is real, but the axis should not be read as a clean curve "
+              "until the arms are on one GPU type. The bs16 PAIR is safe: its muon "
+              "partner is also lotus-0/A100. Tuned lr 5e-5."),
     "plan_adam_eps1e17_16k_wd0.0": dict(
         status="done",
         magic_lds=0.941, magic_ci_lo=0.9326, magic_ci_hi=0.9476,
