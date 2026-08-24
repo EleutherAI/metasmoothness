@@ -878,6 +878,16 @@ MS_MEASURED = {
     # Sharper than the gpt2-medium prediction because both arms share batch
     # size, data, seed and node (lotus-0/A100), differing only in optimizer.
     "plan_muon_eps1e17_16k_bs16":     (0.993900, None),
+    # Token axis at bs256 and the 4-epoch row, measured 2026-08-25.
+    # All well inside the healthy band, and note the token axis does NOT
+    # collapse: 32k and 64k stay at 0.987-0.995 even though 64k is 500 steps.
+    # That matters for the step-scaling ladder -- at bs256 more DATA does not
+    # move ms, so if the bs32 ladder collapses it is the step count doing it.
+    "plan_adam_eps1e17_16k_ep4":      (0.995916, 33964.1),
+    "plan_adam_eps1e17_32k_bs256":    (0.993725, 49520.4),
+    "plan_muon_eps1e17_32k_bs256":    (0.994801, 47704.0),
+    "plan_adam_eps1e17_64k_bs256":    (0.987626, 37072.4),
+    "plan_muon_eps1e17_64k_bs256":    (0.994736, 34602.8),
 }
 
 TUNED_LR = {"plan_adam_eps1e17_4k_bs256": 1e-4, "plan_adam_eps1e17_8k_bs256": 2e-4,
