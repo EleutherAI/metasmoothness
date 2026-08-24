@@ -57,7 +57,7 @@ sm_muon_eps1e17_16k_bs256         | muon      | 2e-04 | 16,000 | 256 |        2 
 
 ## How many queries does an LDS estimate need?
 
-MAGIC costs one reverse pass **per query**. 
+MAGIC costs one reverse pass per query. 
 Bootstrapping confidence intervals of the per-query Spearman mean:
 
 | queries | fraction of rows with confidence intervals <= +/-0.06 |
