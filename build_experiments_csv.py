@@ -338,6 +338,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.9233, magic_ci_lo=0.9115, magic_ci_hi=0.9331,
         magic_n_queries=20,
+        ekfac_lds=0.4142, ekfac_ci_lo=0.366, ekfac_ci_hi=0.4587,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-1/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs512",
         bank_dir="/mnt/ssd-1/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs512",
@@ -351,6 +353,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.1796, magic_ci_lo=0.1249, magic_ci_hi=0.2324,
         magic_n_queries=20,
+        ekfac_lds=0.3872, ekfac_ci_lo=0.3424, ekfac_ci_hi=0.4305,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs16",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs16",
@@ -366,7 +370,17 @@ BANK_RESULTS = {
               "That is far too small to explain 0.18 vs 0.92, so the small-batch "
               "collapse is real, but the axis should not be read as a clean curve "
               "until the arms are on one GPU type. The bs16 PAIR is safe: its muon "
-              "partner is also lotus-0/A100. Tuned lr 5e-5."),
+              "partner is also lotus-0/A100. Tuned lr 5e-5. "
+              "SECOND INVERSION IN THE GRID: EK-FAC scores 0.3872 [0.3424, 0.4305] "
+              "on this bank, well ABOVE MAGIC 0.1796 [0.1249, 0.2324]. And EK-FAC "
+              "barely notices the small batch at all -- 0.3872 against its usual "
+              "0.42-0.46 elsewhere -- while MAGIC drops from 0.94 to 0.18. "
+              "Together with scale0.25 (EK-FAC 0.1733 over MAGIC 0.0456) this is a "
+              "consistent pattern rather than one oddity: MAGIC is far better in "
+              "the normal regime (~0.94 vs ~0.42) but fails hard in specific "
+              "regimes, and in exactly those regimes EK-FAC degrades gracefully "
+              "and overtakes it. That is a robustness claim, distinct from the "
+              "accuracy claim, and the two inversions are the evidence for it."),
     "plan_adam_eps1e17_16k_wd0.0": dict(
         status="done",
         magic_lds=0.941, magic_ci_lo=0.9326, magic_ci_hi=0.9476,
@@ -468,6 +482,8 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.9441, magic_ci_lo=0.9334, magic_ci_hi=0.9523,
         magic_n_queries=20,
+        ekfac_lds=0.4551, ekfac_ci_lo=0.4085, ekfac_ci_hi=0.4973,
+        ekfac_n_subsets=100,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs128",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_bs128",
