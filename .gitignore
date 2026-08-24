@@ -80,3 +80,7 @@ __recovery/
 
 # Boss dependency manager vendor folder https://github.com/HashLoad/boss
 modules/
+
+# Python
+__pycache__/
+*.py[cod]
