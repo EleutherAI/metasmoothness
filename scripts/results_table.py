@@ -63,7 +63,13 @@ def main():
     rows = list(csv.DictReader(open(a.csv, newline="")))
     if not a.all:
         rows = [r for r in rows if any(r.get(c) for c in RESULT_COLS)]
-    rows.sort(key=lambda r: (r["optimizer"], float(r["n_docs"] or 0), float(r["batch_size"] or 0), float(r["num_epochs"] or 0)))
+    # Largest N first, and adamw/muon adjacent within each (N, batch): the table is
+    # read to ask how things scale and whether the two optimizers diverge, and the
+    # old (optimizer, N, ...) order buried the frontier -- 16k has ~20 rows, so the
+    # 32k and 64k rows sat below all of them inside the adamw block and read as if
+    # the grid stopped at 16k (Lucia, 2026-08-25).
+    rows.sort(key=lambda r: (-float(r["n_docs"] or 0), float(r["batch_size"] or 0),
+                             float(r["num_epochs"] or 0), r["optimizer"]))
 
     table = []
     for r in rows:
