@@ -45,6 +45,11 @@ v = c["steps"][0]["validate"]
 v["subset_start"] = int(start)
 v["subset_stop"] = int(stop)
 v["subsets"] = out + "/subsets.json"   # reuse, never regenerate
+# bergson refuses to start into an existing run_path, and every shard shares the
+# base build directory by design. resume is what makes that legal; overwrite
+# would destroy the subsets the base shard has already retrained.
+v["resume"] = True
+v["overwrite"] = False
 yaml.safe_dump(c, open(dst, "w"), sort_keys=False)
 print(f"  shard {start}-{stop} -> {dst}")
 PY
