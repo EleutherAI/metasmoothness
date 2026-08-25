@@ -371,6 +371,11 @@ BANK_RESULTS = {
     "plan_adam_eps1e17_16k_gpt2-medium": dict(
         status="done",
         magic_lds=-0.0407, magic_ci_lo=-0.0980, magic_ci_hi=0.0155,
+        # EK-FAC on the SAME bank reads 0.4189 [0.3707, 0.4645] -- squarely in the
+        # 0.404-0.473 band it produces on every other row, while MAGIC is zero
+        # here. Either EK-FAC is robust where MAGIC is not, or 0.42 is its floor.
+        # Its filter delta decides which; see notes/ekfac_floor.md.
+        ekfac_lds=0.4189, ekfac_ci_lo=0.3707, ekfac_ci_hi=0.4645,
         magic_n_queries=20, n_subsets=100, n_queries=20,
         # scripts/param_delta.py, step 124: rel_l2 0.00940
         delta_l1=324769.17, delta_l2=20.7219,
