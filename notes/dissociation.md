@@ -1,49 +1,47 @@
-# adamw breaks on batch size. muon breaks on corpus. They are orthogonal.
+# muon's ms failure needs BOTH a distant corpus and a large batch
 
-Four cells measured, one pending, all at N=16k, 2 epochs, seed 42, each cell tuned
-to its own lr against its own held-out set.
+Full 2x2, all at N=16k, 2 epochs, seed 42, each cell tuned to its own lr against
+its own held-out set.
 
-              bs256     bs16      drop from batch
-    smollm2
-      adamw   0.9930    0.9133    -0.080
-      muon    0.9963    0.9939    -0.002
-    london
-      adamw   0.9867    0.9058    -0.081
-      muon    0.8547    pending
+                  bs256     bs16      batch effect
+    smollm2 adamw  0.9930    0.9133    -0.080
+    smollm2 muon   0.9963    0.9939    -0.002
+    london  adamw  0.9867    0.9058    -0.081
+    london  muon   0.8547    0.9640    +0.109
 
-    drop from corpus (bs256):  adamw -0.006    muon -0.142
+    corpus effect   at bs256    at bs16
+    adamw            -0.006      -0.008
+    muon             -0.142      -0.030
 
-## The dissociation
+## The interaction
 
-**adamw is batch-sensitive and corpus-blind.** Dropping bs256 to bs16 costs it
-0.080 on smollm2 and 0.081 on london -- the same number twice, on corpora whose
-starting losses differ by half a nat. Changing the corpus at fixed batch costs it
-0.006.
+**adamw is simple.** Batch costs it ~0.080 on both corpora; corpus costs it
+~0.007 at both batch sizes. The two axes do not interact at all, and only one of
+them matters.
 
-**muon is the mirror image.** Batch costs it 0.002. Corpus costs it 0.142.
+**muon is not.** Its corpus penalty is 0.142 at bs256 and 0.030 at bs16 -- five
+times smaller. Equivalently, shrinking the batch *raises* muon's ms on london by
+0.109, the opposite sign to what batch does to adamw everywhere and to muon on
+smollm2.
 
-So the two optimizers fail at metasmoothness for different reasons, and neither
-axis alone would have shown it. The smollm2 grid says muon is the robust one --
-it holds ms above adamw at every N and barely notices batch size. That conclusion
-survives only as long as the corpus stays close to pre-training.
+So muon only breaks in one corner: **large batch AND a distant corpus**. Neither
+alone does it. I predicted before measuring that the effects would be independent
+and this cell would land near 0.85; it landed at 0.9640, which refutes that.
 
-## Why it matters for the questions
+## What it means for the questions
 
-Question 5 asks whether muon and adamw differ in maintaining ms. They do, but not
-as a ranking: which one is "better" depends entirely on which axis you move. Any
-single-corpus comparison will get this wrong.
+Question 5 (do muon and adamw differ in maintaining ms): yes, but the answer is
+not a ranking and not even a pair of main effects. adamw has one failure mode
+(batch). muon has one failure mode that is a *conjunction*. A grid that varies one
+axis at a time reports muon as uniformly the more robust optimizer, which is what
+the smollm2 grid did, and that is wrong outside the corner it never visited.
 
-Question 1 asks what breaks ms. Batch size and corpus distance both do, but they
-select different victims.
+Question 1 (what breaks ms): batch size breaks adamw. Batch-and-corpus together
+break muon. Nothing here breaks both.
 
-The pending cell (london muon bs16) decides whether the two effects compound. If
-it lands near 0.85 the effects are independent -- batch does nothing to muon
-regardless of corpus. If it lands well below, they interact, and the worst case
-for ms is a distant corpus at small batch.
+## Caveat, unchanged
 
-## Caveat
-
-ms is not the same as attribution quality. On smollm2 muon has the HIGHER ms and
-the LOWER MAGIC LDS (0.9963/0.8379 against adamw 0.9930/0.9411), so ms does not
-rank the optimizers the way LDS does. Whether the london muon ms collapse drags
-MAGIC with it is what the london muon bank is being built to answer.
+ms does not rank the optimizers the way LDS does. On smollm2 muon has the higher
+ms and the LOWER MAGIC (0.9963/0.8379 against adamw's 0.9930/0.9411). Whether the
+london muon ms collapse at bs256 drags MAGIC down with it is what the london muon
+bank is being built to answer -- it is in MAGIC scoring now.
