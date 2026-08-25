@@ -12,11 +12,12 @@ from pathlib import Path
 
 # metasmoothness leads and run_id trails: the table is read to compare metrics
 # across rows, and the run_id is the widest column by far, so putting it first
-# pushed every number off the right of a terminal.
+# pushed every number off the right of a terminal. lr sits after heldout loss
+# because it reads as an attribute of the loss it produced rather than as part
+# of the run's identity (Lucia, 2026-08-25).
 COLS = [  # (header, csv column, formatter)
     ("metasmoothness", "metasmoothness", lambda v: f"{float(v):.4f}"),
     ("optimizer",      "optimizer",      str),
-    ("lr",             "lr",             lambda v: f"{float(v):.0e}"),
     ("N docs",         "n_docs",         lambda v: f"{int(float(v)):,}"),
     ("bs",             "batch_size",     str),
     ("N epochs",       "num_epochs",     str),
@@ -30,6 +31,7 @@ COLS = [  # (header, csv column, formatter)
     ("MAGIC filt Δ",   "filter_magic_delta",  lambda v: f"{float(v):.5f}"),
     ("train loss",     "train_loss",     lambda v: f"{float(v):.4f}"),
     ("heldout loss",   "heldout_loss",   lambda v: f"{float(v):.4f}"),
+    ("lr",             "lr",             lambda v: f"{float(v):.0e}"),
     ("delta L2",       "delta_l2",       lambda v: f"{float(v):.2f}"),
     ("status",         "status",         str),
     ("run",            "run_id",         str),
