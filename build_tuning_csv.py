@@ -790,6 +790,11 @@ LONDON_HELDOUT = {
     "tune_adamw_london16k_bs256_lr0.0001": 3.8821,
     "tune_adamw_london16k_bs256_lr0.0002": 3.8641,
     "tune_adamw_london16k_bs256_lr0.0004": 3.8471,
+    # Extension measured 2026-08-26. 8e-4 wins INTERIOR, so the london adamw lr is
+    # settled at 8e-4 -- four times the smollm2 winner, which is the size of lr
+    # correction this corpus wanted.
+    "tune_adamw_london16k_bs256_lr0.0008": 3.8397,
+    "tune_adamw_london16k_bs256_lr0.0016": 3.8551,
 }
 
 BS32_STEP_HELDOUT = {
