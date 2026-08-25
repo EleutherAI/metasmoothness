@@ -36,6 +36,8 @@ ap = argparse.ArgumentParser()
 ap.add_argument("run_id")
 ap.add_argument("--source", choices=["magic", "ekfac"], required=True)
 ap.add_argument("--fraction", type=float, default=None)
+ap.add_argument("--random-n", type=int, default=3,
+    help="random retrains for the control; 3 unless the delta collapses")
 ap.add_argument("--nproc", type=int, default=2)
 ap.add_argument("--method", default="filter-proponents")
 args = ap.parse_args()
@@ -78,6 +80,13 @@ skip = {"run_path", "num_subsets", "skip_validation", "save_models", "save_mode"
         "double_backward_batch_size", "train_mode", "scores", "method",
         "filter_fraction", "retrained_dir"}
 cfg = {k: v for k, v in magic.items() if k in valid and k not in skip}
+# Random-removal control size: THREE (Lucia, 2026-08-25). Measured from every
+# completed run, random_sd is ~0.001-0.002 nats against a typical filter delta
+# of 0.05-0.09, so at k=3 the control contributes SE = sd/sqrt(3) ~ 0.0007,
+# around 1% of the effect. Twenty was costing 17 extra retrains per row for
+# nothing, which at 256k is about 39 GPU-hours thrown away per point.
+if args.random_n:
+    cfg["num_subsets"] = args.random_n
 cfg["save_mode"] = "interval"
 cfg["save_interval"] = 10**9
 
