@@ -75,6 +75,28 @@ Worth re-running the audit before the next publish:
     find <run_dir> -user 1001 ! -perm -o+r     # from a 1001 node
     find <run_dir> -user 1000 ! -perm -o+r     # from a 1000 node
 
+## The shape it keeps taking: one job consuming another's output
+
+Every recurrence so far has been a job reading a file another job wrote on a node
+of the other uid. Four so far:
+
+    retrain bank models        42/100 unreadable, would have shipped a partial publish
+    tuning models              blocked lr evaluations repeatedly
+    the repo checkout          PermissionError editing tracked files
+    a base model               EK-FAC scoring could not read a running experiment's
+                               retrained/base, launched from the other uid
+
+The consumer's error says **FileNotFoundError**, not permission denied, which
+sends you hunting for a missing file. The file is there and 497 MB.
+
+Fast check from the CONSUMING node before blaming the producer:
+
+    head -c 8 <path> && echo readable || echo "not readable -- run fix_perms"
+
+And the rule that avoids it: run `scripts/fix_perms.py` from a node of each uid
+after any job that another job will read -- scoring inputs, bank models, tuning
+models. umask does not cover it, for the safetensors reason above.
+
 ## It reaches the repo too
 
 The checkout on the shared volume is subject to the same split. 20 tracked files
