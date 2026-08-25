@@ -757,6 +757,41 @@ for opt in ["adamw", "muon"]:
           batch_size=256, grad_accum_steps=16,
           notes="Distribution-shift control: anchor config, pre-1931 corpus.")
 
+# Upward extension: adamw won at 4e-4, the top of its grid. A corpus this far from
+# pre-training plausibly wants a larger step than smollm2 did, so this goes two
+# octaves rather than one.
+for opt in ["adamw", "muon"]:
+    sweep(f"tune_{opt}_london16k_bs256",
+          selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_london16k_bs256",
+          lrs=[8e-4, 1.6e-3], priority=2, optimizer=opt, n_docs=16000,
+          batch_size=256, grad_accum_steps=16,
+          notes="Endpoint extension: 4e-4 won the 3-point london grid.")
+
+# London sweep, measured 2026-08-26 on A40, nproc 2, evaluated on
+# london_heldout_4k.hf -- NOT the smollm2 heldout, which would select whichever lr
+# best fits the wrong distribution. The held-out set is packed from source rows
+# 40000+, verified zero-overlap against london_128k.
+#
+#     adamw   1e-4 3.8821   2e-4 3.8641   4e-4 3.8471
+#
+# 4e-4 wins the HIGH endpoint, so the grid extends up; 8e-4 and 1.6e-3 are running.
+#
+# The baseline this exists to establish, stock gpt2 against each held-out set:
+#
+#     smollm2   3.4981 -> 3.2572 (anchor)   drop 0.241
+#     london    4.0181 -> 3.8471 (4e-4)     drop 0.171
+#
+# So london IS further from pre-training -- gpt2 starts half a nat worse on it --
+# but at the anchor's 125-step budget fine-tuning moves the model LESS, not more.
+# Together with the winner sitting at the top of its grid, that reads as the lr
+# being under-tuned for this corpus rather than the corpus failing to shift the
+# distribution. The extension settles it.
+LONDON_HELDOUT = {
+    "tune_adamw_london16k_bs256_lr0.0001": 3.8821,
+    "tune_adamw_london16k_bs256_lr0.0002": 3.8641,
+    "tune_adamw_london16k_bs256_lr0.0004": 3.8471,
+}
+
 BS32_STEP_HELDOUT = {
     # 128k at bs256 (1000 steps), measured 2026-08-25 on A40, nproc 2, pinned venv.
     # Centring on 1e-4 was right for muon, which wins it interior. adamw is a tie
@@ -791,12 +826,17 @@ BS32_STEP_HELDOUT = {
     "tune_muon_32k_bs32_lr5e-05":    3.2310,
     "tune_muon_32k_bs32_lr0.0001":   3.2359,
 }
-for _r in rows:
-    _hl = BS32_STEP_HELDOUT.get(_r["run_id"])
-    if _hl is not None:
-        _r["heldout_loss"] = _hl
-        _r["status"] = "measured"
-        _r["run_dir"] = f"/mnt/ssd-2/lucia/paper_runs/tuning/{_r['run_id']}_s42"
+# One loop per results dict. Each sets status and run_dir as well as the loss --
+# splitting a loop and leaving those lines behind silently demotes every row it
+# covers back to "empty", which is what happened when the london loop was first
+# inserted here: 16 measured 32k/128k rows went empty in one rebuild.
+for _table in (BS32_STEP_HELDOUT, LONDON_HELDOUT):
+    for _r in rows:
+        _hl = _table.get(_r["run_id"])
+        if _hl is not None:
+            _r["heldout_loss"] = _hl
+            _r["status"] = "measured"
+            _r["run_dir"] = f"/mnt/ssd-2/lucia/paper_runs/tuning/{_r['run_id']}_s42"
 
 def main():
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tuning.csv")
