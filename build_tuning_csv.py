@@ -716,12 +716,38 @@ for opt in ["adamw", "muon"]:
           batch_size=256, grad_accum_steps=16,
           notes="Token axis at bs256, 2 epochs (1000 steps). Centre 1e-4 = the 64k winner.")
 
+# High extension on the adamw arm only: 2e-4 edged 1e-4 by 0.0001 nats, which the
+# selection rule treats as an endpoint win. muon took 1e-4 interior and needs no
+# extension. 64k measured 4e-4 at 3.2671 against its 1e-4 winner at 3.2314, so
+# this one is expected to come back clearly worse -- but it is 1000 steps on an
+# otherwise idle pair, and measuring is cheaper than arguing.
+for opt in ["adamw"]:
+    sweep(f"tune_{opt}_128k_bs256",
+          selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_128k_bs256",
+          lrs=[4e-4], priority=2, optimizer=opt, n_docs=128000,
+          batch_size=256, grad_accum_steps=16,
+          notes="Endpoint extension: 2e-4 edged the 3-point grid by 0.0001 nats.")
+
 # Step-scaling sweep results, measured 2026-08-25 (bs32, ga 2, nproc 2, pinned venv).
 # Both 32k arms win on the INTERIOR point, so the CONTROLS batch-16-32 centre of
 # 5e-5 was right and no endpoint extension is needed. Note how flat they are --
 # 0.004 nats across a 4x lr range -- so 5e-5 is "no worse than its neighbours"
 # rather than a sharp optimum, the same pattern gpt2-medium showed.
 BS32_STEP_HELDOUT = {
+    # 128k at bs256 (1000 steps), measured 2026-08-25 on A40, nproc 2, pinned venv.
+    # Centring on 1e-4 was right for muon, which wins it interior. adamw is a tie
+    # rather than a win: 2e-4 beats 1e-4 by 0.0001 nats, which is an order of
+    # magnitude below the 0.0075 spread of its own grid and far below anything
+    # this axis resolves. The selection rule still reads it as a high endpoint,
+    # so the extension to 4e-4 is registered and running rather than argued away
+    # -- the last time a prediction was substituted for the measurement on this
+    # axis it went the wrong way.
+    "tune_adamw_128k_bs256_lr5e-05":  3.2167,
+    "tune_adamw_128k_bs256_lr0.0001": 3.2107,
+    "tune_adamw_128k_bs256_lr0.0002": 3.2106,
+    "tune_muon_128k_bs256_lr5e-05":   3.2181,
+    "tune_muon_128k_bs256_lr0.0001":  3.2108,
+    "tune_muon_128k_bs256_lr0.0002":  3.2114,
     # 128k, measured 2026-08-25 on A40 (allium-0 adamw, iris-0/secret-ord-0/
     # bellflower-0 muon), nproc 2, pinned venv. Both arms win the HIGH endpoint.
     "tune_adamw_128k_bs32_lr1.25e-05": 3.2219,

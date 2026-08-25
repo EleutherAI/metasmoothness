@@ -13,6 +13,14 @@
 # retrained models are not comparable to the bank's random-removal control.
 set -uo pipefail
 
+# `lucia` is uid 1001 on iris-0/secret-ord-0/maria-1 and uid 1000 on the other
+# seven nodes, and CephFS stores the numeric uid. With the default umask 077,
+# anything one group writes is unreadable to the other -- it fails instantly as
+# FileNotFoundError while `ls` shows the file, and it had already made 42 of 100
+# models in one retrain bank invisible to most of the fleet. Born-readable is the
+# only fix that does not need chasing afterwards. See notes/uid_split.md.
+umask 022
+
 DEVS=$1; shift
 REPO=$(cd "$(dirname "$0")/.." && pwd)
 # The filter estimator is PR #430; the pinned -429 worktree predates it and
