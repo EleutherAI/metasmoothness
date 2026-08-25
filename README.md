@@ -40,6 +40,9 @@ prioritised against these.
   wonder whether our fine-tuning dataset is too similar to the pre-training
   corpus; running some experiments with a corpus of pre-1931 text)
 
+The strongest findings -- meaning the ones cheapest to investigate -- should
+generalise up to dataset size **N = 1M** for now.
+
 ## Results
 
 ```
