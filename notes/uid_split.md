@@ -97,3 +97,22 @@ than remembering which side a file came from.
 born group/other readable. That covers the filter path. Anything launched by hand
 still inherits the login shell umask 077, so prefer the slot scripts, and run the
 audit above before trusting a bank you did not build.
+
+## CORRECTION: umask 022 is not sufficient
+
+The note above says the durable fix is `umask 022` in the launch path. That is
+wrong, and it kept producing unreadable models after the fix went in.
+
+huggingface/safetensors saves through a temporary file, and Python creates temp
+files 0600 **regardless of umask**. The temp is then renamed into place, so the
+final `model.safetensors` is 0600 even under a permissive umask. Measured on
+`tune_muon_london16k_bs256_lr0.0002_s42`, launched with umask 022 and still
+written `uid=1000 mode=600`.
+
+So the reliable repair is chmod after the fact: `scripts/fix_perms.py`. Only the
+owning uid can chmod, so it has to run from a node of EACH uid. First run fixed
+488 paths from the 1000 side and 26 from the 1001 side.
+
+Keep umask 022 anyway -- it does help for everything that is not written through
+a temp file -- but do not rely on it alone. Run fix_perms before any publish, and
+after any batch of runs that another node will need to read.
