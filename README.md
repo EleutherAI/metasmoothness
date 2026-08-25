@@ -64,7 +64,7 @@ metasmoothness | optimizer |    lr | N docs |  bs | N epochs | N steps | EK-FAC 
 30 rows shown, 19 with all three metrics. '-' = not yet measured.
 ```
 
-## How many queries does an LDS estimate need?
+## How many queries should an LDS be averaged over?
 
 MAGIC costs one reverse pass per query.  Bootstrapped confidence intervals of mean Spearman rank correlation over queries:
 
