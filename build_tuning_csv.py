@@ -837,6 +837,16 @@ LONDON_HELDOUT = {
     "tune_muon_london16k_bs16_lr0.0001":  3.8283,
     "tune_muon_london16k_bs16_lr0.0002":  3.8240,
     "tune_muon_london16k_bs16_lr0.0004":  3.8451,
+    # london at 128k, bs256 (1000 steps), measured 2026-08-26 against
+    # london_heldout_4k. 1.6e-3 still running.
+    #
+    # Note how much more N buys on this corpus than on smollm2. london goes
+    # 3.8397 at 16k to 3.5264 at 128k, a 0.31 nat gain from 8x the data, while
+    # the smollm2 token axis moves ~0.02 over the same range. A distant corpus is
+    # data-hungry in a way the near one is not, which is worth keeping in mind
+    # when reading any london result against a smollm2 one at matched N.
+    "tune_adamw_london128k_bs256_lr0.0004": 3.5725,
+    "tune_adamw_london128k_bs256_lr0.0008": 3.5264,
 }
 
 BS32_STEP_HELDOUT = {
