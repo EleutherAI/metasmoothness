@@ -43,10 +43,11 @@ plan_adam_eps1e17_16k_wd0.0       | adamw     | 2e-04 | 16,000 | 256 |        2 
 plan_adam_eps1e17_16k_wd0.1       | adamw     | 2e-04 | 16,000 | 256 |        2 |     125 |         0.9930 |     0.4244 |    0.9414 |           - |             - |            - |     3.1077 |       3.2572 |    27.54 | done   
 sm_adamw_eps1e17_16k_bs256        | adamw     | 2e-04 | 16,000 | 256 |        2 |     125 |         0.9930 |     0.4253 |    0.9411 |     0.00023 |       0.05288 |      0.09090 |     3.1078 |       3.2572 |    27.23 | done   
 plan_adam_eps1e17_16k_gpt2-medium | adamw     | 1e-04 | 16,000 | 256 |        2 |     125 |         0.8580 |          - |         - |           - |             - |            - |          - |            - |        - | planned
-plan_adam_eps1e17_16k_ep4         | adamw     | 1e-04 | 16,000 | 256 |        4 |     250 |         0.9959 |          - |         - |           - |             - |            - |          - |       3.2503 |        - | planned
+plan_adam_eps1e17_16k_ep4         | adamw     | 1e-04 | 16,000 | 256 |        4 |     250 |         0.9959 |          - |    0.9534 |           - |             - |            - |          - |       3.2503 |    25.16 | partial
 plan_adam_eps1e17_16k_bs512       | adamw     | 2e-04 | 16,000 | 512 |        2 |      63 |         0.9950 |     0.4142 |    0.9233 |           - |             - |            - |     3.1700 |       3.2751 |    20.83 | done   
 plan_adam_eps1e17_32k_bs32        | adamw     | 5e-05 | 32,000 |  32 |        2 |    2000 |         0.9866 |          - |         - |           - |             - |            - |          - |            - |        - | planned
-plan_adam_eps1e17_32k_bs256       | adamw     | 2e-04 | 32,000 | 256 |        2 |     250 |         0.9937 |          - |         - |           - |             - |            - |          - |       3.2365 |        - | planned
+plan_adam_eps1e17_32k_bs256       | adamw     | 2e-04 | 32,000 | 256 |        2 |     250 |         0.9937 |          - |    0.9529 |           - |             - |            - |          - |       3.2365 |    36.51 | partial
+plan_adam_eps1e17_64k_bs32        | adamw     | 3e-05 | 64,000 |  32 |        2 |    4000 |         0.9869 |          - |         - |           - |             - |            - |          - |            - |        - | planned
 plan_adam_eps1e17_64k_bs256       | adamw     | 1e-04 | 64,000 | 256 |        2 |     500 |         0.9876 |          - |         - |           - |             - |            - |          - |       3.2314 |        - | planned
 plan_muon_eps1e17_4k_bs256        | muon      | 4e-04 |  4,000 | 256 |        2 |      32 |         0.9037 |     0.3031 |    0.3020 |           - |             - |            - |     3.1281 |       3.3114 |    13.17 | done   
 plan_muon_eps1e17_8k_bs256        | muon      | 2e-04 |  8,000 | 256 |        2 |      63 |         0.9962 |     0.3881 |    0.7712 |     0.00012 |       0.02258 |      0.03289 |     3.1560 |       3.2841 |    11.95 | done   
@@ -57,9 +58,10 @@ plan_muon_eps1e17_16k_bs128       | muon      | 1e-04 | 16,000 | 128 |        2 
 sm_muon_eps1e17_16k_bs256         | muon      | 2e-04 | 16,000 | 256 |        2 |     125 |         0.9964 |     0.4237 |    0.8379 |           - |             - |            - |     3.1135 |       3.2570 |    20.03 | done   
 plan_muon_eps1e17_32k_bs32        | muon      | 5e-05 | 32,000 |  32 |        2 |    2000 |         0.9941 |          - |         - |           - |             - |            - |          - |            - |        - | planned
 plan_muon_eps1e17_32k_bs256       | muon      | 2e-04 | 32,000 | 256 |        2 |     250 |         0.9948 |          - |         - |           - |             - |            - |          - |       3.2372 |        - | planned
+plan_muon_eps1e17_64k_bs32        | muon      | 3e-05 | 64,000 |  32 |        2 |    4000 |         0.9936 |          - |         - |           - |             - |            - |          - |            - |        - | planned
 plan_muon_eps1e17_64k_bs256       | muon      | 1e-04 | 64,000 | 256 |        2 |     500 |         0.9947 |          - |         - |           - |             - |            - |          - |       3.2323 |        - | planned
 
-28 rows shown, 19 with all three metrics. '-' = not yet measured.
+30 rows shown, 19 with all three metrics. '-' = not yet measured.
 ```
 
 ## How many queries does an LDS estimate need?

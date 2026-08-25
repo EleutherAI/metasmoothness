@@ -352,6 +352,46 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    "plan_adam_eps1e17_16k_ep4": dict(
+        status="partial",  # train_loss pending; promote when run_losses lands
+        magic_lds=0.9534, magic_ci_lo=0.9458, magic_ci_hi=0.9594,
+        magic_n_queries=20, n_subsets=100, n_queries=20,
+        # scripts/param_delta.py against this run's own checkpoints/step_0.ckpt
+        delta_l1=245405.56, delta_l2=25.1617,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_ep4",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_ep4",
+        notes="D2: double epochs (250 steps, batch unchanged) -- isolates step count "
+              "from batch size. lr 1e-4 from tuning.csv sweep_group tune_adamw_16k_ep4. "
+              "nproc 2, NVIDIA A40, bellflower-0; retrains 30-100 sharded four ways on "
+              "shared-ord-0, also A40, so the bank is hardware-homogeneous under D17. "
+              "100 subsets, 20/20 queries, CI half-width 0.0068. HIGHEST MAGIC IN THE "
+              "GRID: 0.9534 [0.9458, 0.9594] against the anchor 0.9411 [0.9326, 0.9477], "
+              "intervals not overlapping. Doubling epochs at fixed batch RAISES "
+              "attribution, and ms rises with it (0.9959 vs the anchor 0.9930), so on "
+              "this axis smoothness and attributability move together. Read against "
+              "bs512 (0.9233, 63 steps, the uncontrolled double batch): more steps at "
+              "fixed batch helps, more batch at fixed data does not. The main process "
+              "overran its stop and recomputed subsets 30-44, which slice_30_48 also "
+              "covered; the two copies agree to 3.8e-06 on diff, the main copies were "
+              "dropped and the original kept as validation.csv.premerge."),
+    "plan_adam_eps1e17_32k_bs256": dict(
+        status="partial",  # train_loss pending; promote when run_losses lands
+        magic_lds=0.9529, magic_ci_lo=0.9470, magic_ci_hi=0.9577,
+        magic_n_queries=20, n_subsets=100, n_queries=20,
+        delta_l1=353172.61, delta_l2=36.5131,
+        code_commit="79c08dce", reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_32k_bs256",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_32k_bs256",
+        notes="Token axis, adamw at N=32k, bs256 (250 steps). lr 2e-4. nproc 2, "
+              "NVIDIA A40, secret-ord-0; retrains 25-100 sharded three ways on "
+              "allium-0, also A40. 100 subsets, 20/20 queries, CI half-width 0.0054 -- "
+              "the tightest row in the grid. EXTENDS THE ADAMW TOKEN AXIS: 0.9295 at "
+              "4k, 0.9163 at 8k, 0.9411 at the 16k anchor, 0.9529 here. The axis is "
+              "flat to mildly rising over an 8x range in tokens, against the muon arm "
+              "which climbs steeply (0.3020 at 4k to 0.7712 at 8k). ms 0.9937. Main "
+              "overran into the slice range on subsets 25-39; copies agree to 3.3e-06 "
+              "on diff, main copies dropped, original kept as validation.csv.premerge."),
     "plan_muon_eps1e17_16k_bs16": dict(
         status="done",
         magic_lds=0.8850, magic_ci_lo=0.8708, magic_ci_hi=0.8967,
@@ -965,8 +1005,6 @@ for n in [32000, 64000, 128000, 256000, 512000]:
 # D1 (2026-08-20): "warm start" = attribution window, a pre-training experiment —
 # removed from the fine-tuning grid. See EXPERIMENTS_CSV.md "Planned pre-training experiments".
 add(BASE17, run_id="plan_adam_eps1e17_16k_ep4", num_epochs=4,
-    status="done", n_subsets=100, n_queries=20,
-    magic_lds=0.9534, magic_ci_lo=0.9458, magic_ci_hi=0.9594, magic_n_queries=20,
     notes="D2: double epochs (250 steps, batch unchanged) — isolates step count. "
           "lr comes from tuning.csv sweep_group tune_adamw_16k_ep4. nproc 2, A40, "
           "bellflower-0; sharded 30-48/48-65/65-82/82-100 on shared-ord-0, also A40, "
