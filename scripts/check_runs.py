@@ -42,6 +42,25 @@ KINDS = {
 
 claims = {os.path.basename(c) for c in glob.glob(os.path.join(CLAIMS, "*"))}
 
+# A run whose artifact was consumed and then deleted is finished, not dead. The
+# derived result lives in experiments.csv, so consult it: plan_adam_eps1e17_16k_bs64
+# reported DEAD every sweep for 60 hours because its EK-FAC scores had been used
+# (ekfac_lds 0.4239) and cleaned up. That noise is what hides a real failure.
+DERIVED = {"ekfac score": "ekfac_lds", "magic score": "magic_lds"}
+_recorded = {}
+try:
+    import csv as _csv
+    for _r in _csv.DictReader(open("/mnt/ssd-2/lucia/metasmoothness/experiments.csv")):
+        _recorded[_r["run_id"]] = _r
+except OSError:
+    pass
+
+
+def result_recorded(run, label):
+    col = DERIVED.get(label)
+    return bool(col and (_recorded.get(run) or {}).get(col))
+
+
 rows = []
 for log in sorted(glob.glob("/mnt/ssd-*/lucia/paper_runs/experiments/*/*.log")):
     stem = os.path.basename(log)[:-4]
@@ -51,7 +70,7 @@ for log in sorted(glob.glob("/mnt/ssd-*/lucia/paper_runs/experiments/*/*.log")):
     run_dir = os.path.dirname(log)
     run = os.path.basename(run_dir)
 
-    done = os.path.exists(os.path.join(run_dir, done_rel))
+    done = os.path.exists(os.path.join(run_dir, done_rel)) or result_recorded(run, label)
     if done and not a.all:
         continue
 
@@ -73,6 +92,17 @@ for log in sorted(glob.glob("/mnt/ssd-*/lucia/paper_runs/experiments/*/*.log")):
     else:
         state = "DEAD"       # nobody owns it and it stopped short
     rows.append((state, age, label, run, owner or "-"))
+
+# The same run can exist on ssd-1 and ssd-2, and the glob finds both. Report once.
+_seen = set()
+_rows = []
+for _row in rows:
+    _key = (_row[2], _row[3])       # (kind, run)
+    if _key in _seen:
+        continue
+    _seen.add(_key)
+    _rows.append(_row)
+rows = _rows
 
 order = {"running": 0, "done": 1, "STALE": 2, "DEAD": 3}
 rows.sort(key=lambda r: (order[r[0]], -r[1]))
