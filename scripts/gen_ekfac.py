@@ -30,6 +30,8 @@ TEMPLATE = Path(
 ap = argparse.ArgumentParser()
 ap.add_argument("run_id")
 ap.add_argument("--nproc", type=int, default=2)
+ap.add_argument("--no-bank", action="store_true",
+    help="score a row that has no retrain bank, using base/model")
 args = ap.parse_args()
 
 root = None
@@ -41,12 +43,26 @@ for base in ("/mnt/ssd-2", "/mnt/ssd-1"):
 if root is None:
     sys.exit(f"run dir not found: {args.run_id}")
 
-n_models = len(list((root / "retrained").glob("subset_*")))
-if n_models < 100:
-    sys.exit(f"refusing: bank is {n_models}/100, EK-FAC needs the finished bank")
-base_model = root / "retrained" / "base"
-if not base_model.is_dir():
-    sys.exit(f"refusing: no retrained/base in {root}")
+# EK-FAC scoring needs a MODEL and the training data, not a bank -- the bank is
+# only what an LDS is computed against afterwards. The step-ladder rows are
+# registered bank-free on purpose (MAGIC would cost 150h+ of scoring at that N),
+# and they still want scores so the proponent filter can rank documents. So
+# --no-bank takes the model from base/model, produced by the row's base.yaml,
+# and skips the bank precondition. It cannot produce an ekfac_lds, and is not
+# meant to.
+if args.no_bank:
+    base_model = root / "base" / "model"
+    if not base_model.is_dir():
+        sys.exit(f"refusing: --no-bank needs a trained model at {base_model}; "
+                 f"run the row's base.yaml first")
+else:
+    n_models = len(list((root / "retrained").glob("subset_*")))
+    if n_models < 100:
+        sys.exit(f"refusing: bank is {n_models}/100, EK-FAC needs the finished "
+                 f"bank (or pass --no-bank to score a bank-free row)")
+    base_model = root / "retrained" / "base"
+    if not base_model.is_dir():
+        sys.exit(f"refusing: no retrained/base in {root}")
 
 # The training dataset and world size come from the row's own magic config, so
 # EK-FAC scores the same data the bank was built on.
