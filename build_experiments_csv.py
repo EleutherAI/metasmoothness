@@ -355,6 +355,9 @@ BANK_RESULTS = {
     "plan_adam_eps1e17_16k_ep4": dict(
         status="done",
         magic_lds=0.9534, magic_ci_lo=0.9458, magic_ci_hi=0.9594,
+        # scripts/ekfac_lds.py, D7 config, A40 allium-0 nproc 2, scored after the
+        # mirror fix cleared the stall. Same 100-subset bank as MAGIC.
+        ekfac_lds=0.4730, ekfac_ci_lo=0.4310, ekfac_ci_hi=0.5110,
         magic_n_queries=20, n_subsets=100, n_queries=20,
         # scripts/param_delta.py against this run's own checkpoints/step_0.ckpt
         delta_l1=245405.56, delta_l2=25.1617,
