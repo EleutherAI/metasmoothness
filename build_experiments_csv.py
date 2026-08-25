@@ -352,6 +352,22 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    # Second gpt2-medium point, at bs32 rather than bs256 -- the config D11 was
+    # meant to register, and an exact match to plan_adam_eps1e17_16k_bs32 (gpt2,
+    # ms 0.9800, MAGIC 0.9201) with only the model swapped. ms came in at 0.7402,
+    # LOWER than the bs256 run 0.8580, so lowering batch moves ms the wrong way on
+    # this model just as it does on gpt2 (0.9930 bs256 -> 0.9800 bs32 -> 0.9133
+    # bs16). Recovering ms on gpt2-medium is not a batch-size lever.
+    # Bank and MAGIC scoring for this row are running on lotus-0; scoring alone is
+    # ~47h at 8.84 s/step over 1000 steps x 20 queries, so MAGIC LDS lands well
+    # after the bank does.
+    "gpt2medium_16k_bs32": dict(
+        status="planned",
+        metasmoothness=0.7402,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/gpt2medium_16k_bs32",
+        notes="gpt2-medium at bs32, 1000 steps, lr 5e-05, world size 4 on A100 "
+              "(lotus-0/maria-1). ms 0.7402 measured with fd_step 0.1, seed 0, "
+              "total_movement_l1 68137.34."),
     "plan_adam_eps1e17_16k_gpt2-medium": dict(
         status="done",
         magic_lds=-0.0407, magic_ci_lo=-0.0980, magic_ci_hi=0.0155,
