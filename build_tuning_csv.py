@@ -847,7 +847,18 @@ LONDON_HELDOUT = {
     # when reading any london result against a smollm2 one at matched N.
     "tune_adamw_london128k_bs256_lr0.0004": 3.5725,
     "tune_adamw_london128k_bs256_lr0.0008": 3.5264,
+    "tune_adamw_london128k_bs256_lr0.0016": 3.4992,
 }
+
+# london 128k wins at 1.6e-3, the HIGH endpoint, so the grid extends up: 3.2e-3
+# and 6.4e-3 are running.
+#
+# The direction is the interesting part. On london the optimum RISES with N --
+# 8e-4 at 16k, at least 1.6e-3 at 128k -- while at fixed bs256 more N means more
+# steps, and on the smollm2 ladder more steps meant a LOWER optimum (5e-5 at 1000
+# steps, 2.5e-5 at 4000). So the lr-versus-steps trend reverses with the corpus,
+# the same way the optimizer ranking did. Anything extrapolated from the smollm2
+# grid needs re-checking on london rather than assumed.
 
 BS32_STEP_HELDOUT = {
     # 128k at bs256 (1000 steps), measured 2026-08-25 on A40, nproc 2, pinned venv.
