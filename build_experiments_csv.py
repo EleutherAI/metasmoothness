@@ -417,6 +417,8 @@ BANK_RESULTS = {
     "plan_muon_eps1e17_32k_bs256": dict(
         status="done",
         magic_lds=0.8715, magic_ci_lo=0.8575, magic_ci_hi=0.8835,
+        # scripts/ekfac_lds.py, D7 config, A40 allium-0 nproc 2, same 100-subset bank
+        ekfac_lds=0.4044, ekfac_ci_lo=0.3584, ekfac_ci_hi=0.4483,
         magic_n_queries=20, n_subsets=100, n_queries=20,
         # scripts/param_delta.py, step 249: rel_l2 0.01825
         delta_l1=281856.91, delta_l2=31.9472,
