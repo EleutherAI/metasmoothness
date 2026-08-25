@@ -52,10 +52,18 @@ if root is None:
 # and skips the bank precondition. It cannot produce an ekfac_lds, and is not
 # meant to.
 if args.no_bank:
-    base_model = root / "base" / "model"
-    if not base_model.is_dir():
-        sys.exit(f"refusing: --no-bank needs a trained model at {base_model}; "
-                 f"run the row's base.yaml first")
+    # Two layouts hold the trained full-data model. ms-only ladder rows keep it
+    # at base/model; a row built through the magic pipeline keeps it at
+    # retrained/base -- same weights, different path. Accepting both lets a row
+    # whose bank is still building be EK-FAC scored now instead of waiting for
+    # 100 retrains, which is what unblocked the 64k bs256 token-axis rows.
+    _cands = [root / "base" / "model", root / "retrained" / "base"]
+    base_model = next(
+        (c for c in _cands if (c / "model.safetensors").is_file()), None)
+    if base_model is None:
+        sys.exit("refusing: --no-bank needs a trained model at one of "
+                 + ", ".join(str(c) for c in _cands)
+                 + "; run the row's base.yaml first")
 else:
     n_models = len(list((root / "retrained").glob("subset_*")))
     if n_models < 100:
