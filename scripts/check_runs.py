@@ -75,7 +75,25 @@ for log in sorted(glob.glob("/mnt/ssd-*/lucia/paper_runs/experiments/*/*.log")):
         continue
 
     age = (now - os.path.getmtime(log)) / 60
-    owner = next((c for c in claims if c.startswith(run + "__")), None)
+    # A run has several claims at once -- magicscore, ekfacscore, experiment,
+    # bankbuild -- so matching on the run id alone lets a LIVE claim of one kind
+    # mask a DEAD run of another. That is what hid a dead 64k EK-FAC scoring
+    # behind that row's healthy MAGIC scoring: it reported STALE (claimed but
+    # quiet) instead of DEAD (nobody owns it), which reads as "wait" rather than
+    # "relaunch".
+    CLAIM_SUFFIX = {
+        "ekfac score": "ekfacscore",
+        "magic score": "magicscore",
+        "metasmoothness": "ms",
+        "bank build": "bankbuild",
+        "experiment": "experiment",
+        "trajectory": "traj",
+    }
+    _suffix = CLAIM_SUFFIX.get(label)
+    if _suffix:
+        owner = f"{run}__{_suffix}" if f"{run}__{_suffix}" in claims else None
+    else:
+        owner = next((c for c in claims if c.startswith(run + "__")), None)
     if owner:
         try:
             with open(os.path.join(CLAIMS, owner, "host")) as fh:
