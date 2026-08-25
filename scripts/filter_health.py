@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
-"""Freshness of each in-progress filter run, keyed on the per-query CSV.
+"""Filter-run health: freshness AND a live process, checked together.
 
-The earlier check used the checkpoint directory's mtime, which was a fair proxy
-while runs wrote a full sqrt trajectory per query. Since save_mode moved to
-interval that directory barely changes, so it now reports healthy runs as
-stalled. filter_proponents.csv gains a row per finished query, which is the
-thing that actually tracks progress.
+Neither signal alone is sufficient, and both have now produced a wrong call:
+
+  * checkpoint mtime -- barely moves since save_mode became interval, so healthy
+    runs looked stalled (seventeen at once)
+  * CSV mtime -- keeps a recent timestamp for a while after the process dies, so
+    a killed cut row looked live
+
+A run is only healthy if its per-query CSV is fresh AND something on this node
+still holds its config. Anything else is reported for what it is.
 """
 import glob
 import os
+import subprocess
 import time
 
+FRESH_MIN = 25
 now = time.time()
+ps = subprocess.run(["ps", "-eo", "args"], capture_output=True, text=True).stdout
+
 rows = []
 for d in glob.glob("/mnt/ssd-*/lucia/paper_runs/experiments/*/filter_proponents_*/"):
     d = d.rstrip("/")
@@ -22,12 +30,19 @@ for d in glob.glob("/mnt/ssd-*/lucia/paper_runs/experiments/*/filter_proponents_
         continue
     n = sum(1 for _ in open(f)) - 1
     age = (now - os.path.getmtime(f)) / 60
+    held = f"{d}.yaml" in ps
     run = os.path.basename(os.path.dirname(d))
     src = os.path.basename(d).replace("filter_proponents_", "")
-    rows.append((age, n, run, src))
+    if held and age < FRESH_MIN:
+        state = "running"
+    elif held:
+        state = "HUNG"          # process alive, no progress
+    else:
+        state = "dead"          # no process; whatever it wrote is all there is
+    rows.append((state, age, n, run, src))
 
-rows.sort()
-print(f"{'csv age':>8}{'queries':>9}  state    run / source")
-for a, n, r, s in rows:
-    state = "live" if a < 25 else "STALLED"
-    print(f"{a:7.0f}m{n:>9}  {state:<8} {r} / {s}")
+order = {"running": 0, "HUNG": 1, "dead": 2}
+rows.sort(key=lambda r: (order[r[0]], r[1]))
+print(f"{'state':<9}{'csv age':>8}{'queries':>9}  run / source")
+for state, age, n, run, src in rows:
+    print(f"{state:<9}{age:7.0f}m{n:>9}  {run} / {src}")

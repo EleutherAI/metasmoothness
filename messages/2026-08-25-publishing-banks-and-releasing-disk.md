@@ -62,3 +62,25 @@ A bank still needs both filter arms before it qualifies. As of writing:
 `sm_muon` and `muon 4k` have MAGIC deltas but not EK-FAC; the bs16/bs32/bs64/
 bs128/wd/clip/scale0.5 rows have LDS for both scorers but no filter deltas yet.
 Those runs are what the filter queues are working through.
+
+
+## Releasing a bank forecloses new filter runs on it
+
+A tail-filter run ends in an "Evaluating bank" phase that walks the bank's 100
+retrained models to build the random-removal control. So once `retrained/` is
+deleted, that row cannot take a NEW filter measurement without pulling the
+models back from the Hub first.
+
+This is why the precondition is "everything derived from it exists" and not just
+"it is published". All five released banks already had both filter deltas and
+both LDS values, so nothing pending depends on them -- checked against the
+current queue, and no pending job targets a released bank.
+
+If a released bank ever needs another filter arm:
+
+    huggingface-cli download EleutherAI/metasmoothness-bank-<run_id> \
+        --repo-type dataset --local-dir <run_dir>
+
+and the run works again. The models are public, so nothing is lost -- but it is
+a download, not a local read, and worth knowing before planning work that
+depends on it.
