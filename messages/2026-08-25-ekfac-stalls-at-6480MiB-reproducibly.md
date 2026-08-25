@@ -97,3 +97,23 @@ signal is only delivered when it returns to user space.
 
 Until then: do not queue EK-FAC scoring. It will consume GPUs, write 6.8 GB, and
 stop. Three attempts on three nodes did exactly that before this was understood.
+
+## Route around it: MAGIC can score the ladder, with one allocator flag
+
+EK-FAC being down fleet-wide does not have to stop the proponent-filter curve.
+MAGIC scores a bank-free row fine, provided two things:
+
+1. the base run keeps a trajectory. The ladder bases were trained with
+   save_mode interval (final state only), which MAGIC cannot replay. Re-running
+   with save_mode sqrt costs one training run -- 17 min at 32k, 34 at 64k.
+
+2. PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True. Without it the replay dies
+   with CUDA OOM trying to allocate 1.53 GiB on a 47.5 GiB card, which is
+   fragmentation rather than a real limit. With it the same run proceeds at
+   6.5 s/it.
+
+Score-only config: point run_path at the trajectory, resume: true,
+skip_validation: true, num_subsets: 0. Backward replay is ~3.5h at 32k/2000
+steps, which is the whole scoring cost -- not per query.
+
+    plan_adam_eps1e17_32k_bs32   scoring now, Backward 23/2000, ETA ~3.5h
