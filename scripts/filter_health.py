@@ -31,6 +31,11 @@ ps = subprocess.run(["ps", "-eo", "args"], capture_output=True, text=True).stdou
 # be on.
 CLAIMS = "/mnt/ssd-2/lucia/paper_runs/_claims"
 
+# The claim name must be exactly <run_id>__<source>, source being magic or ekfac.
+# A hand-launched run that invents its own suffix (e.g. __ekfacfilter) is
+# invisible both here and to run_filter_slot's stale-output guard, which is how
+# two live 15/20-query jobs came to read as dead with no owner.
+
 
 def claim_host(run, source):
     """Hostname holding this job's claim, or None."""
