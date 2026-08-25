@@ -54,3 +54,27 @@ already stopped.
 
 This is the second ceph wedge in a day; the other is the `mv` on marisa-0, now
 16+ hours in uninterruptible D state, which strands that node's six A100s.
+
+
+## CORRECTION: it is not the node
+
+The conclusion above was wrong. Running the same row on allium-0 -- a node that
+writes 100 MB into that very directory at 566 MB/s -- wedged identically, same
+`ceph_mdsc_wait_request`, same point in the run:
+
+    child 238498 wchan=pipe_read
+    child 238499 wchan=ceph_mdsc_wait_request
+    child 238500 wchan=0
+
+So "shared-ord-0's client is stuck on that inode" does not survive the test that
+should have been run before writing it down.
+
+What still distinguishes this row from the EK-FAC runs that succeeded is SIZE.
+The successful ones are 4k and 16k rows; this is 32k, and it writes a 6.79 GB
+`gradients.bin` before stalling. The next thing to test is whether a smaller
+32k-family row wedges too, which separates "large query-gradient file" from
+"this particular row".
+
+Until that is known, EK-FAC scoring at 32k should be treated as blocked rather
+than retried -- four attempts on two nodes have produced nothing but a 6.8 GB
+partial each time.
