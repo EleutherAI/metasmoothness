@@ -844,6 +844,11 @@ MS_MEASURED = {
     # asserted A40 on no evidence.
     "plan_adam_eps1e17_32k_bs32":     (0.986618, 34054.9),
     "plan_muon_eps1e17_32k_bs32":     (0.994085, 38738.9),
+    # 64k rung, lr 2.5e-05 for both (the interior minimum of the 64k bs32
+    # sweep). 4000 steps, nproc 2, A40, bellflower-0 -- the pair shares a node,
+    # so D17 does not apply to the optimizer contrast between them.
+    "plan_adam_eps1e17_64k_bs32":     (0.986871, 24047.7),
+    "plan_muon_eps1e17_64k_bs32":     (0.993564, 27276.1),
     # Logit-scale axis, measured on A40 (matching these banks):
     #   scale 1.0  (lr 2e-4) -> ms 0.9930 / MAGIC 0.9411
     #   scale 0.5  (lr 2e-4) -> ms 0.9878 / MAGIC 0.9448
@@ -960,8 +965,19 @@ for n in [32000, 64000, 128000, 256000, 512000]:
 # D1 (2026-08-20): "warm start" = attribution window, a pre-training experiment —
 # removed from the fine-tuning grid. See EXPERIMENTS_CSV.md "Planned pre-training experiments".
 add(BASE17, run_id="plan_adam_eps1e17_16k_ep4", num_epochs=4,
+    status="done", n_subsets=100, n_queries=20,
+    magic_lds=0.9534, magic_ci_lo=0.9458, magic_ci_hi=0.9594, magic_n_queries=20,
     notes="D2: double epochs (250 steps, batch unchanged) — isolates step count. "
-          "lr comes from tuning.csv sweep_group tune_adamw_16k_ep4.")
+          "lr comes from tuning.csv sweep_group tune_adamw_16k_ep4. nproc 2, A40, "
+          "bellflower-0; sharded 30-48/48-65/65-82/82-100 on shared-ord-0, also A40, "
+          "so the bank is hardware-homogeneous under D17. 100 subsets, 20/20 queries, "
+          "CI half-width 0.0068. THE HIGHEST MAGIC IN THE GRID: 0.9534 against the "
+          "anchor 0.9411, whose interval [0.9326, 0.9477] it does not overlap. Doubling "
+          "epochs at fixed batch RAISES attribution, and it raises ms too (0.9959 vs "
+          "0.9930), so on this axis the two move together. The main process overran its "
+          "stop and recomputed subsets 30-44, which the slices also covered; the two "
+          "copies agree to 3.8e-06 (diff column) and the main copies were dropped, "
+          "original kept as validation.csv.premerge.")
 add(BASE17, run_id="plan_adam_eps1e17_16k_bs512", batch_size=512, grad_accum_steps=32,
     notes="D2: uncontrolled double batch (63 steps). lr comes from tune_adamw_16k_bs512.")
 for mdl, prm in [("gpt2-medium", 355), ("gpt2-large", 774)]:
