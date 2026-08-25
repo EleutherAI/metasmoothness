@@ -82,10 +82,9 @@ has +/-0.1244. Regenerate data with `scripts/ci_vs_queries.py`.
 ## History
 
 [LDS_RESULTS.md](LDS_RESULTS.md), [BASELINE_LDS.md](BASELINE_LDS.md) and
-[SHAMPOO_RESULTS.md](SHAMPOO_RESULTS.md) hold all pre-2026-08-20 measurements, most of which
-are excluded from the paper CSVs (old shuffle implementation — see the exclusion table in
-EXPERIMENTS_CSV.md). They remain the provenance record; read them only when you need the
-history behind a decision.
+[SHAMPOO_RESULTS.md](SHAMPOO_RESULTS.md) hold pre-2026-08-20 measurements, most of which
+are excluded from the paper CSVs (they use an old shuffle implementation — see the exclusion 
+table in EXPERIMENTS_CSV.md).
 
 ## Differences in final query loss across GPU types
 
