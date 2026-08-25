@@ -11,6 +11,7 @@ are inherited rather than retyped.
 
 import argparse
 import copy
+import os
 import sys
 from pathlib import Path
 
@@ -70,6 +71,22 @@ exp = run_config.load(root)
 magic = next(s["magic"] for s in exp["steps"] if "magic" in s)
 train_ds = magic["data"]["dataset"]
 query_ds = magic["query"]["dataset"]
+
+# The row's own magic config was written when the datasets were only on ssd-1,
+# and that directory has been unlistable fleet-wide since a copy got stuck in
+# uninterruptible sleep inside it. Prefer the ssd-2 mirror where one exists, the
+# same way gen_filter and gen_experiment_run do. Only the mirror is stat-ed --
+# the ssd-1 path is passed through untouched, because probing it is what hangs.
+_MIRROR = "/mnt/ssd-2/lucia/datasets_local"
+
+
+def _mirrored(path: str) -> str:
+    local = os.path.join(_MIRROR, os.path.basename(path.rstrip("/")))
+    return local if os.path.isdir(local) else path
+
+
+train_ds = _mirrored(train_ds)
+query_ds = _mirrored(query_ds)
 
 cfg = copy.deepcopy(yaml.safe_load(TEMPLATE.read_text()))
 ek = cfg["steps"][0]["ekfac"]
