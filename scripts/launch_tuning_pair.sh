@@ -9,10 +9,12 @@
 #   2. the run is already CLAIMED by another node
 #   3. either GPU is in use
 #
-# On success it chmods the run dir readable. umask is NOT enough: safetensors
-# saves through a temp file and Python creates those 0600 regardless of umask, so
-# model.safetensors lands 0600 and the fleet's other uid cannot read it. Doing it
-# here means no separate fix_perms pass is needed for tuning runs.
+# NOTE: an earlier version wrapped the launch in `sh -c "... ; chmod ; rm claim"`
+# so it could fix permissions on its own. That HUNG -- CUDA contexts came up on
+# all four GPUs and then nothing, 0-byte log, six minutes in, on jobs that ran
+# fine without the wrapper. Whatever the extra shell layer does to the process
+# group, torch distributed does not survive it. Launch the process directly and
+# fix permissions with scripts/fix_perms.py instead.
 DEVS=$1; PORT=$2; ID=$3
 C=/mnt/ssd-2/lucia/metasmoothness/configs/tuning/${ID}_s42.yaml
 RUN=/mnt/ssd-2/lucia/paper_runs/tuning/${ID}_s42
@@ -37,13 +39,8 @@ hostname > "$CLAIM/host"
 
 umask 022
 cd /tmp || exit 1
-setsid nohup sh -c "
-  env CUDA_VISIBLE_DEVICES='$DEVS' MASTER_PORT='$PORT' PYTHONNOUSERSITE=1 \
-      HF_HUB_OFFLINE=1 PYTHONPATH=/mnt/ssd-1/lucia/bergson-main-paper-429 \
-      /home/lucia/envs/paper/bin/python -s -P -m bergson '$C'
-  rc=\$?
-  chmod -R a+rX '$RUN' 2>/dev/null
-  rm -rf '$CLAIM'
-  exit \$rc
-" > /tmp/${ID}.log 2>&1 < /dev/null &
+setsid nohup env CUDA_VISIBLE_DEVICES="$DEVS" MASTER_PORT="$PORT" PYTHONNOUSERSITE=1 \
+  HF_HUB_OFFLINE=1 PYTHONPATH=/mnt/ssd-1/lucia/bergson-main-paper-429 \
+  /home/lucia/envs/paper/bin/python -s -P -m bergson "$C" \
+  > /tmp/${ID}.log 2>&1 < /dev/null &
 echo "LAUNCHED $ID on $DEVS"
