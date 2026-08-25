@@ -44,7 +44,17 @@ print(is_cut(sys.argv[1]) or '')
     echo "$RID $SRC CUT: $CUTWHY" | tee -a "$LOG"
     continue
   fi
-  $ENVPY -s -P "$REPO/scripts/gen_filter.py" "$RID" --source "$SRC" --nproc "$NPROC" \
+  # The step-ladder rows were registered ms-only, so they have a trained base but
+  # no leave-k-out bank to borrow a random control from. Those are precisely the
+  # rows the filter curve needs past the point where LDS can be computed, so fall
+  # back to a fresh control rather than refusing the job.
+  RDIR=$(ls -d /mnt/ssd-*/lucia/paper_runs/experiments/"$RID" 2>/dev/null | head -1)
+  NOBANK=""
+  if [ -n "$RDIR" ] && [ ! -d "$RDIR/retrained/base" ]; then
+    NOBANK="--no-bank"
+    echo "$RID $SRC no bank -- drawing a fresh random control" | tee -a "$LOG"
+  fi
+  $ENVPY -s -P "$REPO/scripts/gen_filter.py" "$RID" --source "$SRC" --nproc "$NPROC" $NOBANK \
     || { echo "$RID $SRC GENFAIL" | tee -a "$LOG"; continue; }
 
   R=$(ls -d /mnt/ssd-*/lucia/paper_runs/experiments/"$RID" 2>/dev/null | head -1)

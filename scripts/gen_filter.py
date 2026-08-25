@@ -40,6 +40,9 @@ ap.add_argument("--random-n", type=int, default=3,
     help="random retrains for the control; 3 unless the delta collapses")
 ap.add_argument("--nproc", type=int, default=2)
 ap.add_argument("--method", default="filter-proponents")
+ap.add_argument("--no-bank", action="store_true",
+                help="row has no retrain bank: draw a fresh random control "
+                     "instead of reusing the bank's subsets")
 args = ap.parse_args()
 
 root = None
@@ -100,17 +103,28 @@ out_dir = root / f"filter_{args.method.replace('filter-', '')}_{args.source}"
 # load_and_validate_subsets_match asserts (d / "retrained" / "base").exists(),
 # so it appends "retrained" itself. Passing the subdir makes it look for
 # retrained/retrained/base and fail AFTER all 20 per-query retrains are done.
-retrained = root / "retrained"
-if not (retrained / "base").is_dir():
-    sys.exit(f"no bank base at {retrained / 'base'}; the random control needs it")
-
+# The step-ladder rows are registered ms-only -- no bank was ever planned for
+# them, because MAGIC at that N costs 150h+ to score. They are exactly the rows
+# where the proponent-filter question runs past the regime where LDS can be
+# computed, so the filter has to work without a bank: draw the random control
+# fresh (num_subsets above, default 3) and do not pass retrained_dir, which is
+# what makes bergson reuse a bank instead.
 cfg.update(
     run_path=str(out_dir),
     scores=str(scores),
     method=args.method,
     subset_fraction=float(fraction),
-    retrained_dir=str(root),
 )
+if args.no_bank:
+    if not (root / "base" / "model").is_dir():
+        sys.exit(f"--no-bank needs a trained base at {root / 'base' / 'model'}")
+    cfg["num_subsets"] = args.random_n or 3
+else:
+    retrained = root / "retrained"
+    if not (retrained / "base").is_dir():
+        sys.exit(f"no bank base at {retrained / 'base'}; the random control needs it "
+                 f"-- pass --no-bank to draw a fresh control instead")
+    cfg["retrained_dir"] = str(root)
 cfg["distributed"] = dict(cfg.get("distributed") or {}, nproc_per_node=args.nproc, nnode=1)
 
 # The dataset directory on ssd-1 has been unlistable fleet-wide since a copy got
@@ -143,7 +157,10 @@ path.write_text(yaml.safe_dump({"steps": [{"validate": cfg}]}, sort_keys=False))
 print(f"wrote {path}")
 print(f"  source={args.source} scores={scores}")
 print(f"  method={args.method} subset_fraction={fraction} nproc={args.nproc}")
-print(f"  random control: bank at {retrained} (passed as run dir {root})")
+if args.no_bank:
+    print("  random control: %d fresh random subsets (no bank)" % cfg["num_subsets"])
+else:
+    print(f"  random control: bank at {root / retrained} (passed as run dir {root})")
 print(f"  queries={(cfg.get('query') or {}).get('dataset','?').split('/')[-1]}")
 if dropped:
     print(f"  not accepted by Validate, omitted: {dropped}")
