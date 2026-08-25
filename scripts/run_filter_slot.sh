@@ -41,12 +41,17 @@ for JOB in "$@"; do
   # with FileExistsError and "queries=0". Clear it, but ONLY when it is
   # incomplete: filter_summary.csv is written at the end, so its presence means
   # finished data that must never be deleted.
+  CFG=$R/filter_proponents_$SRC.yaml
   OUT=$R/filter_proponents_$SRC
   if [ -d "$OUT" ] && [ ! -f "$OUT/filter_summary.csv" ]; then
     # Incomplete is not the same as abandoned: these directories are also what a
     # LIVE job on another node is writing into, and every row here takes hours.
     # Only clear one nothing has touched for 30 minutes.
-    if [ -z "$(find "$OUT" -newermt '-30 minutes' -print -quit 2>/dev/null)" ]; then
+    # Recent mtime alone is not proof of life: a run killed a minute ago leaves
+    # one behind and would block its own retry. Require that no process still
+    # holds the config before treating it as live.
+    HOLDER=$(ps -eo args | grep -F "$CFG" | grep -v grep | head -1)
+    if [ -z "$(find "$OUT" -newermt '-30 minutes' -print -quit 2>/dev/null)" ] || [ -z "$HOLDER" ]; then
       echo "$RID $SRC clearing stale output, untouched 30m ($(du -sh "$OUT" 2>/dev/null | cut -f1))" | tee -a "$LOG"
       rm -rf "$OUT"
     else

@@ -62,16 +62,24 @@ if not fraction:
     sys.exit("run has no subset_fraction; pass --fraction explicitly")
 
 valid = {f.name for f in dataclasses.fields(Validate)}
-# save_mode stays at bergson's "sqrt" default rather than inheriting the row's
-# "log": sqrt is O(sqrt N) space but the FASTEST mode for a later MAGIC replay,
-# which is the point of keeping these checkpoints at all. Do not substitute
-# save_mode: interval to save disk -- the config docstring says interval is NOT
-# SUPPORTED BY MAGIC, so it would make the checkpoints useless for replay.
+# save_mode is forced to interval with a stride nothing reaches, so each query's
+# retrain keeps only its final state. The previous choice was bergson's "sqrt"
+# default, kept so the trajectory would stay replayable by MAGIC -- but that is
+# 27-118 GiB per run, one trajectory per query, and /mnt/ssd-2 is a 25 TiB quota
+# shared with other tenants sitting at 24.7 TiB. It hit the limit twice; the
+# second time thirteen runs stalled mid-flight holding 714 GiB and produced
+# nothing. A filter run never replays MAGIC: it retrains once per query and the
+# deliverable is that query's final loss. Same pattern, and same reason, as
+# gen_tuning_run.py. (bergson-filter predates save_mode "final", PR #441, which
+# would say this more directly.) Drop these two keys to restore a replayable
+# trajectory for a row that needs one.
 skip = {"run_path", "num_subsets", "skip_validation", "save_models", "save_mode",
         "save_optimizer_state", "cleanup_ckpts", "resume", "overwrite",
         "double_backward_batch_size", "train_mode", "scores", "method",
         "filter_fraction", "retrained_dir"}
 cfg = {k: v for k, v in magic.items() if k in valid and k not in skip}
+cfg["save_mode"] = "interval"
+cfg["save_interval"] = 10**9
 
 out_dir = root / f"filter_{args.method.replace('filter-', '')}_{args.source}"
 # Reuse the row's existing leave-k-out bank as the random control instead of
