@@ -653,6 +653,22 @@ for opt in ["adamw", "muon"]:
           batch_size=32, grad_accum_steps=2,
           notes="Endpoint extension: 2.5e-5 won the 3-point grid.")
 
+# Pre-emptive low extension on the 128k arms. The 128k grid was already
+# re-centred once on the halving trend (1000 steps -> 5e-5, 4000 -> 2.5e-5), and
+# the trend has since held at 256k, whose two reported points make 1.25e-5 beat
+# 6.25e-6. So 8000 steps is predicted at 1.25e-5, the LOW ENDPOINT of its own
+# grid -- the extension the comment above the GRID says to run "as normal" once
+# that happens. Running it up front costs nothing here: it went onto A40s that
+# had no queued work, and it removes an hour and a half of serial latency from
+# the rung if the prediction holds. If 2.5e-5 wins interior instead, this row is
+# simply surplus.
+for opt in ["adamw"]:
+    sweep(f"tune_{opt}_128k_bs32",
+          selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_128k_bs32",
+          lrs=[6.25e-6], priority=2, optimizer=opt, n_docs=128000,
+          batch_size=32, grad_accum_steps=2,
+          notes="Pre-emptive low extension; 1.25e-5 predicted to win its own endpoint.")
+
 # Step-scaling sweep results, measured 2026-08-25 (bs32, ga 2, nproc 2, pinned venv).
 # Both 32k arms win on the INTERIOR point, so the CONTROLS batch-16-32 centre of
 # 5e-5 was right and no endpoint extension is needed. Note how flat they are --
