@@ -35,6 +35,18 @@ for JOB in "$@"; do
     || { echo "$RID $SRC GENFAIL" | tee -a "$LOG"; continue; }
 
   R=$(ls -d /mnt/ssd-*/lucia/paper_runs/experiments/"$RID" 2>/dev/null | head -1)
+
+  # bergson refuses to start into an existing run path, so a queue that was
+  # killed mid-job leaves an output directory that fails every later attempt
+  # with FileExistsError and "queries=0". Clear it, but ONLY when it is
+  # incomplete: filter_summary.csv is written at the end, so its presence means
+  # finished data that must never be deleted.
+  OUT=$R/filter_proponents_$SRC
+  if [ -d "$OUT" ] && [ ! -f "$OUT/filter_summary.csv" ]; then
+    echo "$RID $SRC clearing incomplete prior output ($(du -sh "$OUT" 2>/dev/null | cut -f1))" | tee -a "$LOG"
+    rm -rf "$OUT"
+  fi
+
   CFG=$R/filter_proponents_$SRC.yaml
   [ -f "$CFG" ] || { echo "$RID $SRC NOCONFIG $CFG" | tee -a "$LOG"; continue; }
 
