@@ -19,6 +19,7 @@ killed the gpt2-medium tuning sweep when a config carried an unknown field.
 
 import argparse
 import dataclasses
+import os
 import sys
 from pathlib import Path
 
@@ -73,6 +74,28 @@ cfg["fd_step"] = args.fd_step
 cfg["direction_seed"] = args.direction_seed
 cfg.setdefault("distributed", {})
 cfg["distributed"] = dict(cfg["distributed"], nproc_per_node=args.nproc, nnode=1)
+
+# gen_ms inherits its dataset from the row's own experiment.yaml, which for older
+# rows still names the ssd-1 directory a stuck copy made unlistable. On the node
+# holding that stuck request every access hangs unkillably, and the symptom is
+# silent: four processes alive, CUDA contexts created, an empty log, forever.
+# That is exactly how the first gpt2-medium ms probe died. Same treatment as
+# gen_experiment_run / gen_filter / gen_ekfac -- prefer the mirror, never stat
+# the ssd-1 path, because probing it is the thing that hangs.
+_MIRROR = "/mnt/ssd-2/lucia/datasets_local"
+
+
+def _mirrored(entry):
+    """Repoint one {'dataset': ...} mapping at the mirror, if the mirror has it."""
+    if not isinstance(entry, dict) or not entry.get("dataset"):
+        return
+    local = os.path.join(_MIRROR, os.path.basename(str(entry["dataset"]).rstrip("/")))
+    if os.path.isdir(local):
+        entry["dataset"] = local
+
+
+for _key in ("data", "query"):
+    _mirrored(cfg.get(_key))
 
 dropped = sorted(set(magic) - set(cfg) - skip)
 out = root / "ms.yaml"
