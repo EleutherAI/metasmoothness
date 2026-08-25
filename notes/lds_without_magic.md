@@ -1,55 +1,62 @@
-# A route to LDS at higher step counts without waiting 40-100h for MAGIC scoring
+# Building a bank at 2000 steps without waiting 40h for MAGIC scoring
 
-The correlation between filter delta and LDS tops out at 2000 steps, because every
-row above that is a ms-only ladder row with no bank. Building a bank the normal
-way means running the magic pipeline, which scores first. Measured rates on the
-ladder rows:
+The filter-delta vs LDS correlation stops at 2000 steps, because every row above
+that is ms-only with no bank. Building one the normal way runs the magic pipeline,
+which scores first, and scoring is serial by construction so hardware does not
+shorten it. Measured on the ladder rows:
 
     plan_adam_eps1e17_32k_bs32   4/20 queries, ~2.4 h each   ~38 h remaining
     plan_muon_eps1e17_32k_bs32   3/20 queries, ~2.8 h each   ~48 h remaining
     plan_adam_eps1e17_64k_bs32   1/20 queries, ~5.0 h each   ~95 h remaining
     plan_muon_eps1e17_64k_bs32   1/20 queries, ~5.9 h each  ~112 h remaining
 
-Scoring is serial by construction (Lucia), so no amount of hardware shortens it.
+## The route
 
-## The observation
+A bank is 100 leave-1%-out retrains plus their measured query-loss diffs. That is
+what `validate` with `method: lds` does, and it does NOT require MAGIC scores --
+EK-FAC scores serve just as well, and both 32k_bs32 arms already have them.
 
-`ekfac_lds.py` does not need MAGIC scores. It reads only the `diff` column out of
-validation.csv, computes its own score sums from the EK-FAC scores, and correlates
-the two. So an EK-FAC LDS needs the RETRAINS, not the scoring.
+So the bank can be built directly through the validate step, skipping scoring
+entirely. Roughly 100 retrains x 2000 steps, about 17 GPU-pair-hours against 38 h
+of scoring that cannot be parallelised.
 
-And EK-FAC scores for both 32k_bs32 arms are already done.
+## The recipe, with the two things that are easy to get wrong
 
-`gen_filter --no-bank` already retrains random subsets and measures exactly the
-right quantity. From a completed run:
+Start from `gen_filter.py --no-bank --random-n 100`, then fix three fields:
 
-    random_filter.csv   subset,query,n_removed,baseline_loss,filtered_loss,loss_change
-    validation.csv      subset,query,diff,score_sum
+    method: lds              # NOT filter-proponents. Valid values are exactly
+                             # lds | filter-proponents | filter-detractors,
+                             # and "random" is not one of them.
+    save_models: true        # THIS is what writes subsets.json. The write sits
+                             # inside `if save_models and global_rank == 0`, so
+                             # without it you get diffs and no way to map them
+                             # back to removed docs, and ekfac_lds cannot run.
+                             # Filter configs leave save_models unset; bank
+                             # configs set it true. That difference is the whole
+                             # reason a filter run never produces a usable bank.
+    scores: <run>/ekfac_scores/scores
+                             # method=lds asserts a scores path exists:
+                             # "Path to attribution scores must be provided."
+                             # Pointing it at the EK-FAC scores makes
+                             # validation.csv's score_sum EK-FAC based, which is
+                             # what an EK-FAC LDS wants anyway.
 
-and the two agree up to sign -- subset 0 query 0 reads diff +0.00064063 against
-loss_change -0.00064134. So `--random-n 100` on a ladder row produces the diffs a
-bank produces, at 100 retrains x 2000 steps, roughly 17 GPU-pair-hours. That is
-overnight on one pair, against 38 h of unshortenable scoring.
+Then `ekfac_lds.py --scores <same> --bank <run_path>` reads validation.csv's diff
+column and subsets.json and produces the LDS.
 
-## The open question, which is why this is a note and not a run
+## Status
 
-`ekfac_lds.py` also wants `subsets.json` -- which documents each subset removed --
-so it can sum scores over the right docs. Banked rows have it at the run root. The
-no-bank filter run currently in flight has not written one, but it has not reached
-its random phase yet, so whether it ever does is untested.
+Running on plan_adam_eps1e17_32k_bs32, output at `bank_from_filter/`, secret-ord-0
+GPUs 2,3. Retrains are ~21 min each at 2000 steps.
 
-If it does: this works as described, and the correlation gains 2000-step points on
-both arms.
+The one thing still unconfirmed: subsets.json appears only once the validation
+phase begins, and at the time of writing the run is still in its first training.
+Check `bank_from_filter/subsets.json` exists before assuming the whole chain
+works.
 
-If it does not: the fix is small, since the subsets are chosen inside the same
-code path that writes random_filter.csv, and dumping them is a few lines.
+## What it buys
 
-Check `filter_proponents_ekfac/` on plan_adam_eps1e17_32k_bs32 once its random
-phase starts.
-
-## Caveat
-
-This gives an EK-FAC LDS, not a MAGIC one, because MAGIC scores are the thing
-that is 40 h away. That is still useful -- the EK-FAC arm of the correlation is
-the weaker one, +0.129 [-0.189, +0.469] against MAGIC's +0.561 -- and it is the
-arm most in need of rows.
+A genuine 2000-step bank on the step ladder. That gives an EK-FAC LDS immediately
+-- the weaker arm of the correlation, +0.129 [-0.189, +0.469] against MAGIC's
++0.561 -- and a MAGIC LDS later for free, once the 38 h of scoring finishes, since
+the bank is scorer-independent.
