@@ -383,7 +383,9 @@ BANK_RESULTS = {
         magic_n_queries=20, n_subsets=100, n_queries=20,
         # scripts/param_delta.py, step 249: rel_l2 0.01825
         delta_l1=281856.91, delta_l2=31.9472,
-        heldout_loss=3.2372,
+        # scripts/run_losses.py against this run own final checkpoint; the
+        # heldout it measures reproduces the independently recorded 3.2372.
+        train_loss=3.1013, heldout_loss=3.2372,
         reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_32k_bs256",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_32k_bs256",
