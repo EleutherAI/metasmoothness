@@ -43,8 +43,16 @@ for JOB in "$@"; do
   # finished data that must never be deleted.
   OUT=$R/filter_proponents_$SRC
   if [ -d "$OUT" ] && [ ! -f "$OUT/filter_summary.csv" ]; then
-    echo "$RID $SRC clearing incomplete prior output ($(du -sh "$OUT" 2>/dev/null | cut -f1))" | tee -a "$LOG"
-    rm -rf "$OUT"
+    # Incomplete is not the same as abandoned: these directories are also what a
+    # LIVE job on another node is writing into, and every row here takes hours.
+    # Only clear one nothing has touched for 30 minutes.
+    if [ -z "$(find "$OUT" -newermt '-30 minutes' -print -quit 2>/dev/null)" ]; then
+      echo "$RID $SRC clearing stale output, untouched 30m ($(du -sh "$OUT" 2>/dev/null | cut -f1))" | tee -a "$LOG"
+      rm -rf "$OUT"
+    else
+      echo "$RID $SRC SKIP: incomplete output is being written right now (another node?)" | tee -a "$LOG"
+      continue
+    fi
   fi
 
   CFG=$R/filter_proponents_$SRC.yaml
