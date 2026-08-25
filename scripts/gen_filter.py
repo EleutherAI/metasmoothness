@@ -113,6 +113,28 @@ cfg.update(
 )
 cfg["distributed"] = dict(cfg.get("distributed") or {}, nproc_per_node=args.nproc, nnode=1)
 
+# The dataset directory on ssd-1 has been unlistable fleet-wide since a copy got
+# stuck in uninterruptible sleep inside it, and on the node holding that stuck
+# request every access to it hangs unkillably -- which is what left six A100s on
+# marisa-0 idle: training there was fine, but each filter job needed query_20.hf
+# and blocked. Rewrite any dataset that has been mirrored to ssd-2. Only the
+# mirror is stat-ed; the ssd-1 path is left alone rather than probed, since
+# probing it is the thing that hangs.
+MIRROR = Path("/mnt/ssd-2/lucia/datasets_local")
+
+
+def _mirrored(entry):
+    """Repoint one {'dataset': ...} mapping at the mirror, if the mirror has it."""
+    if not isinstance(entry, dict) or not entry.get("dataset"):
+        return
+    local = MIRROR / Path(entry["dataset"]).name
+    if local.is_dir():
+        entry["dataset"] = str(local)
+
+
+for _key in ("data", "query"):
+    _mirrored(cfg.get(_key))
+
 dropped = sorted(set(magic) - set(cfg) - skip)
 # bergson refuses to start when run_path already exists, so keep the config
 # OUTSIDE the run directory and let bergson create it.

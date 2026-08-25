@@ -39,6 +39,26 @@ BERGSON = "/mnt/ssd-1/lucia/bergson-main-paper-429"
 # breaks every generated config the moment BERGSON is repointed at a new pinned
 # worktree. Code path and data path are independent; pin the data explicitly.
 DATA = "/mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets"
+
+# One directory on ssd-1 -- the DATA directory itself -- has been unlistable
+# fleet-wide since a copy got stuck in uninterruptible sleep inside it. Named
+# reads of its children still work on most nodes, but on the node holding the
+# stuck request EVERY access to it hangs, including named ones, and the hung
+# process cannot be killed. That is what stranded six A100s on marisa-0:
+# training runs were fine, because they read a train_*.hf that had already been
+# mirrored to ssd-2, while every filter and scoring job needed query_20.hf and
+# blocked on it.
+#
+# So resolve each dataset through the mirror when it has been copied there.
+# Only the mirror is stat-ed; the ssd-1 path is returned as a plain string and
+# never probed, because probing it is the thing that hangs.
+MIRROR = "/mnt/ssd-2/lucia/datasets_local"
+
+
+def data_path(name: str) -> str:
+    """Path to a dataset, preferring the ssd-2 mirror when it has been copied."""
+    mirrored = os.path.join(MIRROR, name)
+    return mirrored if os.path.isdir(mirrored) else f"{DATA}/{name}"
 # ssd-2 is at 98% and a finished row costs ~67 GB (16 GB checkpoints/scores plus
 # ~51 GB of bank models). ssd-1 is the same CephFS volume on every node -- verified
 # by matching csi-vol UUID, unlike /mnt/ssd-cluster which is per-node -- and has
@@ -100,9 +120,9 @@ def main() -> None:
         "seed": int(row["seed"]),
         "cleanup_ckpts": False,
         "distributed": {"nnode": 1, "nproc_per_node": args.nproc},
-        "data": {"dataset": f"{DATA}/train_{n // 1000}k.hf",
+        "data": {"dataset": data_path(f"train_{n // 1000}k.hf"),
                  "split": "train", "chunk_length": 0},
-        "query": {"dataset": f"{DATA}/query_20.hf",
+        "query": {"dataset": data_path("query_20.hf"),
                   "split": "train", "chunk_length": 0},
         "batch_size": int(row["batch_size"]),
         "grad_accum_steps": max(1, int(row["batch_size"]) // (16 * args.nproc)),
