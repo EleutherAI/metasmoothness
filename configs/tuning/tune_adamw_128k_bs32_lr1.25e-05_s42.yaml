@@ -9,9 +9,9 @@ steps:
     use_tf32_matmuls: false
     distributed:
       nnode: 1
-      nproc_per_node: 1
+      nproc_per_node: 2
     data:
-      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_128k.hf
+      dataset: /mnt/ssd-2/lucia/datasets_local/train_128k.hf
       split: train
       chunk_length: 0
     lr_schedule:
@@ -21,7 +21,7 @@ steps:
       lr_end: 1.25e-06
       warmup_steps: 0.25
     batch_size: 32
-    grad_accum_steps: 2
+    grad_accum_steps: 1
     num_epochs: 2
     seed: 42
     optimizer: adamw
