@@ -353,11 +353,13 @@ for bs in [16, 32, 64, 128]:
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
     "plan_adam_eps1e17_16k_ep4": dict(
-        status="partial",  # train_loss pending; promote when run_losses lands
+        status="done",
         magic_lds=0.9534, magic_ci_lo=0.9458, magic_ci_hi=0.9594,
         magic_n_queries=20, n_subsets=100, n_queries=20,
         # scripts/param_delta.py against this run's own checkpoints/step_0.ckpt
         delta_l1=245405.56, delta_l2=25.1617,
+        # scripts/run_losses.py against the run's own final checkpoint
+        train_loss=3.0838, heldout_loss=3.2505,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_ep4",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_ep4",
