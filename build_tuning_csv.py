@@ -795,6 +795,15 @@ LONDON_HELDOUT = {
     # correction this corpus wanted.
     "tune_adamw_london16k_bs256_lr0.0008": 3.8397,
     "tune_adamw_london16k_bs256_lr0.0016": 3.8551,
+    # muon london, measured 2026-08-26 against london_heldout_4k. Winner 8e-4,
+    # INTERIOR -- the same lr adamw settled on, and to within 0.0003 the same loss
+    # (3.8394 vs 3.8397). The two optimizers are indistinguishable on this corpus
+    # at bs256, which is not what the smollm2 grid shows.
+    "tune_muon_london16k_bs256_lr0.0001": 3.8975,
+    "tune_muon_london16k_bs256_lr0.0002": 3.8724,
+    "tune_muon_london16k_bs256_lr0.0004": 3.8490,
+    "tune_muon_london16k_bs256_lr0.0008": 3.8394,
+    "tune_muon_london16k_bs256_lr0.0016": 3.8593,
 }
 
 BS32_STEP_HELDOUT = {
