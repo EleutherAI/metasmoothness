@@ -10,15 +10,17 @@ Re-run any time experiments.csv is regenerated. Stdlib only.
 import argparse, csv, sys
 from pathlib import Path
 
+# metasmoothness leads and run_id trails: the table is read to compare metrics
+# across rows, and the run_id is the widest column by far, so putting it first
+# pushed every number off the right of a terminal.
 COLS = [  # (header, csv column, formatter)
-    ("run",            "run_id",         str),
+    ("metasmoothness", "metasmoothness", lambda v: f"{float(v):.4f}"),
     ("optimizer",      "optimizer",      str),
     ("lr",             "lr",             lambda v: f"{float(v):.0e}"),
     ("N docs",         "n_docs",         lambda v: f"{int(float(v)):,}"),
     ("bs",             "batch_size",     str),
     ("N epochs",       "num_epochs",     str),
     ("N steps",        "steps",          str),
-    ("metasmoothness", "metasmoothness", lambda v: f"{float(v):.4f}"),
     ("EK-FAC LDS",     "ekfac_lds",      lambda v: f"{float(v):.4f}"),
     ("MAGIC LDS",      "magic_lds",      lambda v: f"{float(v):.4f}"),
     # Tail-filter power, z against the row's own bank as the random control.
@@ -30,6 +32,7 @@ COLS = [  # (header, csv column, formatter)
     ("heldout loss",   "heldout_loss",   lambda v: f"{float(v):.4f}"),
     ("delta L2",       "delta_l2",       lambda v: f"{float(v):.2f}"),
     ("status",         "status",         str),
+    ("run",            "run_id",         str),
 ]
 IDX = {c: i for i, (_, c, _) in enumerate(COLS)}  # name -> column index
 RESULT_COLS = ("metasmoothness", "ekfac_lds", "magic_lds")
