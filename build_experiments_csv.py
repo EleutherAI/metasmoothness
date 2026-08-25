@@ -352,6 +352,40 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    "plan_adam_eps1e17_16k_gpt2-medium": dict(
+        status="done",
+        magic_lds=-0.0407, magic_ci_lo=-0.0980, magic_ci_hi=0.0155,
+        magic_n_queries=20, n_subsets=100, n_queries=20,
+        # scripts/param_delta.py, step 124: rel_l2 0.00940
+        delta_l1=324769.17, delta_l2=20.7219,
+        # scripts/run_losses.py against the run's own final checkpoint
+        train_loss=2.8529, heldout_loss=3.0019,
+        reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_gpt2-medium",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_16k_gpt2-medium",
+        notes="Model-size axis, D11's registered scaling target: gpt2-medium (355M) "
+              "at 16k, bs256, 125 steps -- the anchor's config with only the model "
+              "swapped. WORLD SIZE 4, NVIDIA A100 (bank finished on shivam2-0; the "
+              "60-80 slice died partway and 64-79 was re-run). "
+              "MAGIC LDS IS ZERO: -0.0407 [-0.0980, 0.0155], an interval that "
+              "contains zero, against 0.9411 for the same config on gpt2. So MAGIC "
+              "attribution carries no signal at all on the larger model, while the "
+              "model itself trains fine -- held-out 3.0019 against the gpt2 anchor's "
+              "3.2363, the best of any row in the grid. This is the ms prediction "
+              "landing: ms reads 0.8580 here, below the 0.95 boundary that separates "
+              "the rows where MAGIC works from the rows where it collapses, and it "
+              "has the LOWEST ms of any non-cut row. It is not alone below the "
+              "boundary and the ordering is not clean: ms 0.8580 -> -0.04 here, "
+              "0.9133 -> 0.1796 (adam bs16), 0.9037 -> 0.3020 (muon 4k), 0.9930 -> "
+              "0.9411 (the anchor). So a lower ms goes with a lower LDS across this "
+              "set, but 0.9037 beats 0.9133, and ms does not order the two rows "
+              "between them correctly. "
+              "Bank overlap resolved: the main run overran into the slice ranges and "
+              "wrote subsets 0-63 while slices covered 40-59 and 60-62. The 460 "
+              "duplicated (subset, query) pairs agree to 2.1e-06 on diff and are "
+              "bit-identical on score_sum, so the main run's copies of 40-62 were "
+              "dropped and the original kept as validation.csv.premerge. Subset 63 "
+              "exists only in the main run and was kept."),
     "plan_adam_eps1e17_16k_ep4": dict(
         status="done",
         magic_lds=0.9534, magic_ci_lo=0.9458, magic_ci_hi=0.9594,
