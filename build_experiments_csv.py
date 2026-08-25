@@ -1133,6 +1133,10 @@ HELDOUT_FROM_TUNING = {
     "plan_adam_eps1e17_32k_bs256": 3.2365, "plan_muon_eps1e17_32k_bs256": 3.2372,
     "plan_adam_eps1e17_64k_bs256": 3.2314, "plan_muon_eps1e17_64k_bs256": 3.2323,
     "plan_adam_eps1e17_16k_bs16": 3.2497, "plan_muon_eps1e17_16k_bs16": 3.2443,
+    # Step-ladder rows at 2000 steps. Measured from each run own base/model with
+    # heldout_eval.py and they reproduce their tuning winners exactly (adamw 5e-5
+    # 3.2342, muon 5e-5 3.2310), which is reuse rule 3 doing what it claims.
+    "plan_adam_eps1e17_32k_bs32": 3.2342, "plan_muon_eps1e17_32k_bs32": 3.2310,
     "plan_adam_eps1e17_16k_bs32": 3.2473, "plan_muon_eps1e17_16k_bs32": 3.2441,
     "plan_adam_eps1e17_16k_bs64": 3.2479, "plan_muon_eps1e17_16k_bs64": 3.2464,
     "plan_adam_eps1e17_16k_bs128": 3.2498, "plan_muon_eps1e17_16k_bs128": 3.2501,
