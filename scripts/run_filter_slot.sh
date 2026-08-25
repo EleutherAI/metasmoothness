@@ -66,6 +66,19 @@ for JOB in "$@"; do
   SUM=$R/filter_proponents_$SRC/filter_summary.csv
   N=0; [ -f "$SUM" ] && N=$(( $(wc -l < "$SUM") - 1 ))
   if [ $RC -ne 0 ]; then echo "$RID $SRC FAILED rc=$RC queries=$N" | tee -a "$LOG"
-  else echo "$RID $SRC OK queries=$N" | tee -a "$LOG"; fi
+  else
+    echo "$RID $SRC OK queries=$N" | tee -a "$LOG"
+    # Drop the per-query retrained models now the summary exists. Each finished
+    # run leaves 14-27 GB here and 13 of them had filled /mnt/ssd-2 to 0 bytes,
+    # which stops every job and even blocks git from writing objects. The
+    # numbers live in filter_summary.csv / filter_proponents.csv / random_filter.csv,
+    # which are siblings of this directory and are kept.
+    # NOTE: this is the filter run's OWN checkpoints, never the retrain bank --
+    # the bank is $R/retrained and $R/validation*.csv and is not touched.
+    if [ -f "$OUT/filter_summary.csv" ] && [ -d "$OUT/checkpoints" ]; then
+      echo "$RID $SRC reclaiming $(du -sh "$OUT/checkpoints" 2>/dev/null | cut -f1) of filter checkpoints" | tee -a "$LOG"
+      rm -rf "$OUT/checkpoints"
+    fi
+  fi
 done
 echo "FILTER_SLOT_DONE $DEVS $(date -u +%H:%M:%S)" | tee -a "$LOG"
