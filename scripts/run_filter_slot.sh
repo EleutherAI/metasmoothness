@@ -56,6 +56,28 @@ print(is_cut(sys.argv[1]) or '')
   # finished data that must never be deleted.
   CFG=$R/filter_proponents_$SRC.yaml
   OUT=$R/filter_proponents_$SRC
+
+  # Claim across the FLEET, not just this node. The output lives on a shared
+  # filesystem but `ps` only sees local processes, so the liveness check below
+  # cannot see a run on another host -- three processes were once found writing
+  # one run_path at once. mkdir is atomic on CephFS, so it settles the race.
+  CLAIMS=/mnt/ssd-2/lucia/paper_runs/_claims
+  mkdir -p "$CLAIMS"
+  CLAIM=$CLAIMS/${RID}__${SRC}
+  if ! mkdir "$CLAIM" 2>/dev/null; then
+    OWNER=$(cat "$CLAIM/host" 2>/dev/null || echo unknown)
+    AGE=$(( ($(date +%s) - $(stat -c %Y "$CLAIM" 2>/dev/null || date +%s)) / 60 ))
+    # A claim older than 6h with no summary is a crashed run, not a live one.
+    if [ "$AGE" -gt 360 ] && [ ! -f "$OUT/filter_summary.csv" ]; then
+      echo "$RID $SRC breaking stale claim from $OWNER (${AGE}m)" | tee -a "$LOG"
+      rm -rf "$CLAIM" && mkdir "$CLAIM"
+    else
+      echo "$RID $SRC SKIP: claimed by $OWNER (${AGE}m ago)" | tee -a "$LOG"
+      continue
+    fi
+  fi
+  hostname > "$CLAIM/host"
+  trap 'rm -rf "$CLAIM"' EXIT
   if [ -d "$OUT" ] && [ ! -f "$OUT/filter_summary.csv" ]; then
     # Incomplete is not the same as abandoned: these directories are also what a
     # LIVE job on another node is writing into, and every row here takes hours.
@@ -83,6 +105,7 @@ print(is_cut(sys.argv[1]) or '')
 
   SUM=$R/filter_proponents_$SRC/filter_summary.csv
   N=0; [ -f "$SUM" ] && N=$(( $(wc -l < "$SUM") - 1 ))
+  rm -rf "$CLAIM"
   if [ $RC -ne 0 ]; then echo "$RID $SRC FAILED rc=$RC queries=$N" | tee -a "$LOG"
   else
     echo "$RID $SRC OK queries=$N" | tee -a "$LOG"
