@@ -31,6 +31,19 @@ for JOB in "$@"; do
   RID=${JOB%%:*}
   SRC=${JOB##*:}
   echo "=== $RID ($SRC) GPUs $DEVS $(date -u +%H:%M:%S) ==="
+
+  # Weight decay, gradient clipping and logit scale are cut (2026-08-25): no
+  # further results are wanted for them, so they never take a GPU again. The
+  # classification lives in scripts/axes.py so the rule is stated once.
+  CUTWHY=$($ENVPY -s -P -c "
+import sys; sys.path.insert(0, '$REPO/scripts')
+from axes import is_cut
+print(is_cut(sys.argv[1]) or '')
+" "$RID" 2>/dev/null)
+  if [ -n "$CUTWHY" ]; then
+    echo "$RID $SRC CUT: $CUTWHY" | tee -a "$LOG"
+    continue
+  fi
   $ENVPY -s -P "$REPO/scripts/gen_filter.py" "$RID" --source "$SRC" --nproc "$NPROC" \
     || { echo "$RID $SRC GENFAIL" | tee -a "$LOG"; continue; }
 
