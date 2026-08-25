@@ -26,9 +26,8 @@ from huggingface_hub.utils import HfHubHTTPError
 ORG = "EleutherAI"
 COLLECTION_TITLE = "Data Attribution"
 COLLECTION_DESC = (
-    "Retrain banks and datasets for training-data-attribution work: "
-    "leave-1%-out model banks with measured per-query loss changes, the ground "
-    "truth LDS and tail-filter results are computed against."
+    "Leave-1%-out retrain banks and datasets for training-data attribution: "
+    "measured per-query loss changes, the ground truth for LDS."
 )
 IGNORE = ["checkpoints/*", "optimizer.pt", "*.log", "*.tmp", "ekfac_scores/*",
           "scores/*", "per_query/*", "slice_*.yaml", "*.premerge", "*.merged"]
