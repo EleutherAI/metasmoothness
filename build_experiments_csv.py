@@ -1223,28 +1223,34 @@ def _preserve_claims(out_path, rows):
 # dataset sizes. pctile saturates at 0.990 (rank 1 of 101) whenever the filter
 # beats every random removal, which it does on every query measured so far, so
 # it is recorded but carries no resolution at this fraction.
-FILTER_DELTAS = {
-    # run_id: (random, ekfac, magic) each (mean, lo, hi) in nats
-    "plan_adam_eps1e17_4k_bs256": (
-        (0.00004, -0.00001, 0.00008),
-        (0.01153, 0.00887, 0.01516),
-        (0.02505, 0.02250, 0.02840)),
-    "plan_adam_eps1e17_8k_bs256": (
-        (0.00018, 0.00007, 0.00028),
-        (0.02923, 0.01914, 0.04618),
-        (0.07060, 0.05936, 0.08580)),
-    # 16k completes the dataset-size axis this study was scoped to.
-    "sm_adamw_eps1e17_16k_bs256": (
-        (0.00023, 0.00012, 0.00034),
-        (0.05288, 0.03624, 0.07985),
-        (0.09090, 0.07530, 0.11606)),
-    # Off-axis, kept because the run had already finished: the muon arm at 8k,
-    # the one size where both optimizers have a filter measurement.
-    "plan_muon_eps1e17_8k_bs256": (
-        (0.00012, 0.00008, 0.00018),
-        (0.02258, 0.01320, 0.03866),
-        (0.03289, 0.02433, 0.04761)),
-}
+def _load_filter_deltas():
+    """Read the measured deltas instead of restating them here.
+
+    This used to be a hand-maintained dict, so every finished filter run needed a
+    manual edit and the CSV silently fell behind -- thirteen measured rows were
+    missing at once. scripts/filter_deltas.py recomputes data/filter_deltas.csv
+    from every filter_summary.csv on disk, so reading that file makes the grid
+    current the moment the deltas are recomputed, with nothing to remember.
+    """
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        "data", "filter_deltas.csv")
+    out = {}
+    if not os.path.exists(path):
+        return out
+    with open(path, newline="") as f:
+        for r in csv.DictReader(f):
+            def trio(prefix):
+                try:
+                    return (float(r[f"{prefix}_mean"]),
+                            float(r[f"{prefix}_lo"]),
+                            float(r[f"{prefix}_hi"]))
+                except (KeyError, ValueError):
+                    return None
+            out[r["run"]] = (trio("random"), trio("ekfac"), trio("magic"))
+    return out
+
+
+FILTER_DELTAS = _load_filter_deltas()
 
 
 def _apply_filter_power(rows):
@@ -1253,7 +1259,12 @@ def _apply_filter_power(rows):
         hit = FILTER_DELTAS.get(r["run_id"])
         if not hit:
             continue
-        for label, (m, lo, hi) in zip(("random", "ekfac", "magic"), hit):
+        for label, trio in zip(("random", "ekfac", "magic"), hit):
+            # A row can have one scorer's arm measured and not the other, so a
+            # missing trio is normal and must not blank the arm that exists.
+            if trio is None:
+                continue
+            m, lo, hi = trio
             r[f"filter_{label}_delta"] = m
             r[f"filter_{label}_lo"] = lo
             r[f"filter_{label}_hi"] = hi
