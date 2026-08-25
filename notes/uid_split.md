@@ -51,3 +51,26 @@ the next bank is built across mixed nodes.
     done
 
 Run it from a 1000-node, since that is the majority side.
+
+## It had already reached the retrain banks
+
+A read-only audit across every run directory on both volumes found 43 files on
+the wrong side of the split, and they were not incidental:
+
+    plan_adam_eps1e17_32k_bs256    42 x retrained/subset_N/model.safetensors
+    plan_muon_eps1e17_32k_bs256     1 x retrained/subset_N/model.safetensors
+
+42 of that bank 100 subsets could not be opened from seven of the ten nodes. A
+filter run or a HuggingFace publish launched from any of them would have read
+58 models and reported success, because a bank is enumerated by directory and
+nothing checks that each model actually opens.
+
+Relaxed to a+r from the owning node; all 100 now open from a uid-1000 node. No
+content was touched -- this adds a read bit and nothing else. The measured LDS
+is unaffected either way, since magic_lds reads validation.csv rather than the
+models.
+
+Worth re-running the audit before the next publish:
+
+    find <run_dir> -user 1001 ! -perm -o+r     # from a 1001 node
+    find <run_dir> -user 1000 ! -perm -o+r     # from a 1000 node
