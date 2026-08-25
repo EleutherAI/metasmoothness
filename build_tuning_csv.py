@@ -244,6 +244,18 @@ for mod in ["none", "preact_layernorm"]:
 # regenerate). heldout_loss corresponds to run_dir; extra seeds go in notes.
 # ---------------------------------------------------------------------------------
 RESULTS = {
+    "tune_adamw_256k_bs32_lr6.25e-06": dict(status="measured", heldout_loss=3.2185,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_256k_bs32_lr6.25e-06_s42",
+        notes="Step-scaling sweep at fixed bs32 (16000 steps), nproc 2, A100, maria-1. Group INCOMPLETE: the 2.5e-05 point died at rc=124 under the old flat 2h slot deadline and has not been re-measured, so the winner so far (1.25e-05) is still an ENDPOINT of the three-point sweep and the selection rule says extend rather than select."),
+    "tune_adamw_256k_bs32_lr1.25e-05": dict(status="measured", heldout_loss=3.2087,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_256k_bs32_lr1.25e-05_s42",
+        notes="Step-scaling sweep at fixed bs32 (16000 steps), nproc 2, A100, maria-1. Group INCOMPLETE: the 2.5e-05 point died at rc=124 under the old flat 2h slot deadline and has not been re-measured, so the winner so far (1.25e-05) is still an ENDPOINT of the three-point sweep and the selection rule says extend rather than select."),
+    "tune_muon_256k_bs32_lr6.25e-06": dict(status="measured", heldout_loss=3.215,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_256k_bs32_lr6.25e-06_s42",
+        notes="Step-scaling sweep at fixed bs32 (16000 steps), nproc 2, A100, maria-1. Group INCOMPLETE: the 2.5e-05 point died at rc=124 under the old flat 2h slot deadline and has not been re-measured, so the winner so far (1.25e-05) is still an ENDPOINT of the three-point sweep and the selection rule says extend rather than select."),
+    "tune_muon_256k_bs32_lr1.25e-05": dict(status="measured", heldout_loss=3.2039,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_muon_256k_bs32_lr1.25e-05_s42",
+        notes="Step-scaling sweep at fixed bs32 (16000 steps), nproc 2, A100, maria-1. Group INCOMPLETE: the 2.5e-05 point died at rc=124 under the old flat 2h slot deadline and has not been re-measured, so the winner so far (1.25e-05) is still an ENDPOINT of the three-point sweep and the selection rule says extend rather than select."),
     "tune_adamw_64k_bs32_lr1.25e-05": dict(status="measured", heldout_loss=3.2365,
         run_dir="/mnt/ssd-2/lucia/paper_runs/tuning/tune_adamw_64k_bs32_lr1.25e-05_s42",
         notes="Step-scaling sweep at fixed bs32 (4000 steps), nproc 1 ga 2, A100, lotus-0. GROUP COMPLETE, clean interior minimum: 1.25e-5 3.2365 / 2.5e-5 3.2322 / 5e-5 3.2355 / 1e-4 3.2552. 2.5e-5 selected for plan_adam_eps1e17_64k_bs32; both neighbours are higher, so no endpoint extension is needed."),
