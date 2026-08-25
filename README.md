@@ -25,6 +25,21 @@ builder scripts and regenerate — never in the CSVs, except the two node-claim 
 Datasets: `EleutherAI/bergson-smollm2-scaling` on the Hub (verified nested train chain +
 disjoint held-out/query sets); tooling in `scripts/`.
 
+## Research questions
+
+The questions this project exists to answer (Lucia, 2026-08-25). Work is
+prioritised against these.
+
+- How various training setup changes break or aid metasmoothness
+- LDS correlation with proponent filtering (MAGIC and EK-FAC)
+- Whether metasmoothness stays high as dataset size increases (not sure what
+  batch size is convincing for this)
+- Whether proponent filtering effect stays high as dataset size increases
+- Whether Muon and Adam are different in terms of maintaining metasmoothness
+  (all these runs are super high ms which doesn't match my wikitext tests; I
+  wonder whether our fine-tuning dataset is too similar to the pre-training
+  corpus; running some experiments with a corpus of pre-1931 text)
+
 ## Results
 
 ```
