@@ -424,6 +424,9 @@ BANK_RESULTS = {
         status="done",
         magic_lds=0.8850, magic_ci_lo=0.8708, magic_ci_hi=0.8967,
         magic_n_queries=20,
+        # scripts/ekfac_lds.py, D7 config, scored on A100 (lotus-0) nproc 2 after
+        # the mirror fix cleared the EK-FAC stall. Same 100-subset bank as MAGIC.
+        ekfac_lds=0.4276, ekfac_ci_lo=0.3815, ekfac_ci_hi=0.4686,
         # scripts/param_delta.py against this run's own checkpoints/step_0.ckpt
         delta_l1=226800.32, delta_l2=26.1277,
         # scripts/run_losses.py against the run's own final checkpoint
