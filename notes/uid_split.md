@@ -74,3 +74,26 @@ Worth re-running the audit before the next publish:
 
     find <run_dir> -user 1001 ! -perm -o+r     # from a 1001 node
     find <run_dir> -user 1000 ! -perm -o+r     # from a 1000 node
+
+## It reaches the repo too
+
+The checkout on the shared volume is subject to the same split. 20 tracked files
+are owned by uid 1000 with no group/other write, so editing one from a 1001 node
+fails with PermissionError -- which is how the umask fix first failed to apply,
+silently leaving behind a commit whose message claimed it had been made.
+
+`.git` itself is clean (no problematic directories), so commits, branches and
+bundles work from any node. Only in-place edits of those files break. This note
+is on the other side of the same split: it was written from a 1001 node, so a
+1000 node cannot append to it.
+
+The rule: edit a repo file from a node whose uid owns it, or chmod it first.
+Making the tree world-writable would fix it but is a worse trade on a source tree
+than remembering which side a file came from.
+
+## The durable fix, applied
+
+`scripts/run_filter_slot.sh` now sets `umask 022`, so artifacts it creates are
+born group/other readable. That covers the filter path. Anything launched by hand
+still inherits the login shell umask 077, so prefer the slot scripts, and run the
+audit above before trusting a bank you did not build.
