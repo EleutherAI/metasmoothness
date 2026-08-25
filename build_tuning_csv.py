@@ -105,6 +105,22 @@ for opt in ["adamw", "muon"]:
 # off one lucky run, so centring on it is allowed (Lucia, 2026-08-25): it is the
 # endpoint extension we already know is coming, applied up front. If 1.25e-5
 # wins its own endpoint, extend as normal.
+#
+# MEASURED, AND IT WENT THE OTHER WAY (2026-08-25). Both 128k arms won at 5e-5,
+# the HIGH endpoint, so the grid needed extending UP to 1e-4, not down:
+#
+#     adamw   1.25e-5 3.2219   2.5e-5 3.2150   5e-5 3.2129
+#     muon    1.25e-5 3.2183   2.5e-5 3.2110   5e-5 3.2079
+#
+# So 8000 steps wants the same 5e-5 that 2000 steps did, and MORE than the 4000
+# step arms took. The halving trend was three points -- 5e-5, 5e-5, 2.5e-5 --
+# and the 64k step down is worth 0.003 nats against a 0.009 nat spread across
+# the whole 128k grid. That is inside the noise this axis is known to have, and
+# re-centring on it cost a run per arm rather than saving one.
+#
+# The lesson is not "never centre on a trend", it is that this axis is too flat
+# to read a trend off adjacent rungs. Centre on the CONTROLS rule and extend
+# from what the grid reports.
 GRID = {32000: [2.5e-5, 5e-5, 1e-4],
         64000: [2.5e-5, 5e-5, 1e-4],
         128000: [1.25e-5, 2.5e-5, 5e-5]}
@@ -667,7 +683,19 @@ for opt in ["adamw"]:
           selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_128k_bs32",
           lrs=[6.25e-6], priority=2, optimizer=opt, n_docs=128000,
           batch_size=32, grad_accum_steps=2,
-          notes="Pre-emptive low extension; 1.25e-5 predicted to win its own endpoint.")
+          notes="Pre-emptive LOW extension, and it backed the wrong direction: "
+                "both arms then won at the high endpoint 5e-5. Kept as a "
+                "registered row because the run was launched, but it was "
+                "cancelled once the grid reported and never measured.")
+
+# The extension the grid actually asked for: 5e-5 won the high endpoint on BOTH
+# arms, so each gets one 2x step outward.
+for opt in ["adamw", "muon"]:
+    sweep(f"tune_{opt}_128k_bs32",
+          selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_128k_bs32",
+          lrs=[1e-4], priority=2, optimizer=opt, n_docs=128000,
+          batch_size=32, grad_accum_steps=2,
+          notes="Endpoint extension: 5e-5 won the 3-point grid.")
 
 # Next rung of the TOKEN axis (bs256, 2 epochs), which currently runs 4k, 8k,
 # 16k, 32k with 64k banks building. 128k at bs256 is 1000 optimiser steps, so it
@@ -694,6 +722,14 @@ for opt in ["adamw", "muon"]:
 # 0.004 nats across a 4x lr range -- so 5e-5 is "no worse than its neighbours"
 # rather than a sharp optimum, the same pattern gpt2-medium showed.
 BS32_STEP_HELDOUT = {
+    # 128k, measured 2026-08-25 on A40 (allium-0 adamw, iris-0/secret-ord-0/
+    # bellflower-0 muon), nproc 2, pinned venv. Both arms win the HIGH endpoint.
+    "tune_adamw_128k_bs32_lr1.25e-05": 3.2219,
+    "tune_adamw_128k_bs32_lr2.5e-05":  3.2150,
+    "tune_adamw_128k_bs32_lr5e-05":    3.2129,
+    "tune_muon_128k_bs32_lr1.25e-05":  3.2183,
+    "tune_muon_128k_bs32_lr2.5e-05":   3.2110,
+    "tune_muon_128k_bs32_lr5e-05":     3.2079,
     "tune_adamw_32k_bs32_lr2.5e-05": 3.2380,
     "tune_adamw_32k_bs32_lr5e-05":   3.2342,
     "tune_adamw_32k_bs32_lr0.0001":  3.2380,
