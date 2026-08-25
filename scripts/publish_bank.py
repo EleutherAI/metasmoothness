@@ -70,6 +70,43 @@ def main():
     if n_models != 100:
         sys.exit(f"refusing: bank is {n_models}/100")
 
+    # Counting subset_* directories only proves the directory entries exist. It
+    # does not prove this process can READ them, and on this fleet that is a real
+    # distinction: `lucia` is uid 1001 on three nodes and 1000 on the other seven,
+    # CephFS stores the numeric uid, and the default umask writes 0600. A bank
+    # built on one side lists fine from the other and fails on open. That had
+    # already happened -- 42 of the 100 models in plan_adam_eps1e17_32k_bs256 were
+    # unopenable from seven of ten nodes -- so a publish from one of those nodes
+    # would have shipped 58 models and reported success.
+    #
+    # So open every file that is meant for upload. One byte is enough; the point
+    # is to trigger the permission check, not to read 500 MB a hundred times.
+    # This runs BEFORE create_repo, so an unreadable bank never reaches the Hub
+    # even partially, and long before --delete-local can touch anything.
+    unreadable = []
+    for dirpath, _, files in os.walk(root):
+        for f in files:
+            path = os.path.join(dirpath, f)
+            rel = os.path.relpath(path, root)
+            if not wanted(rel):
+                continue
+            try:
+                with open(path, "rb") as fh:
+                    fh.read(1)
+            except OSError as e:
+                unreadable.append((rel, e.strerror))
+    if unreadable:
+        print(f"{len(unreadable)} file(s) meant for upload cannot be opened by "
+              f"uid {os.getuid()}:", file=sys.stderr)
+        for rel, why in unreadable[:10]:
+            print(f"  {rel}: {why}", file=sys.stderr)
+        if len(unreadable) > 10:
+            print(f"  ... and {len(unreadable) - 10} more", file=sys.stderr)
+        sys.exit("refusing to publish a bank this process cannot fully read -- "
+                 "chmod a+rX the run dir from a node whose uid owns it "
+                 "(see notes/uid_split.md), then retry")
+    print(f"readable: every file meant for upload opens as uid {os.getuid()}")
+
     probe = subprocess.run(
         ["/home/lucia/envs/paper/bin/python", "-s", "-P",
          "/mnt/ssd-2/lucia/metasmoothness/scripts/magic_lds.py", str(root)],
