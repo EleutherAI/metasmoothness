@@ -378,10 +378,11 @@ BANK_RESULTS = {
               "covered; the two copies agree to 3.8e-06 on diff, the main copies were "
               "dropped and the original kept as validation.csv.premerge."),
     "plan_adam_eps1e17_32k_bs256": dict(
-        status="partial",  # train_loss pending; promote when run_losses lands
+        status="done",
         magic_lds=0.9529, magic_ci_lo=0.9470, magic_ci_hi=0.9577,
         magic_n_queries=20, n_subsets=100, n_queries=20,
         delta_l1=353172.61, delta_l2=36.5131,
+        train_loss=3.1074, heldout_loss=3.2363,
         code_commit="79c08dce", reusable="bank+scores",
         run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_32k_bs256",
         bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_32k_bs256",
