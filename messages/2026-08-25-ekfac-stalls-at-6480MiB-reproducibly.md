@@ -52,3 +52,48 @@ This blocks the proponent-filter curve past 16k. The step-ladder rows have no
 bank, so EK-FAC is the only scorer available to them -- MAGIC needs a training
 trajectory these runs do not keep. No scores means nothing for the filter to
 rank, so 32k and every rung above it is blocked on this, not on GPU time.
+# CORRECTION: EK-FAC scoring is broken fleet-wide, and it is not about size
+
+The previous note in this directory concluded the stall was about the size of
+the query-gradient write, because every failure was a 32k row and every success
+was 4k or 16k. That reasoning was wrong, and Lucia pointed out why in one line:
+**the query gradient does not scale with the training set.** It is (number of
+queries x tracked parameters), so a 4k row and a 32k row write the same amount.
+
+The test that follows immediately, and that I should have run before writing the
+size hypothesis down: re-run EK-FAC on a 16k row that has already succeeded once.
+
+    plan_adam_eps1e17_16k_bs64, fresh output dir, nproc 2, lucia-ord-0
+    gradients.bin -> 6,794,772,480 bytes, static for 90s
+    scores/ never created
+    child wchan = ceph_mdsc_wait_request
+
+Byte-identical to the 32k failures. So the file size is the same everywhere --
+6480 MiB for 20 queries, dataset-independent, exactly as predicted -- and the
+16k row now fails the same way it once passed.
+
+## What that means
+
+EK-FAC scoring is currently broken for EVERY row, not for large ones. The rows
+that succeeded did so before a copy operation got stuck in uninterruptible sleep
+and started holding CephFS metadata. Every EK-FAC attempt since has stalled at
+the point where the finished gradient file is finalised.
+
+Consequences:
+
+* it is not a bergson bug and there is nothing to fix in the config
+* query batching would not help; the writes are the same size that used to work
+* it blocks the proponent-filter curve everywhere it needs new EK-FAC scores,
+  which for the bank-free ladder rows is all of them
+* it does NOT block the filter runs already going, which write per-query files
+  far below this size, nor training, nor MAGIC on rows that keep a trajectory
+
+## What clears it
+
+The stuck operation needs to go, which means restarting the node holding it
+(marisa-0, ~18 hours in uninterruptible sleep at the time of writing). That is
+an operator action; `kill -9` cannot touch a process in that state because the
+signal is only delivered when it returns to user space.
+
+Until then: do not queue EK-FAC scoring. It will consume GPUs, write 6.8 GB, and
+stop. Three attempts on three nodes did exactly that before this was understood.
