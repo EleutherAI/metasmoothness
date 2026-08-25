@@ -55,3 +55,25 @@ warm — leave the file alone.
 the fix for this, but it removes a second, similar-looking stall: gpt2 and
 gpt2-medium are both cached locally, and the Hub request only ever added a
 network dependency that could hang.
+
+
+## Update 2026-08-25: still wedged after 12.5 hours
+
+The `mv` is at 45131s in uninterruptible D state on marisa-0 and
+`train_128k.hf` is still unreachable from every node tested (iris-0, marisa-0,
+lotus-0, allium-0, shared-ord-0, bellflower-0, maria-1). A commit landed saying
+the 128k rows were released; that was premature -- the CSV rows are claimable
+but the dataset is not readable, so a 128k run started now will hang exactly as
+before.
+
+All six `tune_*_128k_bs32` points are therefore still unmeasured, and they are
+the last thing standing between the step-scaling ladder and its 128k rung.
+
+`kill -9` does not touch a D-state process. Nothing inside the container clears
+it -- no ceph debugfs, and the mount cannot be remounted without privileges. It
+needs the marisa-0 pod restarted, which is an operator action.
+
+Everything else on ssd-1 is fine: 16k reads at 48 MB/s, 32k 65, 64k 134, 256k
+260, 512k 299, and opening any of them by name works from every node. Only
+enumeration of the parent `datasets/` directory and anything touching
+`train_128k.hf` blocks.
