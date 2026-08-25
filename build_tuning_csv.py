@@ -767,6 +767,27 @@ for opt in ["adamw", "muon"]:
           batch_size=256, grad_accum_steps=16,
           notes="Endpoint extension: 4e-4 won the 3-point london grid.")
 
+# london at bs16 (2000 steps). Batch is the one axis known to move ms hard on
+# smollm2 -- 0.9930 at bs256 down to 0.9133 at bs16 -- and london came in at
+# 0.9867 at bs256, so this is the sharp probe for whether the corpus and the
+# batch interact. Grid centred on 2e-4 = 8e-4 * sqrt(16/256).
+for opt in ["adamw", "muon"]:
+    sweep(f"tune_{opt}_london16k_bs16",
+          selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_london16k_bs16",
+          lrs=[1e-4, 2e-4, 4e-4], priority=2, optimizer=opt, n_docs=16000,
+          batch_size=16, grad_accum_steps=1,
+          notes="Distribution-shift control at small batch, pre-1931 corpus.")
+
+# london at larger N, same bs256 anchor config: does ms hold as the corpus grows
+# when the corpus is far from pre-training? adamw only for now -- muon deadlocks
+# on london above 16k, see notes/muon32k_hang.md.
+for n_docs, tag in ((32000, "london32k"), (64000, "london64k")):
+    sweep(f"tune_adamw_{tag}_bs256",
+          selects_lr_for=f"plan_adam_{tag}_bs256",
+          lrs=[4e-4, 8e-4, 1.6e-3], priority=2, optimizer="adamw", n_docs=n_docs,
+          batch_size=256, grad_accum_steps=16,
+          notes="Distribution-shift N-scaling, pre-1931 corpus.")
+
 # London sweep, measured 2026-08-26 on A40, nproc 2, evaluated on
 # london_heldout_4k.hf -- NOT the smollm2 heldout, which would select whichever lr
 # best fits the wrong distribution. The held-out set is packed from source rows
@@ -804,6 +825,18 @@ LONDON_HELDOUT = {
     "tune_muon_london16k_bs256_lr0.0004": 3.8490,
     "tune_muon_london16k_bs256_lr0.0008": 3.8394,
     "tune_muon_london16k_bs256_lr0.0016": 3.8593,
+    # london at bs16 (2000 steps), measured 2026-08-26 against london_heldout_4k.
+    # Both arms win 2e-4 INTERIOR, which is exactly 8e-4 * sqrt(16/256) -- the
+    # CONTROLS batch rule predicting the bs256 winner's rescaling on the nose.
+    #
+    # The optimizers separate here in a way they do not at bs256. There they were
+    # identical (3.8397 adamw, 3.8394 muon); at bs16 muon is 0.022 better.
+    "tune_adamw_london16k_bs16_lr0.0001": 3.8487,
+    "tune_adamw_london16k_bs16_lr0.0002": 3.8463,
+    "tune_adamw_london16k_bs16_lr0.0004": 3.8641,
+    "tune_muon_london16k_bs16_lr0.0001":  3.8283,
+    "tune_muon_london16k_bs16_lr0.0002":  3.8240,
+    "tune_muon_london16k_bs16_lr0.0004":  3.8451,
 }
 
 BS32_STEP_HELDOUT = {
