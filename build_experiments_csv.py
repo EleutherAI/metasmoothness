@@ -444,6 +444,8 @@ BANK_RESULTS = {
     "plan_adam_eps1e17_32k_bs256": dict(
         status="done",
         magic_lds=0.9529, magic_ci_lo=0.9470, magic_ci_hi=0.9577,
+        # scripts/ekfac_lds.py, D7 config, A40 allium-0 nproc 2, same 100-subset bank
+        ekfac_lds=0.4127, ekfac_ci_lo=0.3678, ekfac_ci_hi=0.4554,
         magic_n_queries=20, n_subsets=100, n_queries=20,
         delta_l1=353172.61, delta_l2=36.5131,
         train_loss=3.1074, heldout_loss=3.2363,

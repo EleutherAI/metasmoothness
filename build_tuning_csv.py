@@ -730,6 +730,10 @@ BS32_STEP_HELDOUT = {
     "tune_muon_128k_bs32_lr1.25e-05":  3.2183,
     "tune_muon_128k_bs32_lr2.5e-05":   3.2110,
     "tune_muon_128k_bs32_lr5e-05":     3.2079,
+    # Endpoint extension, measured 2026-08-25 on A40 secret-ord-0, nproc 2.
+    # 1e-4 comes in WORSE than 5e-5, so 5e-5 is now an interior winner and the
+    # adamw 128k lr is settled at 5e-5 -- no further extension.
+    "tune_adamw_128k_bs32_lr0.0001":   3.2224,
     "tune_adamw_32k_bs32_lr2.5e-05": 3.2380,
     "tune_adamw_32k_bs32_lr5e-05":   3.2342,
     "tune_adamw_32k_bs32_lr0.0001":  3.2380,
