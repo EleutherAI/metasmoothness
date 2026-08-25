@@ -22,7 +22,10 @@ BERGSON=/mnt/ssd-1/lucia/bergson-filter
 ENVPY=/home/lucia/envs/paper/bin/python
 NPROC=$(awk -F, '{print NF}' <<<"$DEVS")
 PORT=$((30100 + ${DEVS%%,*}))
-LOG=/mnt/ssd-2/lucia/paper_runs/experiments/filter_slot_${DEVS//,/-}.log
+# Keyed by host as well as devices: the log lives on the shared volume, so two
+# nodes running the same GPU indices otherwise append to the same file, which
+# made three live queues look like one finished one.
+LOG=/mnt/ssd-2/lucia/paper_runs/experiments/filter_slot_$(hostname)_${DEVS//,/-}.log
 
 for JOB in "$@"; do
   RID=${JOB%%:*}
