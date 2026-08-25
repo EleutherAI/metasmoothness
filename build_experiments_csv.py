@@ -377,6 +377,29 @@ BANK_RESULTS = {
               "overran its stop and recomputed subsets 30-44, which slice_30_48 also "
               "covered; the two copies agree to 3.8e-06 on diff, the main copies were "
               "dropped and the original kept as validation.csv.premerge."),
+    "plan_muon_eps1e17_32k_bs256": dict(
+        status="done",
+        magic_lds=0.8715, magic_ci_lo=0.8575, magic_ci_hi=0.8835,
+        magic_n_queries=20, n_subsets=100, n_queries=20,
+        # scripts/param_delta.py, step 249: rel_l2 0.01825
+        delta_l1=281856.91, delta_l2=31.9472,
+        heldout_loss=3.2372,
+        reusable="bank+scores",
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_32k_bs256",
+        bank_dir="/mnt/ssd-2/lucia/paper_runs/experiments/plan_muon_eps1e17_32k_bs256",
+        notes="Token axis, muon at N=32k, bs256 (250 steps). lr 2e-4. WORLD SIZE 2 -- "
+              "all six slice configs agree on nproc_per_node 2, so the bank is "
+              "bit-exactly reusable at that world size. NVIDIA A40 (claimed by iris-0; "
+              "the final subset 74 was retrained on secret-ord-0, also A40). Per-slice "
+              "host is not written to the slice logs, so A40 rests on the claim record "
+              "rather than a per-subset check -- worth re-reading if this row ever "
+              "disagrees with its neighbours, since D17 puts a mixed-hardware bank "
+              "0.055 low. COMPLETES THE MUON TOKEN AXIS: 0.3020 at 4k, 0.7712 at 8k, "
+              "0.8379 at the 16k anchor, 0.8715 here. Monotone and still climbing, "
+              "closing on the adamw arm (0.9295 / 0.9163 / 0.9411 / 0.9529) but 0.081 "
+              "below it at 32k -- the two optimisers have not converged over an 8x "
+              "token range. ms 0.9948, which is above the 0.95 boundary while LDS is "
+              "well under the adamw arm, so ms and LDS disagree here."),
     "plan_adam_eps1e17_32k_bs256": dict(
         status="done",
         magic_lds=0.9529, magic_ci_lo=0.9470, magic_ci_hi=0.9577,

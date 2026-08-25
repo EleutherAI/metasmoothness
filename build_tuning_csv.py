@@ -669,6 +669,25 @@ for opt in ["adamw"]:
           batch_size=32, grad_accum_steps=2,
           notes="Pre-emptive low extension; 1.25e-5 predicted to win its own endpoint.")
 
+# Next rung of the TOKEN axis (bs256, 2 epochs), which currently runs 4k, 8k,
+# 16k, 32k with 64k banks building. 128k at bs256 is 1000 optimiser steps, so it
+# is cheap to tune -- the cost of this rung is the bank, not the sweep.
+#
+# Centre 1e-4: both 64k arms won there, interior in {5e-5, 1e-4, 2e-4, 4e-4}.
+# Two independent arguments agree on it rather than on a lower centre. The step
+# drift says the optimum falls as steps grow, and 128k doubles 64k to 1000 steps.
+# The CONTROLS batch rule says lr scales as sqrt(batch), and the bs32 ladder
+# chose 5e-5 at 1000 steps, which is 1.4e-4 after sqrt(256/32) -- just above 1e-4.
+# The drift pulls down, the batch rule pushes up, and 1e-4 sits between them, so
+# unlike the bs32 ladder there is no case for centring lower up front. Extend as
+# normal if 5e-5 wins its own endpoint.
+for opt in ["adamw", "muon"]:
+    sweep(f"tune_{opt}_128k_bs256",
+          selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_128k_bs256",
+          lrs=[5e-5, 1e-4, 2e-4], priority=2, optimizer=opt, n_docs=128000,
+          batch_size=256, grad_accum_steps=16,
+          notes="Token axis at bs256, 2 epochs (1000 steps). Centre 1e-4 = the 64k winner.")
+
 # Step-scaling sweep results, measured 2026-08-25 (bs32, ga 2, nproc 2, pinned venv).
 # Both 32k arms win on the INTERIOR point, so the CONTROLS batch-16-32 centre of
 # 5e-5 was right and no endpoint extension is needed. Note how flat they are --
