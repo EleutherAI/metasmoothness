@@ -16,7 +16,10 @@ import os
 import subprocess
 import time
 
-FRESH_MIN = 25
+# A retrain at 2000 steps takes 21-27 minutes, measured, so a 25-minute window is
+# tighter than the unit of work and reports HUNG on healthy ladder rows between
+# retrains. Must exceed the slowest retrain on the grid, with margin.
+FRESH_MIN = 45
 now = time.time()
 ps = subprocess.run(["ps", "-eo", "args"], capture_output=True, text=True).stdout
 
@@ -54,7 +57,16 @@ for d in glob.glob("/mnt/ssd-*/lucia/paper_runs/experiments/*/filter_proponents_
     if not os.path.exists(f):
         continue
     n = sum(1 for _ in open(f)) - 1
-    age = (now - os.path.getmtime(f)) / 60
+    # filter_proponents.csv gains a row per QUERY, and stops advancing once the
+    # 20 proponent retrains are done -- the random-control retrains that follow
+    # write nothing to it. A 2000-step random retrain takes ~21 min, so three of
+    # them look like an hour of silence and CSV freshness alone reports HUNG on a
+    # perfectly healthy run. Take the newer of the CSV and the run log.
+    log = os.path.join(os.path.dirname(d), os.path.basename(d) + ".log")
+    mtimes = [os.path.getmtime(f)]
+    if os.path.exists(log):
+        mtimes.append(os.path.getmtime(log))
+    age = (now - max(mtimes)) / 60
     run = os.path.basename(os.path.dirname(d))
     src = os.path.basename(d).replace("filter_proponents_", "")
     owner = claim_host(run, src)
