@@ -87,6 +87,23 @@ MS = {
     # the single outlier carrying the whole story, and it is one measurement.
     "london16k_bs16_adamw": 0.9058,
     "london16k_bs16_muon": 0.9640,
+    # 32k bs256, measured 2026-08-26. These undercut the 16k reading badly.
+    #
+    #   london  16k bs256   adamw 0.9867   muon 0.8547   gap 0.130
+    #   london  32k bs256   adamw 0.9732   muon 0.9536   gap 0.020
+    #   smollm2 32k bs256   adamw 0.9937   muon 0.9948   gap 0.001
+    #
+    # The 0.13 optimizer gap does NOT survive doubling the corpus. muon reads
+    # 0.9536 at 32k, not ~0.85, so london16k_bs256_muon = 0.8547 looks like an
+    # outlier rather than the start of a trend. The seed probes now running will
+    # say whether it is direction noise.
+    #
+    # What DOES survive is smaller and cleaner: london sits below smollm2 for
+    # BOTH optimizers at 32k, by 0.021 (adamw) and 0.041 (muon). A modest corpus
+    # effect in the same direction for both, which is a much more ordinary claim
+    # than the one the 16k cell suggested.
+    "london32k_bs256_adamw": 0.9732,
+    "london32k_bs256_muon": 0.9536,
 }
 
 rows = []
