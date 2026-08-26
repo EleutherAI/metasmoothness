@@ -863,6 +863,17 @@ LONDON_HELDOUT = {
     "tune_adamw_london64k_bs256_lr0.0016": 3.6099,
     "tune_muon_london64k_bs256_lr0.0008": 3.6202,
     "tune_muon_london64k_bs256_lr0.0016": 3.5993,
+    # Endpoint extension, measured 2026-08-26. Both arms blow up above 1.6e-3 --
+    # 3.6 nats to 4.5 is divergence, not a shallow slope -- so 1.6e-3 is the
+    # INTERIOR winner at 64k and the sweep is settled.
+    #
+    # The london lr optimum therefore reads: 8e-4 at 16k, 8e-4 at 32k, 1.6e-3 at
+    # 64k. Flat then one octave up, with the 64k point now bracketed on both
+    # sides rather than sitting on an endpoint.
+    "tune_adamw_london64k_bs256_lr0.0032": 4.5058,
+    "tune_adamw_london64k_bs256_lr0.0064": 4.6774,
+    "tune_muon_london64k_bs256_lr0.0032": 4.5459,
+    "tune_muon_london64k_bs256_lr0.0064": 4.6780,
     "tune_muon_london32k_bs256_lr0.0004": 3.8005,
     "tune_muon_london32k_bs256_lr0.0008": 3.7842,
     "tune_muon_london32k_bs256_lr0.0016": 3.7915,
