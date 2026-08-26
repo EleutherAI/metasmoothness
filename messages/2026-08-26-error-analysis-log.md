@@ -380,3 +380,39 @@ Hessian save.
 Reminder for the health scripts: the muon twin at 114 minutes reads STALE to
 check_runs.py and would read hung to hung_check.py. One rank at 100% with the
 rest at 0% is healthy rank-0 work. Check per-GPU utilisation before acting.
+
+## 2026-08-26 ssd-1 hit its quota and silently truncated a merged bank file
+
+    state    resolved
+    capture  OSError [Errno 122] Disk quota exceeded, from merge_bank.py open(..., "w")
+    status   CLOSED, with a follow-up
+
+ssd-1 reached **0 bytes available** (64T volume, 100% use). merge_bank.py failed
+mid-write on `plan_muon_eps1e17_32k_bs32`, and the failure mode is the dangerous
+part: `open(out, "w")` had already TRUNCATED validation_merged.csv before the
+quota error hit, leaving a zero-byte file. The next step, ekfac_lds.py, then died
+with `pandas EmptyDataError: No columns to parse from file`, which reads like a
+corrupt bank rather than a full disk.
+
+Errno 122 is EDQUOT, a quota, not ENOSPC. Worth knowing because `df` and the
+error disagree in wording.
+
+Reclaimed 71 GB by deleting the training-trajectory `checkpoints/` of five rows
+that are fully consumed -- both magic_lds and ekfac_lds recorded, and all five
+banks verified on the Hub:
+
+    plan_adam_eps1e17_16k_bs32   21G     plan_adam_eps1e17_4k_bs256   11G
+    plan_adam_eps1e17_16k_bs64   19G     plan_muon_eps1e17_4k_bs256  7.3G
+    plan_adam_eps1e17_16k_bs512  13G
+
+Those are trajectories, not banks -- `retrained/` and the scores are untouched, so
+the D6/reuse-rule assets survive. The cost is that re-scoring those rows with a
+NEW attribution method would need the trajectory regenerated. Accepted because
+ssd-1 at zero was failing live jobs.
+
+df took about 25 s to reflect the deletion: it read 0G immediately after and 60G
+once CephFS caught up. Do not conclude a reclaim failed from an immediate df.
+
+Follow-up: 60 GB is not much headroom, and 326 GB is still held by the five banks
+already verified on the Hub. `publish_bank.py --delete-local` exists precisely for
+that and is Lucia's call, not mine.
