@@ -863,6 +863,17 @@ LONDON_HELDOUT = {
     "tune_adamw_london64k_bs256_lr0.0016": 3.6099,
     "tune_muon_london64k_bs256_lr0.0008": 3.6202,
     "tune_muon_london64k_bs256_lr0.0016": 3.5993,
+    # london 128k, measured 2026-08-26. adamw 1.6e-3 is now INTERIOR: 3.2e-3
+    # ties it to within 0.0002 and 6.4e-3 is clearly worse, so the winner is
+    # bracketed and that sweep is settled.
+    "tune_adamw_london128k_bs256_lr0.0032": 3.4994,
+    "tune_adamw_london128k_bs256_lr0.0064": 3.5328,
+    # muon 128k: 1.6e-3 leads so far and BEATS the adamw winner (3.4845 vs
+    # 3.4992). 3.2e-3 and 6.4e-3 are still training, so this is not yet bracketed
+    # on the high side.
+    "tune_muon_london128k_bs256_lr0.0004": 3.5558,
+    "tune_muon_london128k_bs256_lr0.0008": 3.5095,
+    "tune_muon_london128k_bs256_lr0.0016": 3.4845,
     # Endpoint extension, measured 2026-08-26. Both arms blow up above 1.6e-3 --
     # 3.6 nats to 4.5 is divergence, not a shallow slope -- so 1.6e-3 is the
     # INTERIOR winner at 64k and the sweep is settled.
