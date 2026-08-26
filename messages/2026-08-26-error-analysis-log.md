@@ -449,3 +449,42 @@ Two lessons, and the second is the one I keep relearning:
     path. The stack said stat() on a path; I had already established that path
     stalls; I did not connect them because I was looking for a NEW cause. Read
     the evidence already collected before reaching for a new hypothesis.
+
+## 2026-08-26 four large-N ms probes killed by the ssd-1 quota, unnoticed for an hour
+
+    state    crashed -> relaunched
+    capture  OSError [Errno 122] Disk quota exceeded, inside tqdm, then
+             "RuntimeError: metasmoothness child exited with code 1"
+    status   CLOSED for the incident; the DETECTION gap is open
+
+ssd-1 filled a second time and killed four of the five large-N ms probes:
+
+    plan_muon_eps1e17_128k_bs32   died at 4%    69 min unnoticed
+    plan_muon_eps1e17_256k_bs32   died at 91%   48 min unnoticed
+    plan_adam_eps1e17_512k_bs32   died at 47%   69 min unnoticed
+    plan_muon_eps1e17_512k_bs32   died at 31%   69 min unnoticed
+
+muon 256k died at 91% of a training, so nearly a full training was thrown away.
+
+**How I nearly missed it, and this is the part worth keeping.** Reading the last
+"Training: N%" line out of each log showed 4 / 91 / 47 / 31 -- plausible numbers
+for runs in flight. ms runs three trainings, so a percentage that stops moving
+looks identical to one that has rolled over to the next training. Two sweeps in a
+row I read those numbers and moved on.
+
+What caught it was counting PROCESSES fleet-wide rather than reading logs: one
+live ms process across nine nodes, against five that should have been running.
+The progress line is not evidence of life; the process table is.
+
+I also guessed wrong about which node each run was on and got NOT HERE four
+times, which looked like my query was broken rather than like the runs were dead.
+Sweep for the process by config name across all nodes; do not assume placement.
+
+Space had already recovered by the time I looked -- 444 GB free -- so the fix was
+only to relaunch. The quota window and the failure are separated by an hour, which
+is exactly why the logs looked normal.
+
+Both scripts miss this class: check_runs.py keys on claim + log age, and a dead
+run holding a stale claim with a frozen log reads STALE, not DEAD. hung_check.py
+looks at live processes, so a process that no longer exists is invisible to it.
+Neither answers "should something be running here that is not".
