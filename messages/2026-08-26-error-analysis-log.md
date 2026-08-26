@@ -136,3 +136,41 @@ not merge them.
 
 Follow-up, still open: launch children with output going directly to a file
 rather than through the launcher, so an orphaned rank cannot block on a pipe.
+
+## 2026-08-26 plan_adam_eps1e17_64k_bs32 :: ekfac score :: iris-0 -- LIVE CONFIRMATION of #444
+
+    state    running (not stale, despite what check_runs.py says)
+    capture  log parked at "Collecting gradients: 100%" for 59 min;
+             GPU 5 at 100% utilisation, GPU 4 at 0%; parent in do_wait
+    status   CLOSED as a diagnosis; the run itself is still going
+
+This is the rank-0 asymmetry from EleutherAI/bergson#444 caught in the act rather
+than inferred from a crash. The split across the two GPUs is the whole argument:
+
+    GPU 5   100%   rank 0: process_autocorrelation_matrices + processor.save()
+    GPU 4     0%   rank 1: blocked in dist.all_reduce(total_processed)
+
+One rank saturated, the other idle, at exactly the point where teardown does
+rank-0-only work. Nothing else produces that pattern.
+
+It has now been in that section for **59 minutes**, twice the 30-minute timeout
+the unpatched build.py allowed. So the 30-minute value was not merely tight, it
+was well under what a 64k row needs, and every previous abort at this point was
+a healthy run being killed. That settles the question the earlier entry left
+open: a bigger timeout is necessary AND, on this evidence, 1-2 hours is the right
+order of magnitude rather than a guess.
+
+Two detector consequences:
+
+  * check_runs.py called this STALE at 59 minutes because it infers health from
+    log age, and the rank-0 Hessian section emits nothing by design. Silence here
+    is expected, not a symptom. A long-running EK-FAC row will always trip a
+    log-age threshold near the end.
+  * hung_check.py would make the same mistake for the same reason. Neither should
+    be trusted on an EK-FAC row sitting at "Collecting gradients: 100%" without
+    checking per-GPU utilisation first -- one rank at 100% and the rest at 0% is
+    the signature of healthy rank-0 work, not a hang.
+
+The same check applies to the 512k ms probes launched today: an empty log with
+the launcher in state D on folio_wait_bit_common is dataset loading, and GPU
+utilisation is what distinguishes it from a hang. Log age alone cannot.
