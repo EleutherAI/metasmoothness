@@ -56,52 +56,43 @@ HELDOUT = {
     "london128k_bs256_adamw": 3.4992, "london128k_bs256_muon": 3.4845,
 }
 
-# Measured ms. Only 16k exists so far; 32k/64k/128k are probing now.
+# Measured ms, against the matched smollm2 row at the same N and batch.
 #
-# THE HEADLINE, and the reason this arm was worth the compute: at 16k bs256 the
-# two optimizers separate by 0.13, which nothing in the smollm2 grid comes close
-# to -- there adamw and muon sit at 0.9930 and 0.9963 at the same setting. So the
-# corpus, not the optimizer, is what was hiding the difference.
+# There is NO optimizer headline here, and there nearly was one. A 0.13 gap
+# appeared at 16k bs256 and turned out to be a single bad probe direction.
+#
+# ms perturbs data weights along ONE random direction v. Re-probing
+# london16k_bs256_muon at two further directions, with data, lr, optimizer,
+# batch, fd_step and world size all identical and only direction_seed changed:
+#
+#   london16k_bs256_muon    seed 0  0.8547   seed 1  0.9858   seed 2  0.9890
+#   london16k_bs256_adamw   seed 0  0.9867   seed 1  0.9827
+#
+# Two independent directions put muon at ~0.987; adamw moves 0.004 across
+# directions. The seed-0 draw disagreed with itself by 0.13. That also withdraws
+# the "corpus x optimizer x batch interaction" I read off the bs16 pair -- the
+# inversion existed only because of that one cell.
+#
+# The table as it actually stands:
+#
+#                  adamw    muon
+#   london  bs16   0.9058   0.9640
+#   london  bs256  0.9867   0.9858
+#   smollm2 bs16   0.9133   0.9939
+#   smollm2 bs256  0.9930   0.9964
+#
+# Both optimizers prefer the larger batch on both corpora. london sits below
+# smollm2 everywhere, and against the matched smollm2 row: -0.006 and -0.011 at
+# 16k bs256, -0.021 and -0.041 at 32k bs256. A real corpus effect, consistent in
+# direction, widening slightly with N -- and far too small to explain why ms sits
+# at 0.98-0.99 across the whole grid.
+#
+# Raw seed values in notes/ms_direction_seed_variance.md.
 MS = {
     "london16k_bs256_adamw": 0.9867,
-    "london16k_bs256_muon": 0.8547,
-    # bs16 measured 2026-08-26. These invert the bs256 ordering, which is the
-    # most surprising thing the arm has produced so far:
-    #
-    #                  adamw    muon
-    #   london  bs16   0.9058   0.9640
-    #   london  bs256  0.9867   0.8547
-    #   smollm2 bs16   0.9133   0.9939
-    #   smollm2 bs256  0.9930   0.9963
-    #
-    # On smollm2 both optimizers prefer the LARGER batch (adamw 0.9133 -> 0.9930,
-    # muon 0.9939 -> 0.9963). On london adamw does the same (0.9058 -> 0.9867)
-    # but muon goes the OTHER WAY, 0.9640 down to 0.8547.
-    #
-    # So the 0.13 optimizer gap at bs256 is not a plain corpus effect. At bs16
-    # london and smollm2 look alike for both optimizers; the gap only opens at
-    # large batch, and only for muon. That is a corpus x optimizer x batch
-    # interaction, not "london is harder".
-    #
-    # Treat london16k_bs256_muon at 0.8547 as the value to re-check first: it is
-    # the single outlier carrying the whole story, and it is one measurement.
+    "london16k_bs256_muon": 0.9858,   # was 0.8547 at seed 0; artifact
     "london16k_bs16_adamw": 0.9058,
     "london16k_bs16_muon": 0.9640,
-    # 32k bs256, measured 2026-08-26. These undercut the 16k reading badly.
-    #
-    #   london  16k bs256   adamw 0.9867   muon 0.8547   gap 0.130
-    #   london  32k bs256   adamw 0.9732   muon 0.9536   gap 0.020
-    #   smollm2 32k bs256   adamw 0.9937   muon 0.9948   gap 0.001
-    #
-    # The 0.13 optimizer gap does NOT survive doubling the corpus. muon reads
-    # 0.9536 at 32k, not ~0.85, so london16k_bs256_muon = 0.8547 looks like an
-    # outlier rather than the start of a trend. The seed probes now running will
-    # say whether it is direction noise.
-    #
-    # What DOES survive is smaller and cleaner: london sits below smollm2 for
-    # BOTH optimizers at 32k, by 0.021 (adamw) and 0.041 (muon). A modest corpus
-    # effect in the same direction for both, which is a much more ordinary claim
-    # than the one the 16k cell suggested.
     "london32k_bs256_adamw": 0.9732,
     "london32k_bs256_muon": 0.9536,
 }
