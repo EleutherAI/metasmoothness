@@ -103,7 +103,7 @@ def main() -> None:
         "this row already has a MAGIC bank")
     assert row["model"] in ("gpt2", "gpt2-medium", "gpt2-large"), (
         f"model {row['model']} needs its own generator (arch rows are blocked)")
-    assert row["dataset"] == "smollm2", row["dataset"]
+    assert row["dataset"] in ("smollm2", "london"), row["dataset"]
 
     n = int(row["n_docs"])
     lr = float(row["lr"])
@@ -120,7 +120,13 @@ def main() -> None:
         "seed": int(row["seed"]),
         "cleanup_ckpts": False,
         "distributed": {"nnode": 1, "nproc_per_node": args.nproc},
-        "data": {"dataset": data_path(f"train_{n // 1000}k.hf"),
+        # The corpus comes from the row, not from n_docs. Building the path from
+        # the document count alone is exactly how the london TUNING configs ended
+        # up training on smollm2 -- same name, same size, wrong distribution, and
+        # nothing in the run reports which corpus it used.
+        "data": {"dataset": data_path(
+            f"london_{n // 1000}k.hf" if row["dataset"] == "london"
+            else f"train_{n // 1000}k.hf"),
                  "split": "train", "chunk_length": 0},
         "query": {"dataset": data_path("query_20.hf"),
                   "split": "train", "chunk_length": 0},

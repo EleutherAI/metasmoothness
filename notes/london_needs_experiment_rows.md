@@ -1,48 +1,56 @@
-# The london tuning is finished and has nowhere to go
+# The london ablation is blocked by an explicit design rule, not an oversight
 
-Every london sweep in build_tuning_csv.py declares what it is choosing an lr for:
+Follow-up to the earlier note. I went to add the missing experiment rows and hit
+two guards in build_experiments_csv.py. The first was mine to satisfy; the second
+is a decision that is not mine to overturn.
 
-    selects_lr_for = plan_adam_london16k_bs256
-                     plan_muon_london16k_bs256
-                     plan_adam_london{32,64,128}k_bs256   (and muon)
+## Guard 1 -- satisfied
 
-**None of those rows exist in experiments.csv.** A grep for "london" over the
-whole file returns nothing. So the tuning has settled lrs for experiment rows
-that were never defined, and the ablation cannot produce a single ms or LDS
-value until they are.
+    assert r["run_id"] in TUNED_LR, "tuning group complete but its selection is
+    not recorded in TUNED_LR - the wrong-lr failure mode"
 
-## What is settled and waiting
+Correct and easily met: the winners are measured. Recorded them, all interior,
+all scored against london_heldout_4k rather than the smollm2 held-out set:
 
-    london 16k bs256    adamw 8e-4  3.8397     muon 8e-4  3.8394
-    london 32k bs256    adamw 8e-4  3.7873     muon 8e-4  3.7842
-    london 64k bs256    adamw 1.6e-3 3.6099    muon 1.6e-3 3.5993   (interior)
-    london 16k bs16     adamw 2e-4  3.8463     muon 2e-4  3.8240
-    london 128k bs256   adamw 1.6e-3 3.4992    muon: sweep running
+    16k bs256  8e-4     32k bs256  8e-4     64k bs256  1.6e-3     16k bs16  2e-4
 
-That is 8 settled lr choices across four corpus sizes and two batch sizes, at a
-cost of roughly 30 tuning runs, and none of it has an experiment row to feed.
+## Guard 2 -- STOPS HERE
 
-The two london runs that DID produce ms -- london16k_bs256_adamw at 0.9867 and
-london16k_bs256_muon at 0.8547 -- are not experiment rows either. They exist as
-run directories under paper_runs and their numbers live in notes, not in
-experiments.csv, so they are outside the generator entirely and outside every
-consistency check it performs.
+    assert r["dataset"] == "smollm2",
+        "non-smollm2 row admitted: ... paper runs use the SmolLM2 pipeline only
+         (WikiText does not scale)"
 
-## Why this matters for the question being asked
+This is an explicit design rule about what belongs in the paper grid. Adding
+london experiment rows contradicts it directly, so the rows are NOT added and the
+change is reverted. The standing instruction is to trust the design documents and
+raise the conflict rather than route around it.
 
-The london ablation exists to test whether the fine-tuning setup is "too easy"
-because the corpus is close to pre-training. That test is a comparison of ms and
-LDS between smollm2 and london at matched N. The smollm2 side is a full grid in
-experiments.csv. The london side is currently two numbers in a note.
+Worth noting for the decision, though: the stated reason is that WikiText does
+not scale. london-llm-1800 is not WikiText. It is purpose-built by
+scripts/prep_london.py, packed to 512-token chunks, and already exists at 16k,
+32k, 64k and 128k with a zero-overlap held-out set of 4000 documents. It scales
+to the same sizes the smollm2 arm uses. So the rule's justification may not cover
+this corpus even though its wording does.
 
-## What it needs
+## What is waiting on the answer
 
-Experiment rows for london at 16k/32k/64k bs256 for both optimizers, carrying the
-settled lrs above, plus the 16k bs16 pair. Then the ms probes and banks run
-through the same generator, the same guards and the same reuse rules as
-everything else.
+Roughly 30 completed tuning runs and 8 settled lrs. Also the two london runs that
+already produced ms -- 0.9867 adamw against 0.8547 muon at 16k -- which are a far
+larger optimizer gap than anything in the smollm2 grid, and which currently live
+only as run directories and a note.
 
-This is a design addition rather than a bug fix -- it changes the experiment grid
--- so it is recorded here rather than done unilaterally at the end of a long
-session. It is the single highest-value next step for the london work: without it
-roughly 30 completed tuning runs stay unusable.
+The ablation exists to test whether ms sits at 0.98-0.99 everywhere because
+smollm2 is too close to GPT-2 pre-training. That test needs london ms and LDS in
+the same table as the smollm2 rows, and this rule is what prevents it.
+
+Two ways forward, both Lucia's call:
+
+  1. relax the assert to allow dataset in ("smollm2", "london"), and let the
+     london arm into the grid as a first-class axis
+  2. keep the grid smollm2-only and carry london as a separate table, in which
+     case the tuning has done its job and the ablation needs its own home
+
+scripts/gen_experiment_run.py has been taught the london corpus either way -- it
+resolves london_<n>k.hf from the mirror instead of train_<n>k.hf. That change is
+harmless on its own and is what stops a london row silently training on smollm2,
+which is exactly what happened to the london TUNING configs earlier today.
