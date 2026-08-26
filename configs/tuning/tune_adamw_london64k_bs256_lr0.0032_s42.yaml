@@ -11,7 +11,7 @@ steps:
       nnode: 1
       nproc_per_node: 2
     data:
-      dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_64k.hf
+      dataset: /mnt/ssd-2/lucia/datasets_local/london_64k.hf
       split: train
       chunk_length: 0
     lr_schedule:
