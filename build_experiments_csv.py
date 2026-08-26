@@ -368,6 +368,14 @@ BANK_RESULTS = {
         notes="gpt2-medium at bs32, 1000 steps, lr 5e-05, world size 4 on A100 "
               "(lotus-0/maria-1). ms 0.7402 measured with fd_step 0.1, seed 0, "
               "total_movement_l1 68137.34."),
+    "gpt2medium_64k_bs32": dict(
+        status="planned",
+        metasmoothness=0.8580,
+        run_dir="/mnt/ssd-2/lucia/paper_runs/experiments/gpt2medium_64k_bs32",
+        notes="gpt2-medium at 64k, bs32, 4000 steps, lr 2.5e-05, world size 4 on A100 "
+              "(marisa-0). ms 0.8579838871955872 with fd_step 0.1, seed 0, "
+              "total_movement_l1 64432.09. Matches the 16k bs256 gpt2-medium row "
+              "(0.8580217, movement 44512.30) to four decimals across 4x the data."),
     "plan_adam_eps1e17_16k_gpt2-medium": dict(
         status="done",
         magic_lds=-0.0407, magic_ci_lo=-0.0980, magic_ci_hi=0.0155,
@@ -1111,6 +1119,23 @@ add(BASE17, run_id="plan_adam_eps1e17_16k_ep4", num_epochs=4,
           "original kept as validation.csv.premerge.")
 add(BASE17, run_id="plan_adam_eps1e17_16k_bs512", batch_size=512, grad_accum_steps=32,
     notes="D2: uncontrolled double batch (63 steps). lr comes from tune_adamw_16k_bs512.")
+# The two gpt2-medium bs32 points. Both were measured, both were entered in
+# BANK_RESULTS, and neither had a row here -- so neither reached the CSV. The
+# 64k one also answers the dataset-size question on this model directly: ms
+# 0.85798 at 64k against 0.85802 at 16k, two independent runs (total_movement_l1
+# 64432.09 vs 44512.30) agreeing to four decimals. On gpt2-medium ms is flat in
+# N over a 4x increase -- it is simply flat at 0.858, not at the 0.98 we want.
+add(BASE17, run_id="gpt2medium_16k_bs32", model="gpt2-medium", n_params_m=355,
+    batch_size=32, grad_accum_steps=2, lr=5e-5,
+    notes="Model-size axis at bs32 (1000 steps), the config D11 registered: an exact "
+          "match to plan_adam_eps1e17_16k_bs32 (gpt2, ms 0.9800) with only the model "
+          "swapped. WORLD SIZE 4, NVIDIA A100.")
+add(BASE17, run_id="gpt2medium_64k_bs32", model="gpt2-medium", n_params_m=355,
+    n_docs=64000, batch_size=32, grad_accum_steps=2, lr=2.5e-5,
+    notes="gpt2-medium at 64k, bs32, 4000 steps, 2 epochs. WORLD SIZE 4, NVIDIA A100 "
+          "(marisa-0). Paired with gpt2medium_16k_bs32 for the dataset-size question "
+          "on this model.")
+
 for mdl, prm in [("gpt2-medium", 355), ("gpt2-large", 774)]:
     add(BASE17, run_id=f"plan_adam_eps1e17_16k_{mdl}", model=mdl, n_params_m=prm,
         notes="Model-size axis. MAGIC is one reverse pass per query and scales with params. "
@@ -1242,8 +1267,24 @@ for r in rows:
     if r["run_id"] in TUNED_LR:
         r["lr"] = TUNED_LR[r["run_id"]]
 
+_matched = set()
 for r in rows:
+    if r["run_id"] in BANK_RESULTS:
+        _matched.add(r["run_id"])
     r.update(BANK_RESULTS.get(r["run_id"], {}))
+
+# BANK_RESULTS UPDATES rows, it never creates them, so a key naming a run with no
+# add() call above matches nothing and its measurements are dropped in silence.
+# That is not hypothetical: gpt2medium_16k_bs32 sat here with ms 0.7402 for a
+# day, correct on disk and correct in this file, and never once appeared in
+# experiments.csv. Recording a result and publishing a result are different
+# things, and nothing connected them. Fail loudly instead.
+_orphans = sorted(set(BANK_RESULTS) - _matched)
+if _orphans:
+    raise SystemExit(
+        "BANK_RESULTS has %d key(s) with no matching row, so their results would "
+        "be silently dropped:\n  %s\nAdd an add(...) row for each, or remove the "
+        "entry." % (len(_orphans), "\n  ".join(_orphans)))
 
 # D15 final ruling, scoped per Lucia: only results that RODE ON the known-invalid
 # banks are struck - the MAGIC and EK-FAC cells scored against the deleted
