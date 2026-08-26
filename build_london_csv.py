@@ -90,7 +90,22 @@ HELDOUT = {
 # Raw seed values in notes/ms_direction_seed_variance.md.
 MS = {
     "london16k_bs256_adamw": 0.9867,
-    "london16k_bs256_muon": 0.9858,   # was 0.8547 at seed 0; artifact
+    # SIX directions measured, and this cell is a DISTRIBUTION, not a point:
+    #
+    #   0.8547  0.9858  0.9890  0.9711  0.8262  0.9659
+    #   mean 0.9321  median 0.9685  sd 0.0700  range 0.826-0.989
+    #
+    # Two of six collapse to ~0.83-0.85; the other four sit at 0.966-0.989. That
+    # is not a rare tail, it is about a third of directions, so the seed-0 value
+    # was neither a fluke nor representative.
+    #
+    # Controls, same probe, same everything but the direction:
+    #   london  adamw 16k   0.9867 0.9827 0.9861          sd 0.0020
+    #   smollm2 muon  16k   0.99636 0.99660 0.99672 0.99462  sd 0.0010
+    #
+    # So the direction-sensitivity is specific to muon ON LONDON. Recording the
+    # mean, because no single direction represents this cell.
+    "london16k_bs256_muon": 0.9321,
     "london16k_bs16_adamw": 0.9058,
     "london16k_bs16_muon": 0.9640,
     "london32k_bs256_adamw": 0.9732,
