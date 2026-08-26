@@ -174,3 +174,52 @@ Two detector consequences:
 The same check applies to the 512k ms probes launched today: an empty log with
 the launcher in state D on folio_wait_bit_common is dataset loading, and GPU
 utilisation is what distinguishes it from a hang. Log age alone cannot.
+
+## 2026-08-26 london 32k hang :: DIAGNOSTIC RUN (updates the OPEN entry above)
+
+Ran the single unbuffered reproduction the earlier entry called for. It
+reproduces cleanly and rules out the explanation that entry was leaning on.
+
+    python -u -X faulthandler, PYTHONUNBUFFERED=1, log OUTSIDE the run dir,
+    alone on secret-ord-0 GPUs 6,7, nproc 2
+
+Result after 160 s: **zero bytes of output**, GPUs at 0% utilisation, 130 threads
+(128 in futex_wait_queue, 1 wait_woken, 1 do_sys_poll), CPU frozen at ~18 s, 0
+MiB read.
+
+What this settles:
+
+  * It is NOT a buffering artefact. The earlier entry said the zero-byte log
+    could not distinguish a startup hang from a training hang because stdout was
+    block-buffered. With -u and PYTHONUNBUFFERED the log is still empty, so the
+    process hangs BEFORE bergson emits its first line.
+  * It is not I/O. read_bytes stays at 0 and CPU stops climbing at 18 s, so it is
+    blocked, not slowly working. That is different from the 512k ms probes, which
+    sit in state D on folio_wait_bit_common with read_bytes rising -- those are
+    genuinely loading and do start.
+  * No GPU work ever begins.
+
+Also found while setting this up, and it explains an old mystery: **bergson wipes
+the run directory at startup**. A log redirected into run_path is deleted out
+from under the process, which is exactly the `train.log (deleted)` fd seen on the
+hung muon 128k jobs, and why the tuning launcher writes to /tmp instead. Any
+diagnostic log must live outside the run directory.
+
+Still not root-caused. Both stack-dump routes are blocked in this container:
+
+    py-spy dump   Permission Denied as lucia AND as root -- the container has no
+                  CAP_SYS_PTRACE, so no ptrace-based tool will work here
+    SIGABRT with PYTHONFAULTHANDLER=1   produced no dump and did not kill the
+                  process, so the signal is not reaching a thread that can serve it
+
+Next thing to try, in order: (1) faulthandler.dump_traceback_later() compiled into
+a wrapper so the dump is scheduled from inside the process rather than delivered
+by signal; (2) strace if the container permits it; (3) bisect the config -- london
+16k bs256 works and london 32k bs256 does not, so halve the dataset until it
+starts, which at least localises the trigger to size rather than corpus.
+
+A note on process hygiene: my first three attempts left three competing copies on
+the same GPU pair, which made the first capture meaningless. The kill loop that
+cleaned them up also killed my own shell, because the command line contained the
+config path the pattern matched. Third time today. Capture the PID at launch and
+signal by PID; never name the target in the same command as the kill.
