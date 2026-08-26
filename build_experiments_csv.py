@@ -432,6 +432,23 @@ BANK_RESULTS = {
               "queries. THE FIRST LDS ABOVE 250 STEPS: 0.4146 [0.3719, 0.4541], "
               "indistinguishable from the 16k and 32k bs256 rows (0.4127-0.4730). "
               "EK-FAC does not degrade with step count over this range."),
+    # ms at N=128,000 -- the largest measured, and the first point on the ladder
+    # that Lucia wants carried to N=1M. 8000 steps at bs32, 2 epochs.
+    #
+    #     16k 0.9800   32k 0.9866   64k 0.9869   128k 0.9741
+    #
+    # Still high, and the first drift downward: 128k is 0.013 below 64k, where
+    # 16k->32k->64k moved by less than 0.007 in total. One point is not a trend,
+    # and the muon twin plus 256k and 512k are running, but it is the first sign
+    # that ms is not simply flat in N.
+    "plan_adam_eps1e17_128k_bs32": dict(
+        status="planned",
+        metasmoothness=0.9741,
+        run_dir="/mnt/ssd-1/lucia/paper_runs/experiments/plan_adam_eps1e17_128k_bs32",
+        notes="ms 0.9741322994232178 with fd_step 0.1, direction_seed 0, "
+              "world size 2 on NVIDIA A100 (shivam2-0). 128k docs, bs32, 8000 "
+              "steps, lr 5e-05. No bank: this is a training probe only, which is "
+              "why it can run at a size where a 100-model bank is out of reach."),
     "gpt2medium_64k_bs32": dict(
         status="planned",
         metasmoothness=0.8580,
