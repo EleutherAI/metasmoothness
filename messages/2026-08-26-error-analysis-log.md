@@ -223,3 +223,40 @@ the same GPU pair, which made the first capture meaningless. The kill loop that
 cleaned them up also killed my own shell, because the command line contained the
 config path the pattern matched. Third time today. Capture the PID at launch and
 signal by PID; never name the target in the same command as the kill.
+
+## 2026-08-26 plan_adam_eps1e17_64k_bs256 :: bank build :: marisa-0 -- ssd-1 PATH LOOKUP STALLS
+
+    state    hung -> fixed
+    capture  wchan=walk_component; read_bytes 0 -> 0 over 50 s; CPU frozen at
+             1792 jiffies; 129 threads; GPUs 0%; log 0 bytes
+    status   CLOSED (cause found and fixed)
+
+A third distinct hang signature, and the most useful one because it is not
+bergson at all.
+
+`wchan=walk_component` is the kernel resolving a path component. Nothing was
+reading, computing, or touching a GPU. The config pointed `data` and `query` at
+
+    /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/{train_64k,query_20}.hf
+
+and a plain `ls -d` on that path **times out with no output**. So it is the
+filesystem, not the job. ssd-1 is the volume at 100% use with ~87 GB free against
+970 GB of our own data.
+
+Rewriting both paths to the ssd-2 mirror and relaunching: training at 7% within
+three minutes, GPUs at 99/100%.
+
+Three hang signatures now, and they are genuinely different mechanisms:
+
+    wait_woken   + futex_wait x39, log 0 B, CPU frozen   london 32k/64k, OPEN
+    pipe_write   + PPid 1, fd -> deleted log             orphaned launcher, CLOSED
+    walk_component + read_bytes flat, CPU frozen         ssd-1 path stall, CLOSED
+
+The discriminator that separates a hang from a slow start is read_bytes plus CPU,
+not log age: a 512k ms probe sits in state D for minutes with an empty log and
+read_bytes CLIMBING, and it starts fine. Frozen CPU with flat read_bytes is a
+hang every time so far.
+
+`scripts/gen_bank.py` now rewrites dataset paths to the mirror, which
+gen_filter.py and gen_ms.py already did. Any config still naming a
+bergson-damping path under ssd-1 is a latent instance of this.
