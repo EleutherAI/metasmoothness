@@ -488,3 +488,37 @@ Both scripts miss this class: check_runs.py keys on claim + log age, and a dead
 run holding a stale claim with a frozen log reads STALE, not DEAD. hung_check.py
 looks at live processes, so a process that no longer exists is invisible to it.
 Neither answers "should something be running here that is not".
+
+
+## 2026-08-27 4000-step EK-FAC exceeds a SIX HOUR collective timeout
+
+    state    crashed twice -> relaunched at 24 h
+    capture  "Timeout(ms)=21600000" in the watchdog abort, i.e. the 360-minute
+             BERGSON_DIST_TIMEOUT_MIN did apply and was still exceeded
+    status   OPEN as a design problem; the runs are retried
+
+Both plan_{adam,muon}_eps1e17_64k_bs32 aborted in the rank-0 section again. The
+log settles what would otherwise be ambiguous: the env override reached the
+process, the collective timeout really was six hours, and rank 0 still had not
+arrived.
+
+The measurement has now moved three times:
+
+    1 h    proposed in EleutherAI/bergson#444, a guess with no data
+    3 h    after a 64k bs256 row was seen healthy in that section at 114 min
+    >6 h   a 64k bs32 row at 4000 steps, still unfinished
+
+The section scales with trajectory length, and 4000 steps is 8x the 500-step row
+that cleared it in under two hours. Relaunched at 1440 minutes, which is a guess
+of the same kind as the previous two.
+
+Ruled out I/O, the obvious suspect since these write to ssd-1 and that volume hit
+its quota twice on 2026-08-26. It has recovered: 2.7 T free, and it currently
+writes at 3.0 GB/s against ssd-2 at 538 MB/s. So this is compute in
+process_autocorrelation_matrices plus the save, not a stalled filesystem.
+
+Raising the ceiling is not a fix and should stop being treated as one. Rank 0
+works while every other rank blocks in dist.all_reduce(total_processed); a larger
+timeout only stops that being fatal. The fix is to remove the asymmetry -- move
+the all_reduce before teardown, or shard the Hessian save across ranks -- and
+until then the 4000-step rows are not a dependable route to a high-step LDS.
