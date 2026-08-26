@@ -23,15 +23,26 @@ import sys
 
 import yaml
 
-EXP = "/mnt/ssd-2/lucia/paper_runs/experiments"
+EXP_ROOTS = ["/mnt/ssd-2/lucia/paper_runs/experiments",
+             "/mnt/ssd-1/lucia/paper_runs/experiments"]
+
+
+def find_run(run_id):
+    """Runs live on either volume; a hardcoded root silently misses half of them."""
+    for root in EXP_ROOTS:
+        if os.path.isfile(os.path.join(root, run_id, "ms.yaml")):
+            return root
+    return None
+
 
 if len(sys.argv) < 3:
     sys.exit(__doc__)
 run_id, seeds = sys.argv[1], [int(s) for s in sys.argv[2:]]
 
+EXP = find_run(run_id)
+if EXP is None:
+    sys.exit("no ms.yaml for %s under %s" % (run_id, " or ".join(EXP_ROOTS)))
 src = os.path.join(EXP, run_id, "ms.yaml")
-if not os.path.isfile(src):
-    sys.exit("no ms.yaml at %s" % src)
 base = yaml.safe_load(open(src))
 
 
