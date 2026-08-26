@@ -384,6 +384,39 @@ BANK_RESULTS = {
     # notes/ekfac_2000step_collapse.md.
     #
     # MAGIC for this row is still scoring, so magic_lds stays empty.
+    # SECOND COMPLETED 2000-STEP BANK, and the muon twin of the adam row below.
+    # 100/100 subsets, sharded across A40 nodes, merged with merge_bank.py.
+    #
+    # 0.4281 [0.3833, 0.4695] -- inside the same 0.404-0.473 band as every other
+    # EK-FAC row, and agreeing with its adam twin at 0.4146. So EK-FAC flatness
+    # holds to 2000 steps for BOTH optimizers, and notes/ekfac_floor.md stays
+    # open: nothing measured so far distinguishes robustness from a floor.
+    #
+    # The incomplete-bank trap fired again here and harder than the first time.
+    # At 99/100 subsets this row read 0.1659 [0.1036, 0.2288]. ONE subset moved
+    # it to 0.4281. The adam row did the same thing at 92/100 (0.1085) against
+    # 0.4146 at 100. Two independent rows, both looking like a collapse, both
+    # ordinary once complete -- and in both cases the partial interval was tight
+    # enough to look trustworthy. Never read an LDS off a bank that
+    # merge_bank.py reports INCOMPLETE.
+    "plan_muon_eps1e17_32k_bs32": dict(
+        ekfac_lds=0.4281, ekfac_ci_lo=0.3833, ekfac_ci_hi=0.4695,
+        n_subsets=100, n_queries=20,
+        reusable="bank+scores",
+        run_dir="/mnt/ssd-1/lucia/paper_runs/experiments/plan_muon_eps1e17_32k_bs32",
+        bank_dir="/mnt/ssd-1/lucia/paper_runs/experiments/plan_muon_eps1e17_32k_bs32/bank_from_filter",
+        notes="Token axis at 2000 steps, muon, bs32, 32k docs, 2 epochs. WORLD "
+              "SIZE 2, NVIDIA A40 -- base build on lucia-ord-0 with shards on "
+              "allium-0, bellflower-0, shared-ord-0 and iris-0, all A40, so the "
+              "bank is hardware-homogeneous under D17. Built via validate with "
+              "method: lds and save_models: true against existing EK-FAC scores, "
+              "skipping the unshardable MAGIC scoring stage. 100 subsets, 20/20 "
+              "queries. Pairs with plan_adam_eps1e17_32k_bs32 (0.4146): the two "
+              "2000-step rows agree, and both sit in the band the 250-step rows "
+              "occupy. EK-FAC does not degrade with step count over this range. "
+              "Subset 39 was lost when the ssd-1 quota killed its shard mid-write "
+              "and was rebuilt separately; MAGIC scoring for this row is still "
+              "running, so magic_lds is empty."),
     "plan_adam_eps1e17_32k_bs32": dict(
         ekfac_lds=0.4146, ekfac_ci_lo=0.3719, ekfac_ci_hi=0.4541,
         n_subsets=100, n_queries=20,
