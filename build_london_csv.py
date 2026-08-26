@@ -95,6 +95,31 @@ MS = {
     "london16k_bs16_muon": 0.9640,
     "london32k_bs256_adamw": 0.9732,
     "london32k_bs256_muon": 0.9536,
+    # 64k, and ms falls off a cliff:
+    #
+    #   london  16k  adamw 0.9867  muon ~0.986   lr 8e-4
+    #   london  32k  adamw 0.9732  muon 0.9536   lr 8e-4
+    #   london  64k  adamw 0.7000  muon 0.4434   lr 1.6e-3
+    #   smollm2 64k  adamw 0.9876  muon 0.9947   lr 1e-4
+    #
+    # DO NOT read this as an N effect yet. The 64k rows run at a DIFFERENT
+    # LEARNING RATE -- the london sweep chose 1.6e-3 by held-out loss, against
+    # 8e-4 at 16k/32k and 1e-4 for smollm2 at the same N. lr is a known ms lever
+    # (the scale0.25 row in the paper grid turned out to be an lr effect, not a
+    # logit-scale one), so N and lr move together across this ladder and the
+    # cliff could be either.
+    #
+    # london64k_bs256_{adamw,muon}_lr8e-4 are running to separate them: same 64k
+    # corpus, same everything, lr held at the 32k value. If ms recovers toward
+    # 0.97 the cliff is the learning rate; if it stays near 0.70/0.44 it is the
+    # corpus at scale.
+    #
+    # Note this cuts both ways for the tuning. 1.6e-3 is the right lr by held-out
+    # loss and apparently a terrible one for ms, which means "tune on loss, then
+    # measure ms" can select configurations that are bad for the thing being
+    # studied.
+    "london64k_bs256_adamw": 0.7000,
+    "london64k_bs256_muon": 0.4434,
 }
 
 rows = []
