@@ -779,14 +779,22 @@ for opt in ["adamw", "muon"]:
           notes="Distribution-shift control at small batch, pre-1931 corpus.")
 
 # london at larger N, same bs256 anchor config: does ms hold as the corpus grows
-# when the corpus is far from pre-training? adamw only for now -- muon deadlocks
-# on london above 16k, see notes/muon32k_hang.md.
-for n_docs, tag in ((32000, "london32k"), (64000, "london64k")):
-    sweep(f"tune_adamw_{tag}_bs256",
-          selects_lr_for=f"plan_adam_{tag}_bs256",
-          lrs=[4e-4, 8e-4, 1.6e-3], priority=2, optimizer="adamw", n_docs=n_docs,
-          batch_size=256, grad_accum_steps=16,
-          notes="Distribution-shift N-scaling, pre-1931 corpus.")
+# when the corpus is far from pre-training?
+#
+# This was adamw-only, on the grounds that muon deadlocked on london above 16k.
+# It never did. The hang was a damaged datasets .map() cache file sitting beside
+# london_32k.hf and london_64k.hf -- pyarrow blocked memory-mapping it inside
+# attach_doc_ids_if_missing, for adamw and muon alike. Moving the caches aside
+# fixed both, and muon london 32k has since completed all three lrs. See
+# messages/2026-08-26-error-analysis-log.md; notes/muon32k_hang.md is superseded.
+for n_docs, tag in ((32000, "london32k"), (64000, "london64k"),
+                    (128000, "london128k")):
+    for opt in ("adamw", "muon"):
+        sweep(f"tune_{opt}_{tag}_bs256",
+              selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_{tag}_bs256",
+              lrs=[4e-4, 8e-4, 1.6e-3], priority=2, optimizer=opt, n_docs=n_docs,
+              batch_size=256, grad_accum_steps=16,
+              notes="Distribution-shift N-scaling, pre-1931 corpus.")
 
 # London sweep, measured 2026-08-26 on A40, nproc 2, evaluated on
 # london_heldout_4k.hf -- NOT the smollm2 heldout, which would select whichever lr
@@ -816,6 +824,19 @@ LONDON_HELDOUT = {
     # muon london 32k bs256: 8e-4 wins and wins INTERIOR, so no endpoint
     # extension is needed. Same winner as london 16k for both optimizers, so the
     # london lr optimum is stable across a doubling of the corpus.
+    # adamw london 32k bs256, measured 2026-08-26 alongside the muon arm. 8e-4
+    # wins INTERIOR here too, so BOTH optimizers pick 8e-4 at 32k and both picked
+    # 8e-4 at 16k. The london lr optimum does not move with corpus size over this
+    # range, which is worth knowing before spending a sweep at 64k.
+    #
+    # muon is very slightly ahead at every lr (3.7842 vs 3.7873 at the winner,
+    # 0.003 nats). That is far too small to call a difference, and it matches the
+    # 16k finding that the two optimizers are indistinguishable on this corpus --
+    # unlike the smollm2 grid, where they separate.
+    "tune_adamw_london32k_bs256_lr0.0004": 3.8029,
+    "tune_adamw_london32k_bs256_lr0.0008": 3.7873,
+    "tune_adamw_london32k_bs256_lr0.0016": 3.7893,
+    "tune_adamw_london64k_bs256_lr0.0004": 3.6737,
     "tune_muon_london32k_bs256_lr0.0004": 3.8005,
     "tune_muon_london32k_bs256_lr0.0008": 3.7842,
     "tune_muon_london32k_bs256_lr0.0016": 3.7915,
@@ -912,13 +933,27 @@ BS32_STEP_HELDOUT = {
 # splitting a loop and leaving those lines behind silently demotes every row it
 # covers back to "empty", which is what happened when the london loop was first
 # inserted here: 16 measured 32k/128k rows went empty in one rebuild.
+_heldout_matched = set()
 for _table in (BS32_STEP_HELDOUT, LONDON_HELDOUT):
     for _r in rows:
         _hl = _table.get(_r["run_id"])
         if _hl is not None:
+            _heldout_matched.add(_r["run_id"])
             _r["heldout_loss"] = _hl
             _r["status"] = "measured"
             _r["run_dir"] = f"/mnt/ssd-2/lucia/paper_runs/tuning/{_r['run_id']}_s42"
+
+# These tables UPDATE rows; they never create them. A key naming a run with no
+# sweep() row above matches nothing and its measurement is dropped without a
+# word. Four muon london values sat in this file for hours doing exactly that,
+# because the muon london 32k/64k sweeps had never been defined. Fail loudly.
+_heldout_keys = set(BS32_STEP_HELDOUT) | set(LONDON_HELDOUT)
+_heldout_orphans = sorted(_heldout_keys - _heldout_matched)
+if _heldout_orphans:
+    raise SystemExit(
+        "%d heldout result(s) name a run with no sweep() row, so they would be "
+        "silently dropped:\n  %s\nAdd the sweep, or remove the entry."
+        % (len(_heldout_orphans), "\n  ".join(_heldout_orphans)))
 
 def main():
     out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tuning.csv")
