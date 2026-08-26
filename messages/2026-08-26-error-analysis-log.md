@@ -351,3 +351,32 @@ deleted, so this is reversible if a cache turns out to matter.
 Lesson worth keeping: when a job hangs with no output and cannot be attached to,
 `faulthandler.dump_traceback_later` from inside beats every external tool. Three
 hours of hypothesis-testing produced nothing; the stack took one run.
+
+## 2026-08-26 plan_adam_eps1e17_64k_bs32 :: ekfac score :: iris-0 -- WATCHDOG FIRED
+
+    state    crashed -> relaunched with BERGSON_DIST_TIMEOUT_MIN=360
+    capture  log tail "Watchdog"; GPU 5 at 100%, GPU 4 at 0% at the time
+    status   CLOSED, but it revises the timeout guidance in #444
+
+The abort this row had been threatening actually fired. It launched before the
+DIST_TIMEOUT backport landed, so it still carried build.py's 30-minute value.
+
+The number that matters comes from its muon twin, which was still ALIVE in the
+same rank-0 section at **114 minutes**, GPU 3 at 100% and GPU 2 at 0%. So the
+rank-0 Hessian processing and save on a 64k row takes over 110 minutes.
+
+That means the 1-hour default I proposed in EleutherAI/bergson#444 is **too
+small** for this workload -- it would abort exactly these runs. The env override
+is doing the real work here; relaunched with BERGSON_DIST_TIMEOUT_MIN=360 and it
+is running, both GPUs at ~100%.
+
+Worth stating plainly: a timeout is not a fix, it is a ceiling, and I picked the
+ceiling before I had a measurement of what it needs to clear. The measurement now
+exists and says 2 h minimum for 64k, more for anything larger. The asymmetry
+itself -- rank 0 working while every other rank blocks in all_reduce -- is what
+should be removed, by doing the all_reduce before teardown or sharding the
+Hessian save.
+
+Reminder for the health scripts: the muon twin at 114 minutes reads STALE to
+check_runs.py and would read hung to hung_check.py. One rank at 100% with the
+rest at 0% is healthy rank-0 work. Check per-GPU utilisation before acting.
