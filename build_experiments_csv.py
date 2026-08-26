@@ -368,6 +368,37 @@ BANK_RESULTS = {
         notes="gpt2-medium at bs32, 1000 steps, lr 5e-05, world size 4 on A100 "
               "(lotus-0/maria-1). ms 0.7402 measured with fd_step 0.1, seed 0, "
               "total_movement_l1 68137.34."),
+    # FIRST COMPLETED 2000-STEP BANK. 100/100 subsets, built by shards and merged
+    # with scripts/merge_bank.py, scored against the row's own EK-FAC scores.
+    #
+    # 0.4146 [0.3719, 0.4541] sits inside the 0.404-0.473 band every other EK-FAC
+    # row occupies, so EK-FAC flatness now extends to 2000 steps instead of
+    # breaking there. notes/ekfac_floor.md stays open.
+    #
+    # I reported 0.1085 for this row from a 92/100 bank and it was wrong -- not
+    # because the partial data was corrupt, but because dropping those same 8
+    # subsets from the FINISHED file reproduces 0.1085 exactly. Eight subsets in a
+    # hundred move this estimate from 0.11 to 0.41, and the 92-subset interval
+    # [0.0476, 0.1655] was tight enough to look trustworthy. A partial bank is not
+    # a noisy version of the finished one; it can be precisely wrong. See
+    # notes/ekfac_2000step_collapse.md.
+    #
+    # MAGIC for this row is still scoring, so magic_lds stays empty.
+    "plan_adam_eps1e17_32k_bs32": dict(
+        ekfac_lds=0.4146, ekfac_ci_lo=0.3719, ekfac_ci_hi=0.4541,
+        n_subsets=100, n_queries=20,
+        reusable="bank+scores",
+        run_dir="/mnt/ssd-1/lucia/paper_runs/experiments/plan_adam_eps1e17_32k_bs32",
+        bank_dir="/mnt/ssd-1/lucia/paper_runs/experiments/plan_adam_eps1e17_32k_bs32/bank_from_filter",
+        notes="Token axis at 2000 steps, bs32, 32k docs, 2 epochs. WORLD SIZE 2, "
+              "NVIDIA A40 -- base build on secret-ord-0 with shards on allium-0, "
+              "bellflower-0, lucia-ord-0 and shared-ord-0, all A40, so the bank is "
+              "hardware-homogeneous under D17. Bank built via validate with "
+              "method: lds and save_models: true against existing EK-FAC scores, "
+              "which skips the unshardable MAGIC scoring stage. 100 subsets, 20/20 "
+              "queries. THE FIRST LDS ABOVE 250 STEPS: 0.4146 [0.3719, 0.4541], "
+              "indistinguishable from the 16k and 32k bs256 rows (0.4127-0.4730). "
+              "EK-FAC does not degrade with step count over this range."),
     "gpt2medium_64k_bs32": dict(
         status="planned",
         metasmoothness=0.8580,

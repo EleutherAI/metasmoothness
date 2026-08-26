@@ -51,13 +51,23 @@ def run_root(rid):
 
 def per_query_lds(root):
     """One Spearman per query, over subsets. None if the bank is unscoreable."""
-    try:
-        csv_path = merge_slices(root)
-        _, _, _, per_q, _ = magic_lds(csv_path, n_boot=1, seed=0)
-        return per_q
-    except Exception as e:                                  # noqa: BLE001
-        print(f"  {root.name}: cannot score ({type(e).__name__})", file=sys.stderr)
-        return None
+    # A bank built through validate(method=lds) lives in <run>/bank_from_filter,
+    # not at the run root. Try both, nearest first. Without this the 2000-step
+    # rows -- the only ones above 250 steps -- were dropped as unscoreable.
+    last = None
+    for cand in (root, root / "bank_from_filter"):
+        if not cand.is_dir():
+            continue
+        try:
+            pre = cand / "validation_merged.csv"
+            csv_path = pre if pre.is_file() else merge_slices(cand)
+            _, _, _, per_q, _ = magic_lds(csv_path, n_boot=1, seed=0)
+            return per_q
+        except Exception as e:                              # noqa: BLE001
+            last = e
+    print(f"  {root.name}: cannot score ({type(last).__name__ if last else 'no bank'})",
+          file=sys.stderr)
+    return None
 
 
 def collect(src):
