@@ -65,6 +65,28 @@ HELDOUT = {
 MS = {
     "london16k_bs256_adamw": 0.9867,
     "london16k_bs256_muon": 0.8547,
+    # bs16 measured 2026-08-26. These invert the bs256 ordering, which is the
+    # most surprising thing the arm has produced so far:
+    #
+    #                  adamw    muon
+    #   london  bs16   0.9058   0.9640
+    #   london  bs256  0.9867   0.8547
+    #   smollm2 bs16   0.9133   0.9939
+    #   smollm2 bs256  0.9930   0.9963
+    #
+    # On smollm2 both optimizers prefer the LARGER batch (adamw 0.9133 -> 0.9930,
+    # muon 0.9939 -> 0.9963). On london adamw does the same (0.9058 -> 0.9867)
+    # but muon goes the OTHER WAY, 0.9640 down to 0.8547.
+    #
+    # So the 0.13 optimizer gap at bs256 is not a plain corpus effect. At bs16
+    # london and smollm2 look alike for both optimizers; the gap only opens at
+    # large batch, and only for muon. That is a corpus x optimizer x batch
+    # interaction, not "london is harder".
+    #
+    # Treat london16k_bs256_muon at 0.8547 as the value to re-check first: it is
+    # the single outlier carrying the whole story, and it is one measurement.
+    "london16k_bs16_adamw": 0.9058,
+    "london16k_bs16_muon": 0.9640,
 }
 
 rows = []

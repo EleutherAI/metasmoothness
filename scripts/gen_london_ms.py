@@ -43,6 +43,10 @@ PLAN = [
     (32000, "adamw", 8e-4), (32000, "muon", 8e-4),
     (64000, "adamw", 1.6e-3), (64000, "muon", 1.6e-3),
     (128000, "adamw", 1.6e-3), (128000, "muon", 1.6e-3),
+    # bs16 at 16k: 2000 steps, the sharp probe. Batch is the axis that moves ms
+    # hardest on smollm2 -- 0.9930 at bs256 down to 0.9133 at bs16 -- so if the
+    # corpus matters this is where it should show most. lr 2e-4, interior winner.
+    (16000, "adamw", 2e-4, 16), (16000, "muon", 2e-4, 16),
 ]
 
 base = yaml.safe_load(open(TEMPLATE))
@@ -66,8 +70,10 @@ def setk(node, key, value):
 
 
 written = []
-for n, opt, lr in PLAN:
-    tag = "london%dk_bs256_%s" % (n // 1000, opt)
+for entry in PLAN:
+    n, opt, lr = entry[0], entry[1], entry[2]
+    bs = entry[3] if len(entry) > 3 else 256
+    tag = "london%dk_bs%d_%s" % (n // 1000, bs, opt)
     root = os.path.join(EXP, tag)
     data = "%s/london_%dk.hf" % (MIRROR, n // 1000)
     if not os.path.isdir(data):
@@ -78,6 +84,11 @@ for n, opt, lr in PLAN:
     assert setk(cfg, "dataset", data), "no dataset key in template"
     assert setk(cfg, "optimizer", opt), "no optimizer key in template"
     assert setk(cfg, "lr", lr), "no lr key in template"
+    if bs != 256:
+        # grad_accum has to move with batch or the effective batch is wrong; the
+        # template is bs256 with accum 16 over world size 2, i.e. 8 per step.
+        setk(cfg, "batch_size", bs)
+        setk(cfg, "grad_accum_steps", max(1, bs // (16 * 2)))
     ms_path = os.path.join(root, "ms")
     setk(cfg, "run_path", ms_path)
     cfg["run_path"] = ms_path
@@ -89,6 +100,15 @@ for n, opt, lr in PLAN:
     if os.path.isfile(os.path.join(ms_path, "metasmoothness.json")):
         print("  %-30s already has a result, skipping" % tag)
         continue
+    # A run in flight has a config it already loaded; rewriting it is harmless
+    # now but leaves the on-disk config disagreeing with what actually ran, which
+    # is exactly the kind of drift that makes a result unreproducible later.
+    if os.path.isfile(os.path.join(root, "ms.log")) and not os.path.isfile(out + ".bak"):
+        age = os.path.getmtime(os.path.join(root, "ms.log"))
+        import time
+        if time.time() - age < 3600:
+            print("  %-30s log active in the last hour, leaving config alone" % tag)
+            continue
     os.makedirs(root, exist_ok=True)
     with open(out, "w") as f:
         yaml.safe_dump(cfg, f, sort_keys=False)
