@@ -108,8 +108,14 @@ MS = {
     "london16k_bs256_muon": 0.9321,
     "london16k_bs16_adamw": 0.9058,
     "london16k_bs16_muon": 0.9640,
-    "london32k_bs256_adamw": 0.9732,
-    "london32k_bs256_muon": 0.9536,
+    "london32k_bs256_adamw": 0.9712,
+    # 32k muon over THREE directions: 0.9536 0.9623 0.9699, sd 0.0082.
+    # That is tight. The 16k cell had sd 0.0721 with two of six directions
+    # collapsing; at 32k nothing collapses in three draws. So the bimodality is a
+    # 16k phenomenon, not a property of muon-on-london generally, and the 32k
+    # values can be read as ordinary measurements.
+    # adamw at 32k: 0.9732 0.9692, sd 0.0028.
+    "london32k_bs256_muon": 0.9619,
     # 64k, and ms falls off a cliff:
     #
     #   london  16k  adamw 0.9867  muon ~0.986   lr 8e-4

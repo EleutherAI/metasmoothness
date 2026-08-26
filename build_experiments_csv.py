@@ -441,6 +441,23 @@ BANK_RESULTS = {
     # 16k->32k->64k moved by less than 0.007 in total. One point is not a trend,
     # and the muon twin plus 256k and 512k are running, but it is the first sign
     # that ms is not simply flat in N.
+    # ms at N=256,000, 16000 steps. The ladder now reads:
+    #
+    #   16k 0.9800   32k 0.9866   64k 0.9869   128k 0.9741   256k 0.9637
+    #
+    # ms rises slightly to 64k and then declines steadily: -0.013 to 128k, a
+    # further -0.010 to 256k. It stays high in absolute terms -- 0.96 is nowhere
+    # near a collapse -- but it is no longer flat, and the decline is monotone
+    # over the last three points rather than noise. Extrapolating that slope
+    # naively puts N=1M near 0.94, still high.
+    "plan_adam_eps1e17_256k_bs32": dict(
+        status="planned",
+        metasmoothness=0.9637,
+        run_dir="/mnt/ssd-1/lucia/paper_runs/experiments/plan_adam_eps1e17_256k_bs32",
+        notes="ms 0.9637260437011719, fd_step 0.1, direction_seed 0, world size 2 "
+              "on A40. 256k docs, bs32, 16000 steps, lr 5e-05. Training probe "
+              "only, no bank -- a 100-model bank at this size is out of reach, "
+              "which is why ms is the only measure that reaches here."),
     "plan_adam_eps1e17_128k_bs32": dict(
         status="planned",
         metasmoothness=0.9741,
