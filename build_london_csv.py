@@ -165,8 +165,22 @@ MS = {
     # Recording the TUNED-lr values as the headline, since those are the
     # configurations the rest of the grid uses, with the lr8e-4 controls beside
     # them. Both are real measurements of different things.
-    "london64k_bs256_adamw": 0.7000,
-    "london64k_bs256_muon": 0.4434,
+    # 64k, now measured over MULTIPLE DIRECTIONS, and the collapse is uniform:
+    #
+    #   adamw  0.7000 0.6589 0.6642                 mean 0.6744  sd 0.0225
+    #   muon   0.4434 0.4468 0.4643 0.4497 0.4332   mean 0.4478  sd 0.0113
+    #
+    # Tight. No bimodality, nothing like the 16k muon cell where two of six
+    # directions collapsed and the rest did not. So this is NOT a probe artifact:
+    # at its tuned learning rate, london 64k genuinely has ms 0.67 / 0.45.
+    #
+    # And it is mostly the learning rate. At lr 8e-4 (what 32k used) the same 64k
+    # corpus reads adamw 0.9302 and muon 0.8692. So the 1.6e-3 the sweep chose by
+    # held-out loss costs roughly 0.26 of ms for adamw and 0.42 for muon.
+    #
+    # Recording the means over directions.
+    "london64k_bs256_adamw": 0.6744,
+    "london64k_bs256_muon": 0.4475,
 }
 # ms at the 32k learning rate, holding lr fixed across N. Not part of the main
 # table -- these are the control arm for the lr confound above.
