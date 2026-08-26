@@ -305,3 +305,49 @@ Two real bugs found on the way, neither of which was the hang:
 Workaround to try before touching bergson: the assertion text suggests a
 different token batch size. That is one config change and would unblock the
 london ablation at 32k/64k without waiting on an upstream fix.
+
+## 2026-08-26 london 32k/64k hang :: SOLVED -- damaged datasets .map() cache
+
+    status   CLOSED. Six london tuning runs now training, muon included.
+
+Got a stack by scheduling faulthandler from inside the process
+(`faulthandler.dump_traceback_later(60, repeat=True)`), which needs no ptrace and
+works where py-spy is refused:
+
+    bergson/magic/cli.py:288  attach_doc_ids_if_missing
+      datasets/arrow_dataset.py:3580  map
+        :3469  load_processed_shard_from_cache
+          datasets/table.py:120  _memory_mapped_arrow_table_from_file
+            pyarrow/ipc.py:52  __init__          <- blocked here, forever
+
+`.map()` finds a `cache-*.arrow` beside the dataset and blocks memory-mapping it.
+Moving the three cache files out of `london_32k.hf` and rerunning the identical
+config: training, 16/250 steps, GPU 100%. Same for 64k.
+
+Note the step count -- 250, not the 125 the 16k runs show -- confirming it is
+using all 32000 documents rather than silently falling back.
+
+**Correcting my earlier entry**, which said the trigger was dataset SIZE and
+pointed at bin-packing. Both parts were wrong:
+
+  * the bin-packer is fine. Called directly on 32000 uniform-512 docs it returns
+    125 batches in 0.01 s. Uniform lengths are not the problem.
+  * size was a proxy. london_16k also has cache files and works, so it is not
+    "caches are bad" -- these particular files are damaged.
+
+Why they were damaged is the ugly part: every hung london run was eventually
+killed, and a killed `.map()` leaves a partially written cache. The next run
+memory-maps it, blocks, gets killed, and the state persists. It was
+self-perpetuating, which is why it survived ten hours and several relaunches.
+
+Also refuted along the way, each with a test rather than an argument: buffering
+(empty log with -u), world size (hangs at nproc 1), the run directory (hangs
+clean), thread pools (hangs with TOKENIZERS_PARALLELISM=false, OMP/RAYON/MKL=1),
+and the GPU or node (full 32k hangs on the same GPU where a 16k slice trained).
+
+Caches moved to `/mnt/ssd-2/lucia/datasets_local/_stale_caches_aug26/` rather than
+deleted, so this is reversible if a cache turns out to matter.
+
+Lesson worth keeping: when a job hangs with no output and cannot be attached to,
+`faulthandler.dump_traceback_later` from inside beats every external tool. Three
+hours of hypothesis-testing produced nothing; the stack took one run.
