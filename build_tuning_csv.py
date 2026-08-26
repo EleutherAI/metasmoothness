@@ -796,6 +796,22 @@ for n_docs, tag in ((32000, "london32k"), (64000, "london64k"),
               batch_size=256, grad_accum_steps=16,
               notes="Distribution-shift N-scaling, pre-1931 corpus.")
 
+# Upward extension at 64k and 128k. Both optimizers won the HIGH endpoint (1.6e-3)
+# at 64k, and adamw did the same at 128k, so the grid has to go up. This is the
+# same endpoint-extension rule the smollm2 sweeps follow.
+#
+# Note what this says: the london lr optimum is 8e-4 at 16k AND 32k, then climbs
+# to at least 1.6e-3 by 64k. It is flat and then it moves, so a two-point read at
+# 16k/32k was not enough to call it stable.
+for n_docs, tag in ((64000, "london64k"), (128000, "london128k")):
+    for opt in ("adamw", "muon"):
+        sweep(f"tune_{opt}_{tag}_bs256",
+              selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_{tag}_bs256",
+              lrs=[3.2e-3, 6.4e-3], priority=2, optimizer=opt, n_docs=n_docs,
+              batch_size=256, grad_accum_steps=16,
+              notes="Endpoint extension: 1.6e-3 won the high end of the grid.")
+
+
 # London sweep, measured 2026-08-26 on A40, nproc 2, evaluated on
 # london_heldout_4k.hf -- NOT the smollm2 heldout, which would select whichever lr
 # best fits the wrong distribution. The held-out set is packed from source rows
@@ -826,8 +842,14 @@ LONDON_HELDOUT = {
     # london lr optimum is stable across a doubling of the corpus.
     # adamw london 32k bs256, measured 2026-08-26 alongside the muon arm. 8e-4
     # wins INTERIOR here too, so BOTH optimizers pick 8e-4 at 32k and both picked
-    # 8e-4 at 16k. The london lr optimum does not move with corpus size over this
-    # range, which is worth knowing before spending a sweep at 64k.
+    # 8e-4 at 16k.
+    #
+    # CORRECTION: I read that as "the london lr optimum does not move with corpus
+    # size". The 64k sweep, finished hours later, says otherwise -- both arms win
+    # the HIGH endpoint at 1.6e-3 there, and adamw london 128k also wants 1.6e-3
+    # or above. So the optimum is flat from 16k to 32k and then climbs. Two
+    # points were not enough to call it, and the claim should not have been made
+    # from them.
     #
     # muon is very slightly ahead at every lr (3.7842 vs 3.7873 at the winner,
     # 0.003 nats). That is far too small to call a difference, and it matches the
@@ -837,6 +859,10 @@ LONDON_HELDOUT = {
     "tune_adamw_london32k_bs256_lr0.0008": 3.7873,
     "tune_adamw_london32k_bs256_lr0.0016": 3.7893,
     "tune_adamw_london64k_bs256_lr0.0004": 3.6737,
+    "tune_adamw_london64k_bs256_lr0.0008": 3.6328,
+    "tune_adamw_london64k_bs256_lr0.0016": 3.6099,
+    "tune_muon_london64k_bs256_lr0.0008": 3.6202,
+    "tune_muon_london64k_bs256_lr0.0016": 3.5993,
     "tune_muon_london32k_bs256_lr0.0004": 3.8005,
     "tune_muon_london32k_bs256_lr0.0008": 3.7842,
     "tune_muon_london32k_bs256_lr0.0016": 3.7915,
