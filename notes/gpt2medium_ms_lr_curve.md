@@ -91,3 +91,33 @@ For the tuning discussion: the ms-optimal lr for gpt2-medium is at least eight
 times smaller than the loss-tuned 1e-4, and that gap WIDENS with batch. A grid
 that picks lr by held-out loss and then reports ms is reporting a configuration
 selected against the property it is measuring.
+
+
+## CORRECTION: the batch lever is not weak, it needed to go bigger
+
+At lr 2.5e-5, holding 125 steps and scaling data with batch:
+
+    bs256  / 16k    0.9074
+    bs512  / 32k    0.9136    +0.006
+    bs1024 / 64k    0.9466    +0.033
+
+I concluded from the first two points that "the batch lever is worth +0.006, not
+the 0.07 needed" and that gpt2-medium likely could not reach 0.98. That was wrong,
+and wrong in a specific way: I read a two-point slope as if it were the whole
+curve. The lever accelerates -- the second doubling is five times the first.
+
+Best configuration now: bs1024, 64k docs, lr 2.5e-5, 125 steps, ms 0.9466.
+0.033 short of 0.98, with the last doubling worth 0.033.
+
+The lr axis also has room. At bs512, ms was still climbing as lr fell (1.25e-5
+gave 0.9186 against 0.9136 at 2.5e-5), and the ms-optimal lr keeps dropping as
+batch rises. bs1024 has only been measured at 2.5e-5.
+
+Running a (batch, lr) grid to find the corner:
+
+    bs1024 / 64k    lr 1.25e-5, 6.25e-6
+    bs2048 / 128k   lr 2.5e-5, 1.25e-5
+
+If the doubling keeps paying and the lr optimum keeps falling, 0.98 is reachable
+at bs2048 with a small learning rate -- at 125 steps, which is the constraint
+Lucia set, with data scaled to match as she allowed.
