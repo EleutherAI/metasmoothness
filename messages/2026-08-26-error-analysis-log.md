@@ -260,3 +260,48 @@ hang every time so far.
 `scripts/gen_bank.py` now rewrites dataset paths to the mirror, which
 gen_filter.py and gen_ms.py already did. Any config still naming a
 bergson-damping path under ssd-1 is a latent instance of this.
+
+## 2026-08-26 london 32k hang :: ROOT CAUSED -- uniform token lengths at >=32k docs
+
+    status   was OPEN, now localised to allocate_batches
+
+Bisected it. Four tests, each changing one variable against the same config:
+
+    nproc 2, stale run dir     hangs        (130 thr, wait_woken, CPU frozen)
+    nproc 1, stale run dir     FAILS FAST   PermissionError in shutil rmtree
+    nproc 1, clean run dir     hangs        same signature
+    nproc 1, london_16k        TRAINS       125 steps, GPU 100%
+    nproc 1, 16k SLICE of london_32k   TRAINS
+
+The last two are the answer. A 16000-row slice **of london_32k itself** trains
+fine, so the file is not corrupt and the corpus is not the problem. **It is the
+size.** 32000 rows hangs; 16000 rows from the same file does not.
+
+Why london and not smollm2 at the same 32k: every london row is exactly 512
+tokens. distinct_lengths=1 for london_16k, _32k and _64k alike. bergson packs
+batches by bin-packing on length, and `data.py` carries this assertion text:
+
+    "Could not construct a number of batches divisible by the world size. If
+     variability of item lengths in your dataset is low consider using a
+     different dataset size or token batch size."
+
+Zero variability is the degenerate case that warning describes, and it only
+bites once there are enough items. smollm2 rows have varied lengths, which is
+why 32k works there and not here.
+
+Note the size threshold is between 16k and 32k and has not been pinned exactly;
+a bisect at 20k/24k/28k would do it, using .select() on the existing file.
+
+Two real bugs found on the way, neither of which was the hang:
+
+  * bergson rmtrees run_path at startup, and with the uid split a run dir created
+    by uid 1001 cannot be wiped by uid 1000 -- PermissionError on config.yaml.
+    At nproc 1 this surfaces as a clean crash; at nproc 2 it does not propagate
+    and the ranks deadlock instead, which is a second way to get the same
+    zero-byte-log symptom. All 13 stale london run dirs were removed.
+  * the run dirs are created with no group write (umask 022), which is what makes
+    the cross-uid wipe fail. umask 002 for run dirs would prevent it.
+
+Workaround to try before touching bergson: the assertion text suggests a
+different token batch size. That is one config change and would unblock the
+london ablation at 32k/64k without waiting on an upstream fix.
