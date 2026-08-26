@@ -416,3 +416,36 @@ once CephFS caught up. Do not conclude a reclaim failed from an immediate df.
 Follow-up: 60 GB is not much headroom, and 326 GB is still held by the five banks
 already verified on the Hub. `publish_bank.py --delete-local` exists precisely for
 that and is Lucia's call, not mine.
+
+## 2026-08-26 muon london128k "unexplained hang" :: SOLVED -- it was the wrong-corpus config
+
+    status   CLOSED. Corrects the previous entry, which called it unexplained.
+
+I recorded this as a fourth, mysterious hang signature: three muon london128k
+runs parked in `ceph_mdsc_wait_request` with frozen CPU, on two different nodes,
+surviving a cache restore, while `.map()` on london_128k completed in 2.9 s
+standalone and writes ran at 832 MB/s.
+
+It was not mysterious and it was not a fourth signature. Those runs were using
+the configs gen_tuning_run.py had generated with the WRONG corpus:
+
+    dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_128k.hf
+
+which is the ssd-1 path already documented in this log as stalling -- `ls -d` on
+it times out, and a bank build hung there earlier the same day with
+wchan=walk_component. The stack confirmed it: `data.py:459 load_data_string` ->
+`Path.is_dir()` -> `stat()`, blocked on that path.
+
+So it is the SAME ssd-1 stall, reached through a different call. Correcting the
+corpus fixed the hang as a side effect: the same three runs now train at 100% GPU
+on london_128k.
+
+Two lessons, and the second is the one I keep relearning:
+
+  * every ssd-1 bergson-damping reference is a latent hang. gen_bank.py rewrites
+    to the ssd-2 mirror; gen_tuning_run.py now resolves london to
+    datasets_local. Anything else still naming that path will stall.
+  * I called it "genuinely unexplained" while holding a stack that named the
+    path. The stack said stat() on a path; I had already established that path
+    stalls; I did not connect them because I was looking for a NEW cause. Read
+    the evidence already collected before reaching for a new hypothesis.
