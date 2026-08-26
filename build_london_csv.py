@@ -139,8 +139,40 @@ MS = {
     # loss and apparently a terrible one for ms, which means "tune on loss, then
     # measure ms" can select configurations that are bad for the thing being
     # studied.
+    # 64k. The lr controls have landed and they decompose the cliff.
+    #
+    #                        lr 1.6e-3 (tuned)   lr 8e-4 (the 32k lr)
+    #   london 64k adamw          0.7000               0.9302
+    #   london 64k muon           0.4434               0.8692
+    #
+    # Dropping the lr recovers 0.23 of ms for adamw and 0.43 for muon. So most of
+    # the apparent collapse at 64k is the LEARNING RATE, not the corpus at scale.
+    #
+    # But not all of it. At the SAME lr of 8e-4, comparing 32k to 64k:
+    #
+    #   adamw   0.9712 -> 0.9302   -0.041
+    #   muon    0.9619 -> 0.8692   -0.093
+    #
+    # So there is a genuine N effect on london at fixed lr, roughly twice as
+    # large for muon, on top of a much larger lr effect.
+    #
+    # THE CONFOUND IS IN THE LADDER ITSELF. london 16k and 32k were tuned to 8e-4
+    # and 64k and 128k to 1.6e-3, so "ms versus N" on this arm silently mixes an
+    # lr change into every step past 32k. The same is true of the smollm2 ladder,
+    # where the tuned lr also moves with N. Any ms-versus-N claim from either
+    # table needs the lr held fixed or the effect is not identified.
+    #
+    # Recording the TUNED-lr values as the headline, since those are the
+    # configurations the rest of the grid uses, with the lr8e-4 controls beside
+    # them. Both are real measurements of different things.
     "london64k_bs256_adamw": 0.7000,
     "london64k_bs256_muon": 0.4434,
+}
+# ms at the 32k learning rate, holding lr fixed across N. Not part of the main
+# table -- these are the control arm for the lr confound above.
+MS_LR8E4 = {
+    "london64k_bs256_adamw_lr8e-4": 0.9302,
+    "london64k_bs256_muon_lr8e-4": 0.8692,
 }
 
 rows = []
