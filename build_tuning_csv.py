@@ -808,6 +808,20 @@ for n_docs, tag in ((32000, "london32k"), (64000, "london64k")):
 # being under-tuned for this corpus rather than the corpus failing to shift the
 # distribution. The extension settles it.
 LONDON_HELDOUT = {
+    # First london results ABOVE 16k, measured 2026-08-26 against
+    # london_heldout_4k (4000 docs x 512 tok). These exist only because the
+    # stale datasets .map() cache was the hang -- every 32k/64k london run had
+    # failed to start until the cache files were moved aside.
+    #
+    # muon london 32k bs256: 8e-4 wins and wins INTERIOR, so no endpoint
+    # extension is needed. Same winner as london 16k for both optimizers, so the
+    # london lr optimum is stable across a doubling of the corpus.
+    "tune_muon_london32k_bs256_lr0.0004": 3.8005,
+    "tune_muon_london32k_bs256_lr0.0008": 3.7842,
+    "tune_muon_london32k_bs256_lr0.0016": 3.7915,
+    # muon london 64k bs256, first point only -- 8e-4 and 1.6e-3 are still
+    # training, so this is NOT yet a winner, just the one measurement.
+    "tune_muon_london64k_bs256_lr0.0004": 3.6616,
     "tune_adamw_london16k_bs256_lr0.0001": 3.8821,
     "tune_adamw_london16k_bs256_lr0.0002": 3.8641,
     "tune_adamw_london16k_bs256_lr0.0004": 3.8471,
