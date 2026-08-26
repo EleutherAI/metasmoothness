@@ -1,61 +1,41 @@
-# How much of an ms value is the direction it was probed along?
+# ms direction variance: smollm2 is stable, london+muon is not
 
-Every metasmoothness value in experiments.csv and london.csv was measured at
-`direction_seed 0`. ms perturbs the data weights along ONE random direction v and
-scores the agreement of three trainings at weights 1, 1+h*v and 1+2h*v. So a
-single ms number confounds two things: how smooth the configuration actually is,
-and which v happened to be drawn.
+Follow-up to notes/ms_direction_seed_variance.md, with the control arm in.
 
-Nothing measured so far separates them. That is tolerable while ms values are
-being compared coarsely -- 0.99 against 0.91 is unlikely to be a direction
-artifact -- and it is not tolerable for the one comparison the london arm now
-rests on.
+## Measured
 
-## The number under test
+    smollm2 muon 16k bs256    seed 0  0.99636   seed 1  0.99660   seed 2  0.99672
+    smollm2 adamw 16k bs256   seed 0  0.99304   seed 1  0.99425
+    london  adamw 16k bs256   seed 0  0.98670   seed 1  0.98274
+    london  muon  16k bs256   seed 0  0.85470   seed 1  0.98580   seed 2  0.98900
 
-    london16k_bs256_muon = 0.8547
+Spreads: 0.0004, 0.0012, 0.0040, **0.1343**.
 
-It is the only cell in the london/smollm2 x adamw/muon x bs16/bs256 table that
-breaks the pattern:
+## What this settles, and what it un-settles
 
-                     adamw    muon
-    london  bs16     0.9058   0.9640
-    london  bs256    0.9867   0.8547     <-- this one
-    smollm2 bs16     0.9133   0.9939
-    smollm2 bs256    0.9930   0.9964
+ms is NOT generally direction-noisy. smollm2 reproduces to four decimal places
+across three independent directions, which is better than I expected and means
+the ms column in experiments.csv can be read at the second decimal after all.
+That was the outcome I most needed to rule out, and it is ruled out.
 
-Both corpora look alike at bs16. Both optimizers prefer the larger batch on
-smollm2, and adamw does on london too. Only london muon reverses. The reading
-that "the corpus was hiding an optimizer difference" is carried entirely by that
-single value, drawn from a single v.
+So the earlier retraction was too broad. I withdrew the london result entirely on
+the grounds that 0.8547 was "a direction artifact". It is an artifact in the
+sense that the mean is ~0.987 and quoting 0.8547 as THE ms of that run was wrong.
+It is not noise in the sense of "ms is unreliable" -- the same probe on smollm2
+is stable to 0.0004, and london adamw to 0.0040.
 
-## The design
+The variance itself is the finding. london+muon has a direction along which
+training smoothness collapses to 0.855 while other directions read 0.986+.
+Nothing else measured behaves that way. That is a sharper claim than either the
+original headline (a lower mean) or the flat retraction (nothing to see).
 
-Six probes, a 2x2 of corpus x optimizer with multiple directions each:
+## Caveat that keeps this honest
 
-    london16k_bs256_muon_seed1, _seed2       london muon, v=1 and v=2
-    london16k_bs256_adamw_seed1              london adamw, v=1
-    sm_muon_eps1e17_16k_bs256_seed1, _seed2  smollm2 muon, v=1 and v=2
-    sm_adamw_eps1e17_16k_bs256_seed1         smollm2 adamw, v=1
+0.8547 is one draw in three. It could be a rare tail rather than a second mode,
+and three points cannot distinguish those. Seeds 3, 4 and 5 are running on london
+muon, plus seed 3 on smollm2 muon as a continued control. Six directions will say
+whether roughly one in three collapses, or whether seed 0 was a one-off.
 
-Only `direction_seed` and `run_path` differ from the seed-0 runs. Same data, lr,
-optimizer, batch, fd_step 0.1, world size 2 -- anything else moving would make
-the comparison meaningless. scripts/gen_ms_seeds.py enforces that by copying the
-finished run's own ms.yaml rather than regenerating one.
-
-The smollm2 arm is not optional. Measuring london's spread without knowing the
-normal spread would answer nothing, which is what the first three probes alone
-would have done.
-
-## How to read the outcome
-
-  * smollm2 muon also swings ~0.1 -> ms is direction-noisy at this setting;
-    0.8547 says nothing about the corpus, and the ms column generally should not
-    be trusted to the second decimal
-  * smollm2 stable, london muon not -> the corpus genuinely makes muon's
-    smoothness direction-dependent, which is a sharper claim than the one it
-    replaces
-  * both stable -> 0.8547 stands and the 0.13 optimizer gap on london is real
-
-Whatever comes back, this is also the first evidence about how much any single ms
-value in the grid should be trusted, since all of them share seed 0.
+If it recurs, the interesting question is what that direction is -- a perturbation
+that muon on this corpus responds to discontinuously is worth identifying, and
+total_movement_l1 is already recorded per run as a first place to look.
