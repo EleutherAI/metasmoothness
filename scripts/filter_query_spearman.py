@@ -115,8 +115,14 @@ for root in ROOTS:
             rows.append({"run": run, "scorer": src, "status": "scores missing: %s" % sdir})
             continue
         pq = list(csv.DictReader(open(prop)))
+        # The random control's per-query mean loss change, from the same bank.
+        summ_p = os.path.join(d, "filter_summary.csv")
+        rnd = {}
+        if os.path.isfile(summ_p):
+            for r in csv.DictReader(open(summ_p)):
+                rnd[int(r["query"])] = float(r["random_mean"])
         k = int(round(frac * S.shape[0]))
-        xs, ys, bad = [], [], 0
+        xs, ys, zs, bad = [], [], [], 0
         for r in pq:
             q = int(r["query"])
             if q >= S.shape[1]:
@@ -126,17 +132,25 @@ for root in ROOTS:
             top = np.partition(S[:, q], -k)[-k:]
             xs.append(float(top.sum()))
             ys.append(float(r["loss_change"]))
+            zs.append(rnd.get(q, float("nan")))
             if int(r["n_removed"]) != k:
                 bad += 1
         if len(xs) < 3:
             rows.append({"run": run, "scorer": src, "status": "too few queries"})
             continue
         rho, lo, hi = boot_spearman(np.array(xs), np.array(ys))
+        za = np.array(zs)
+        if np.all(np.isfinite(za)):
+            rho_r = spearmanr(np.array(xs), za).statistic
+            rho_r = "%.4f" % rho_r if np.isfinite(rho_r) else ""
+        else:
+            rho_r = ""
         rows.append({"run": run, "scorer": src, "n_queries": len(xs), "k_removed": k,
                      "rho": "%.4f" % rho, "lo": "%.4f" % lo, "hi": "%.4f" % hi,
+                     "rho_random": rho_r,
                      "status": ("n_removed mismatch on %d queries" % bad) if bad else "ok"})
 
-cols = ["run", "scorer", "n_queries", "k_removed", "rho", "lo", "hi", "status"]
+cols = ["run", "scorer", "n_queries", "k_removed", "rho", "lo", "hi", "rho_random", "status"]
 os.makedirs(os.path.dirname(OUT), exist_ok=True)
 with open(OUT, "w", newline="") as f:
     w = csv.DictWriter(f, fieldnames=cols)
@@ -144,11 +158,13 @@ with open(OUT, "w", newline="") as f:
     for r in rows:
         w.writerow({c: r.get(c, "") for c in cols})
 
-print("%-40s %-6s %3s %8s %18s  %s" % ("run", "scorer", "n", "rho", "95% CI", "status"))
+print("%-40s %-6s %3s %8s %18s %8s  %s"
+      % ("run", "scorer", "n", "rho", "95% CI", "rho_rand", "status"))
 for r in sorted(rows, key=lambda r: (r["scorer"], r["run"])):
     if "rho" in r:
-        print("%-40s %-6s %3d %8s [%7s,%7s]  %s" % (
-            r["run"], r["scorer"], r["n_queries"], r["rho"], r["lo"], r["hi"], r["status"]))
+        print("%-40s %-6s %3d %8s [%7s,%7s] %8s  %s" % (
+            r["run"], r["scorer"], r["n_queries"], r["rho"], r["lo"], r["hi"],
+            r.get("rho_random", ""), r["status"]))
     else:
         print("%-40s %-6s %3s %8s %18s  %s" % (
             r["run"], r["scorer"], "", "", "", r["status"]))
@@ -160,4 +176,10 @@ for sc in ("magic", "ekfac"):
         print("\n%s: %d runs, median rho %+.3f, mean %+.3f, %d/%d positive"
               % (sc, len(v), float(np.median(v)), float(np.mean(v)),
                  sum(1 for x in v if x > 0), len(v)))
+        c = [float(r["rho_random"]) for r in fin
+             if r["scorer"] == sc and r.get("rho_random")]
+        if c:
+            print("%s: CONTROL vs random removal -- median %+.3f, %d/%d positive"
+                  % (" " * len(sc), float(np.median(c)),
+                     sum(1 for x in c if x > 0), len(c)))
 print("\nwrote %s" % OUT)
