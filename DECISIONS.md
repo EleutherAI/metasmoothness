@@ -458,6 +458,62 @@ comparison (fresh trajectory's ckptavg gradients scored against the old bank), w
 breaks the base==bank-base invariant and is not recommended. The 10 `fill_*_magic`
 rollouts inherit the same choice.
 
+### D18. A job releases its claim when it exits; a crash files an analysis task
+
+Ruled by Lucia 2026-08-26.
+
+A claim is taken by `mkdir` and, until now, never released. Nothing distinguished
+a finished job from a live one, so `gpt2medium_64k_bs32` sat with its ms answer
+on disk for ten hours while the fleet read it as a live 751-minute job. It was
+found only because Lucia asked for marisa-0 to be cleared for unrelated reasons.
+
+Every launcher releases its claim on exit, in a trap, whatever the exit status.
+
+A clean exit releases and says nothing. A **crash releases too**, and appends an
+entry to `messages/YYYY-MM-DD-error-analysis-log.md` naming the run, the kind,
+the host, the exit status and the last progress line. The claim must not be used
+as a crash marker: holding it makes the row unclaimable by any other node, which
+converts one crashed job into an indefinitely blocked row.
+
+The point of the split: a released claim means the row is available, and the log
+entry means somebody still owes it an explanation. Availability and diagnosis are
+different facts and were previously conflated in one directory.
+
+### D19. Hung jobs are killed and analysed, never left running
+
+Ruled by Lucia 2026-08-26.
+
+A hung job is worse than a crashed one. It holds its GPUs, holds its claim, and
+reports healthy to every liveness check that looks at process state. Thirteen
+london tuning runs at 32k and 64k held fourteen GPUs for ten hours in exactly
+this state -- 130 threads, 39 parked in `futex_wait`, zero-byte logs, nothing in
+the run directory but `config.yaml`.
+
+Kill it, then analyse it. Before killing, capture what dies with the process:
+`/proc/<pid>/wchan`, the per-thread wchan histogram, open fds, and a `py-spy
+dump` where py-spy is available. Those go in the error-analysis log with the
+kill. A kill with no capture destroys the only evidence and guarantees the next
+occurrence starts from zero, which is what happened the first three times.
+
+### D20. A scheduled sweep looks for hangs, because liveness checks cannot see them
+
+Ruled by Lucia 2026-08-26.
+
+`check_runs.py` and `filter_health.py` both infer health from claim ownership and
+log age. Neither can see a hang, for two reasons that compounded:
+
+  * a hung process is alive, so anything keyed on process state calls it healthy
+  * the tuning launcher writes to `/tmp/tune_<name>.log`, not the run directory,
+    so every sweep found "no log", and no log was scored as no problem
+
+`scripts/hung_check.py` runs on a schedule and reports any live bergson process
+whose newest output -- run directory, run log, or `/tmp` log -- has not advanced
+past a threshold. It is deliberately separate from the liveness checks: those
+answer "is anyone working on this row", this answers "is that work moving".
+
+Absence of output is not evidence of health. That inversion cost ten hours and
+fourteen GPUs and it was silent the whole time.
+
 ## Open
 
 *(D15's D9 consequence, above, is the only open item.)*
