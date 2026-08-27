@@ -180,3 +180,41 @@ on smollm2. Direction variance has never been measured at this model size, so
 
 Best measured so far remains bs1024 / lr2.5e-5 / 0.9466, still 0.033 short.
 
+## 2026-08-28: the seed floor makes this whole grid uninterpretable
+
+Direction-seed replicates at the bs1024 / lr2.5e-5 point (the 0.9466 row):
+
+    seed 0  (nproc=4)   0.9466
+    seed 21 (nproc=1)   0.9536
+    seed 22 (nproc=1)   0.9382
+
+Spread **0.0154** between the two matched-world-size seeds. Every difference this
+note reports as a finding is the same size or smaller:
+
+    bs1024 -> bs2048   +0.0114
+    bs2048 -> bs4096   +0.0145
+    0.9725 -> 0.98      0.0055
+
+So "the batch lever accelerates" and "0.98 looks reachable" are NOT supported.
+They were read off differences below the noise floor of the measurement.
+
+The bs2048 lr column already showed it and I did not act on it:
+
+    2.5e-5 0.9580   1.25e-5 0.9071   6.25e-6 0.9567   3.1e-6 0.9090
+
+That alternates high-low-high-low across a monotone sweep. A real lr response
+does not do that; independent noise of ~0.015-0.1 does.
+
+Related measurement, same day: at gpt2medium_16k_bs32 (ms ~0.62-0.74) the seed
+spread is **0.117** (0.6228, 0.7055, 0.7402). Seed noise on gpt2-medium shrinks
+as ms rises but is still ~0.015 at ms 0.95, which is the regime the whole
+batch/lr grid lives in.
+
+For contrast, on smollm2 at a healthy config (4k muon lr2e-4, ms 0.997) four
+seeds span 0.00044. The noise problem is specific to gpt2-medium, not to ms.
+
+**Consequence:** roughly 30 GPUs went into this grid measuring differences it
+cannot resolve. Any future gpt2-medium claim needs either (a) seed replicates at
+every point so differences are quoted against their own spread, or (b) an effect
+larger than ~0.02. Single-seed comparisons at this model should not be reported.
+
