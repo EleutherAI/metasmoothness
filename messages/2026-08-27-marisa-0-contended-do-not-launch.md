@@ -24,16 +24,33 @@ idle, and launched into them. Everything I put on marisa-0 this sweep died:
 Nothing was corrupted - the bank shard writes per-subset and got no further
 than its own base training, so the bank is still a clean 97/100.
 
-## The detection rule that actually works
+## CORRECTION: the cmdline test gives false positives
 
-memory.used is a point sample and can be zero for a job that is starting.
-Cross-check with BOTH:
+I first wrote that an empty cmdline for a compute-app PID proves the GPU
+belongs to another container. That is WRONG and I checked it against a node
+where I know the answer:
 
-    nvidia-smi --query-compute-apps=pid,used_memory --format=csv,noheader
-    ps -o user=,args= -p <pid>     # empty cmdline as root => another namespace
+    allium-0: gpu4-7 busy, 4 compute-app PIDs, ALL with empty cmdline
+              ...and 6 live bergson processes. They are MY OWN workers.
 
-An empty cmdline for a compute-app PID means the GPU is spoken for by a
-container you cannot see, no matter what memory.used says right now.
+torch spawns distributed workers whose argv does not survive into `ps`, so
+"empty cmdline" describes my own jobs just as well as a foreign tenant's.
+Using it as the test would have made me abandon nodes I am happily using.
+
+What actually distinguished marisa-0 was the conjunction, not any single fact:
+
+    - ALL 8 GPUs busy at one uniform size (54432 MiB) = one 8-GPU job
+    - ZERO live bergson processes (63 of mine, every one <defunct>)
+    - my logs stop advancing while the GPUs stay pinned at 100%
+
+Zero-live-bergson-plus-busy-GPUs is the signal. Count live (non-Z) bergson
+processes and compare against the jobs you believe you are running there:
+
+    ps -eo stat=,args= | grep "[b]ergson" | grep -vc "^Z"
+
+memory.used alone is still not enough on its own - it is a point sample and
+reads near zero for a job that is still coming up, which is how I raced this
+tenant in the first place.
 
 ## Rehomed / still needs a home
 
