@@ -363,6 +363,13 @@ BANK_RESULTS = {
     # now on secret-ord-0; the MAGIC side needs MAGIC scores, which this row
     # does not have yet.
     "plan_adam_eps1e17_64k_bs256": dict(
+        # MAGIC LDS computed with no GPU: this row already had MAGIC scores and a
+        # complete 100-subset bank on disk, so the sums just needed recomputing
+        # against those scores. scripts/ekfac_lds.py returns it NEGATED for MAGIC
+        # (load_scores_loss_signed signs proponents the other way); verified exact
+        # on two rows with known values -- sm_adamw 0.9411 -> -0.9411 and
+        # sm_muon 0.8379 -> -0.8379 -- so the sign is flipped here deliberately.
+        magic_lds=0.9581, magic_ci_lo=0.9518, magic_ci_hi=0.9631,
         ekfac_lds=0.4336, ekfac_ci_lo=0.3826, ekfac_ci_hi=0.4796,
         ekfac_n_subsets=100,
     ),
