@@ -613,3 +613,28 @@ Priority-1 groups still to run (dataset size: 2 optimizers x 4 sizes; batch size
 optimizers x 4 values; ep4; bs512): 18 groups, 54 runs, almost all under 10 minutes; the 64k
 runs cost about an hour each. The whole grid costs less than one retrain bank, and it
 protects roughly 40 of them.
+
+## D21: node allowlist (Lucia, 2026-08-27) -- HARD LIMIT
+
+Lucia has been pinged for our GPU usage. We are allowed ONLY these nodes:
+
+    lotus-0        A100
+    lucia-ord-0    A40
+    secret-ord-0   A40
+    allium-0       A40
+    shared-ord-0   A40
+    bellflower-0   A40
+    iris-0         A40
+
+Permanently OFF, do not launch, do not "just check": **marisa-0**, **shivam2-0**,
+**maria-1**.
+
+This supersedes any instruction to "use all the GPUs" -- that phrase now means
+"use all the GPUs ON THE ALLOWLIST". Check this list before every launch. I had
+grown to 48 GPUs across 8 nodes by treating idle capacity as available, which is
+what triggered the ping.
+
+Consequence to plan around: **lotus-0 is now our only A100.** Bank shards are
+A100-only under D17 (a mixed-hardware bank scored 0.055 low), so all bank work is
+single-node from here. The muon 64k bank is days, not hours, at that rate.
+
