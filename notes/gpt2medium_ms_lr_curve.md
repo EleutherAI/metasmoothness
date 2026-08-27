@@ -121,3 +121,32 @@ Running a (batch, lr) grid to find the corner:
 If the doubling keeps paying and the lr optimum keeps falling, 0.98 is reachable
 at bs2048 with a small learning rate -- at 125 steps, which is the constraint
 Lucia set, with data scaled to match as she allowed.
+
+## 2026-08-27: bs1024 measured at a second lr, and it argues against my model
+
+    bs1024 / 64k   lr 2.5e-5    0.9466
+    bs1024 / 64k   lr 6.25e-6   0.9229   (new)
+
+I had been predicting the lr optimum keeps HALVING as batch doubles, which for
+bs1024 would put the peak at or below 6.25e-6. It does not: dropping lr from
+2.5e-5 to 6.25e-6 costs 0.024. So bs1024's optimum sits at or ABOVE 2.5e-5,
+not below it, and the "peak lr halves per doubling" rule I read off bs256->bs512
+does not survive its first real test at bs1024.
+
+That matters for the search, not just for bookkeeping: I sized the bs2048 and
+bs4096 grids around low learning rates on the strength of that rule, so those
+points may be bracketing the wrong side of their optima.
+
+Launched to settle it:
+
+    bs1024 / 64k    lr 5e-5     (does bs1024 peak above 2.5e-5?)
+    bs4096 / 256k   lr 2.5e-5   (bs4096 had only been probed at 6.25e-6 / 3.1e-6)
+
+Still outstanding: bs1024 lr1.25e-5 (running), bs2048 lr1.25e-5 (113/125),
+bs8192 lr3.1e-6 (the next doubling, at N=512k so 125 steps is still 2 epochs).
+
+Standing caveat on this whole grid: it now spans both A40 and A100 nodes, and
+D17 makes GPU type part of run identity. Hardware is recorded per point so the
+grid can be re-based or quarantined later; it is not safe to read a 0.01-level
+difference between two points on different hardware.
+
