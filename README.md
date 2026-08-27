@@ -8,8 +8,7 @@ Score (LDS)** of attribution methods (MAGIC, EK-FAC). Target setting: LLM post-t
 
 ```
 EK-FAC proponent-filter delta vs corpus size (bs256, 2 epochs)
-A = adamw   M = muon   | = 95% CI   lowercase a/m = ms below 0.98,
-                       training collapsed, point not trustworthy
+A = adamw   M = muon   | = 95% CI   lowercase a/m = ms below 0.98
 
  0.062 |                     | |      | |
  0.058 |                     | |      | |

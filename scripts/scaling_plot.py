@@ -60,8 +60,7 @@ H, COLW = args.height, 9
 
 out = []
 out.append("EK-FAC proponent-filter delta vs corpus size (bs256, 2 epochs)")
-out.append("A = adamw   M = muon   | = 95% CI   lowercase a/m = ms below 0.98,")
-out.append("                       training collapsed, point not trustworthy")
+out.append("A = adamw   M = muon   | = 95% CI   lowercase a/m = ms below 0.98")
 out.append("")
 for row in range(H, -1, -1):
     y = hi * row / H
