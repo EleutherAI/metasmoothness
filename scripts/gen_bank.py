@@ -37,6 +37,11 @@ AP.add_argument("--out-root", default=None,
                 help="volume for the bank, e.g. /mnt/ssd-2 (default: beside the run)")
 AP.add_argument("--num-subsets", type=int, default=100)
 AP.add_argument("--subset-fraction", type=float, default=0.01)
+AP.add_argument("--shard", nargs=2, type=int, default=None, metavar=("START", "STOP"),
+                help="emit bank_shard_START_STOP.yaml that resumes into an existing "
+                     "bank instead of bank_build.yaml. The bank_build run must have "
+                     "created subsets.json first -- every shard must remove the SAME "
+                     "documents, so they all share one subsets.json.")
 args = AP.parse_args()
 
 root = None
@@ -164,9 +169,22 @@ for _key in ("data", "query"):
                       % (_key, _old), file=sys.stderr)
 
 
+if args.shard is not None:
+    a, b = args.shard
+    # A shard is a *resume* into a bank some other process created. Without these
+    # three keys the second shard dies with FileExistsError on the shared run_path;
+    # and if it somehow did not, it would generate its own subsets and remove
+    # different documents than its peers -- a silently corrupt bank.
+    step["subset_start"] = a
+    step["subset_stop"] = b
+    step["subsets"] = str(bank / "subsets.json")
+    step["resume"] = True
+    step["overwrite"] = False
+
 doc = {"steps": [{"validate": step}], "run_path": str(bank)}
 
-out = root / "bank_build.yaml"
+out = root / ("bank_shard_%d_%d.yaml" % tuple(args.shard)
+              if args.shard is not None else "bank_build.yaml")
 if out.exists():
     sys.exit("refusing: %s already exists" % out)
 with open(out, "w") as f:
