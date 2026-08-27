@@ -88,9 +88,29 @@ EK-FAC proponent filter, FIXED 40 documents removed (adamw, bs256, 2 epochs)
      N      frac  n_removed           delta [95% CI]    rank1
     4k  0.010000         40 0.01137 [0.00871,0.01492]     20/20
     8k  0.005000         40 0.02078 [0.01161,0.03677]     20/20
-   16k  0.002500         40               retraining        -
+   16k  0.002500         40 0.02637 [0.01807,0.03818]     20/20
    32k  0.001250         40               retraining        -
    64k  0.000625         40               retraining        -
+
+F = fixed 40 docs    P = proportional (1% of N)
+
+ 0.138 |
+ 0.128 |
+ 0.118 |                                         P
+ 0.108 |
+ 0.098 |
+ 0.089 |
+ 0.079 |
+ 0.069 |
+ 0.059 |
+ 0.049 |                       P        P
+ 0.039 |
+ 0.030 |              P      F
+ 0.020 |            F
+ 0.010 |   F P
+ 0.000 |
+       +---------------------------------------------
+            4k       8k      16k      32k      64k   
 ```
 
 ## Alternative corpus: london

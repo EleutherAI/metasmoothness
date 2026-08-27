@@ -51,6 +51,56 @@ for n, run in ROWS:
     else:
         out.append("%6s %9.6f %10d %24s %8s"
                    % ("%dk" % (n // 1000), frac, 40, "retraining", "-"))
+
+# --- ASCII plot: fixed-40 against the proportional (1%) curve on one axis ---
+import csv as _csv
+_prop = {}
+for _r in _csv.DictReader(open(pathlib.Path(__file__).resolve().parent.parent / "experiments.csv")):
+    try:
+        _n = int(float(_r["n_docs"]))
+    except (TypeError, ValueError):
+        continue
+    _rid = _r["run_id"]
+    if not (_rid.endswith("_bs256") and _rid.startswith(("plan_adam_eps1e17_", "sm_adamw_eps1e17_"))):
+        continue
+    _v = (_r.get("filter_ekfac_delta") or "").strip()
+    if _v:
+        try:
+            _prop[_n] = float(_v)
+        except ValueError:
+            pass
+
+_fixed = {}
+for _n, _run in ROWS:
+    _root = next((r for r in ROOTS if os.path.isdir(os.path.join(r, _run))), None)
+    _p = os.path.join(_root, _run, "filter_top40_ekfac", "filter_summary.csv") if _root else None
+    if _p and os.path.isfile(_p):
+        _fixed[_n] = delta(_p)[0]
+
+_vals = list(_prop.values()) + list(_fixed.values())
+if _vals:
+    _hi = max(_vals) * 1.12
+    _H, _W = 14, 9
+    out.append("")
+    out.append("F = fixed 40 docs    P = proportional (1% of N)")
+    out.append("")
+    for _row in range(_H, -1, -1):
+        _y = _hi * _row / _H
+        _line = ("%.3f" % _y).rjust(6) + " |"
+        for _i, (_n, _) in enumerate(ROWS):
+            _cell = " " * _W
+            # assign each value to its NEAREST row, not a band: a band of
+            # hi/H/2 leaves gaps and silently drops points that fall between
+            # rows (the 64k proportional point vanished this way).
+            for _mark, _d in (("F", _fixed.get(_n)), ("P", _prop.get(_n))):
+                if _d is not None and int(round(_d / _hi * _H)) == _row:
+                    _pos = 3 if _mark == "F" else 5
+                    _cell = _cell[:_pos] + _mark + _cell[_pos + 1:]
+            _line += _cell
+        out.append(_line.rstrip())
+    out.append("       +" + "-" * (_W * len(ROWS)))
+    out.append("        " + "".join(("%dk" % (n // 1000)).center(_W) for n, _ in ROWS))
+
 block = "\n".join(out)
 print(block)
 
