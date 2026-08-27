@@ -20,6 +20,24 @@ EXP = "/mnt/ssd-2/lucia/metasmoothness/experiments.csv"
 DELTAS = "/mnt/ssd-2/lucia/metasmoothness/data/filter_deltas.csv"
 ORG = "EleutherAI"
 
+def bank_repo_id(run_id: str) -> str:
+    """Hub repo name for a run's retrain bank, e.g. LDS-retrain-bank-muon-N16k-bs256.
+
+    Renamed 2026-08-27 from metasmoothness-bank-<run_id>; the Hub redirects the
+    old names, but new repos must be created under the new scheme.
+    """
+    s = run_id
+    for a, b in [("plan_adam_", "adamw_"), ("plan_muon_", "muon_"),
+                 ("sm_adamw_", "adamw_"), ("sm_muon_", "muon_")]:
+        s = s.replace(a, b)
+    opt, _eps, n, var = s.split("_", 3)
+    parts = [opt, "N" + n]
+    if var.startswith("bs"):
+        parts.append(var)
+    else:
+        parts.extend(["bs256", var])
+    return f"{ORG}/LDS-retrain-bank-" + "-".join(parts)
+
 
 def fmt(v, nd=4):
     try:
@@ -70,7 +88,7 @@ def card(rid, row, dl):
         "from huggingface_hub import snapshot_download",
         "import pandas as pd",
         "",
-        f'path = snapshot_download("{ORG}/metasmoothness-bank-{rid}", repo_type="dataset")',
+        f'path = snapshot_download("{bank_repo_id(rid)}", repo_type="dataset")',
         "",
         "# ground truth: what removing each subset did to each query's loss",
         'truth = pd.read_csv(f"{path}/validation.csv")',
@@ -128,7 +146,7 @@ def main():
     except OSError:
         pass
 
-    repo_id = f"{ORG}/metasmoothness-bank-{a.run_id}"
+    repo_id = bank_repo_id(a.run_id)
     HfApi().upload_file(
         path_or_fileobj=card(a.run_id, row, dl).encode(),
         path_in_repo="README.md",

@@ -24,6 +24,24 @@ from huggingface_hub import HfApi, add_collection_item, create_collection, get_c
 from huggingface_hub.utils import HfHubHTTPError
 
 ORG = "EleutherAI"
+
+def bank_repo_id(run_id: str) -> str:
+    """Hub repo name for a run's retrain bank, e.g. LDS-retrain-bank-muon-N16k-bs256.
+
+    Renamed 2026-08-27 from metasmoothness-bank-<run_id>; the Hub redirects the
+    old names, but new repos must be created under the new scheme.
+    """
+    s = run_id
+    for a, b in [("plan_adam_", "adamw_"), ("plan_muon_", "muon_"),
+                 ("sm_adamw_", "adamw_"), ("sm_muon_", "muon_")]:
+        s = s.replace(a, b)
+    opt, _eps, n, var = s.split("_", 3)
+    parts = [opt, "N" + n]
+    if var.startswith("bs"):
+        parts.append(var)
+    else:
+        parts.extend(["bs256", var])
+    return f"{ORG}/LDS-retrain-bank-" + "-".join(parts)
 COLLECTION_TITLE = "Data Attribution"
 COLLECTION_DESC = (
     "Leave-1%-out retrain banks and datasets for training-data attribution: "
@@ -63,7 +81,7 @@ def main():
     a = ap.parse_args()
 
     root = find_root(a.run_id)
-    repo_id = f"{ORG}/metasmoothness-bank-{a.run_id}"
+    repo_id = bank_repo_id(a.run_id)
     api = HfApi()
 
     n_models = len(list((root / "retrained").glob("subset_*")))
