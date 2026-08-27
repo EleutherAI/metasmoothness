@@ -678,3 +678,40 @@ steps of bs256 at the same N. The measured ms cost of doing so is nil:
 A 0.0007-0.0011 ms difference, inside noise, for 8x the step count. Schedule on
 steps, and pick the lowest batch whose ms is within noise of the best.
 
+## D23: stop writing to /mnt/ssd-1 (2026-08-27)
+
+Three separate wedges, all the same shape, all on ssd-1:
+
+    marisa-0            bank_build            D state, 23h, node effectively lost
+    iris-0              ekfac 4000-step       D state, 9h16m, ~9h of work lost
+    lucia-ord-0         ekfac 4000-step       D state, 9h39m, ~9h of work lost
+
+Signature: a worker sits in state **D** with `wchan = ceph_mdsc_wait_request`,
+holding an open fd on its own output under /mnt/ssd-1, while its peer spins at
+100% waiting on the collective. `ls` on the same path returns in 2ms, so the
+filesystem is NOT down - it is one client request that never completes. D-state
+survives `kill -9`; the only recovery is a node restart, and each occurrence
+permanently strands a GPU until then.
+
+Rules:
+
+  1. **PYTHONPATH off ssd-1.** Use `/mnt/ssd-2/lucia/bergson-filter` and
+     `/mnt/ssd-2/lucia/bergson-main-paper-429`. Both mirrors exist and are
+     verified identical to the ssd-1 originals (same git HEAD, same md5 over the
+     whole bergson/*.py tree).
+  2. **run_path on ssd-2.** `gen_filter.py` now maps an ssd-1 row directory to
+     the matching ssd-2 path for its OUTPUT. Reading configs and scores off ssd-1
+     is fine.
+  3. **Datasets on ssd-2.** Already handled by gen_bank.py/gen_filter.py, which
+     rewrite dataset paths to /mnt/ssd-2/lucia/datasets_local.
+
+Detection, since a frozen log is ALSO the normal appearance of a healthy
+long serial phase:
+
+    ps -eo pid,ppid,stat,pcpu,args= | awk '$2==<launcher>'
+    cat /proc/<worker>/wchan
+
+Healthy: workers R/S, one near 100% cpu. Wedged: one worker **D** with
+`ceph_mdsc_wait_request`. Do not judge by log age - I lost 9 hours twice by
+treating a silent log as the documented 6-hour rank-0 phase.
+

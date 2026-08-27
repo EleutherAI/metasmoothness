@@ -93,7 +93,22 @@ if args.random_n:
 cfg["save_mode"] = "interval"
 cfg["save_interval"] = 10**9
 
-out_dir = root / f"filter_{args.method.replace('filter-', '')}_{args.source}"
+
+# Sustained writes to /mnt/ssd-1 are what wedged marisa-0 and BOTH 4000-step
+# EK-FAC scorings: a worker blocks in ceph_mdsc_wait_request writing its own
+# output and never returns, and a D-state process cannot be killed. ssd-2 is a
+# different Ceph cluster (different mons, different CSI volume), so put outputs
+# there even when the row directory itself lives on ssd-1. Reading configs off
+# ssd-1 is fine; it is the writing that hangs.
+def _out_root(root):
+    from pathlib import Path as _P
+    if str(root).startswith("/mnt/ssd-1/"):
+        alt = _P(str(root).replace("/mnt/ssd-1/", "/mnt/ssd-2/", 1))
+        alt.mkdir(parents=True, exist_ok=True)
+        return alt
+    return root
+
+out_dir = _out_root(root) / f"filter_{args.method.replace('filter-', '')}_{args.source}"
 # Reuse the row's existing leave-k-out bank as the random control instead of
 # retraining num_subsets fresh randoms: load_bank_losses reads the bank's 100
 # retrained models directly, which drops this from ~120 retrains per row to 20
