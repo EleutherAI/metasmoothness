@@ -150,3 +150,33 @@ D17 makes GPU type part of run identity. Hardware is recorded per point so the
 grid can be re-based or quarantined later; it is not safe to read a 0.01-level
 difference between two points on different hardware.
 
+## 2026-08-27 (later): bs1024 curve complete, and the lr rule runs the other way
+
+    bs512 / 32k     5e-5  0.8204   2.5e-5 0.9136   1.25e-5 0.9186*  6.25e-6 0.9141   3.1e-6 0.8738
+    bs1024 / 64k                   2.5e-5 0.9466*  1.25e-5 0.9150   6.25e-6 0.9229
+    (* = best measured at that batch size)
+
+The optimum lr DOUBLED from bs512 (1.25e-5) to bs1024 (2.5e-5). It does not
+halve per doubling, which is what I claimed from the bs256->bs512 pair and
+repeated several times; it rises with batch size, which is the ordinary linear
+scaling behaviour and what should have been the prior all along.
+
+Consequence, and it is not just bookkeeping: I sized the bs2048 and bs4096
+sweeps around LOW learning rates on the strength of the wrong rule. Every point
+I have running at those batch sizes (2.5e-5, 1.25e-5, 6.25e-6, 3.1e-6) is at or
+below the bs1024 optimum, so they are probably all on the wrong side of their
+own optima. If the rule holds, bs2048 peaks near 5e-5 and bs4096 near 1e-4.
+
+Launched gpt2medium_128k_bs2048_lr5e-5 to test the first of those.
+gpt2medium_64k_bs1024_lr5e-5 is already running and bounds bs1024 from above:
+if it comes back below 0.9466 then bs1024 peaks at 2.5e-5 and the doubling rule
+is confirmed on two consecutive rungs.
+
+One caution against over-reading the shape: within bs1024, 1.25e-5 (0.9150)
+sits BELOW 6.25e-6 (0.9229), which is not monotone. Either that is a genuine
+dip or ms direction-seed noise at gpt2-medium is larger than the 0.0004 measured
+on smollm2. Direction variance has never been measured at this model size, so
+0.01-level differences between adjacent lrs here carry no weight.
+
+Best measured so far remains bs1024 / lr2.5e-5 / 0.9466, still 0.033 short.
+
