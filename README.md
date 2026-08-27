@@ -77,6 +77,22 @@ A = adamw   M = muon   | = 95% CI
   64k   500     0.12307 [0.11110,0.13481] 0.12397 [0.11155,0.13616] 0.9876  0.9947
 ```
 
+## Fixed-count filter curve (top 40 documents)
+
+Same rows as the scaling curve above, but removing a fixed 40 documents at
+every N instead of 1%. Regenerate with `python scripts/top40_curve.py --readme`.
+
+```
+EK-FAC proponent filter, FIXED 40 documents removed (adamw, bs256, 2 epochs)
+
+     N      frac  n_removed           delta [95% CI]    rank1
+    4k  0.010000         40 0.01137 [0.00871,0.01492]     20/20
+    8k  0.005000         40 0.02078 [0.01161,0.03677]     20/20
+   16k  0.002500         40               retraining        -
+   32k  0.001250         40               retraining        -
+   64k  0.000625         40               retraining        -
+```
+
 ## Alternative corpus: london
 
 No bank was built for these rows, so there is no LDS and no filter delta.
