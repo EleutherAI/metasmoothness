@@ -52,6 +52,7 @@ reusable    bank+scores = retrained models on disk; re-score a new method withou
 """
 
 import csv
+import sys
 import os
 
 COLUMNS = [
@@ -1502,6 +1503,18 @@ FILTER_DELTAS = _load_filter_deltas()
 
 def _apply_filter_power(rows):
     """Fill the tail-filter cells. Must run after every row is added."""
+    # A measured delta whose run_id has no row here is silently dropped, which is
+    # exactly how thirteen rows went missing before. data/filter_deltas.csv is
+    # rebuilt from disk, so a NEW run directory (e.g. a re-run at a different lr)
+    # lands there with no grid row and vanishes. Report it loudly; do not raise,
+    # because a half-finished run legitimately has a delta before it has a row.
+    known = {r["run_id"] for r in rows}
+    orphans = sorted(set(FILTER_DELTAS) - known)
+    if orphans:
+        print("WARNING: %d measured filter delta(s) have no row and were dropped:"
+              % len(orphans), file=sys.stderr)
+        for o in orphans:
+            print("    %s" % o, file=sys.stderr)
     for r in rows:
         hit = FILTER_DELTAS.get(r["run_id"])
         if not hit:
