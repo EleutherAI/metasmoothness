@@ -1200,6 +1200,17 @@ for n in [4000, 8000, 32000, 64000]:
     add(BASE17, run_id=rid, n_docs=n, optimizer="muon", lr=TUNED_LR.get(rid, 2e-4),
         notes="N axis, muon. 16k measured (MAGIC 0.8470). lr comes from tuning.csv "
               f"sweep_group tune_muon_{n//1000}k.")
+
+# The 4k muon bs256 point trained to ms 0.9036 -- collapsed, far below the
+# 0.992-0.996 of every other point in the series -- so its filter delta (0.01844)
+# confounded "small corpus" with "bad training". Both direction seeds on that row
+# are low (0.9036, 0.9302), so it is the configuration, not the probe direction.
+# Re-run at lr 2e-4 reaches ms 0.9968 and measures 0.00943, roughly half. Use THIS
+# row for the muon 4k point of the curve; the original stays for the record.
+add(BASE17, run_id="plan_muon_eps1e17_4k_bs256_lr2e-4", n_docs=4000,
+    optimizer="muon", lr=2e-4,
+    notes="4k muon re-run at lr 2e-4 (ms 0.9968) replacing the collapsed lr 4e-4 "
+          "point (ms 0.9036). Filter delta only -- no bank, per D22.")
 # STEP-SCALING axis: METASMOOTHNESS ONLY (2026-08-25).
 # How does ms behave as the number of OPTIMISER STEPS grows? Batch size is held
 # at 32 -- the config with 1000 steps and ms 0.9800 at 16k -- and the corpus

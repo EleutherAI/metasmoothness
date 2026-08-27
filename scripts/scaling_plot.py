@@ -21,10 +21,17 @@ NS = [4000, 8000, 16000, 32000, 64000]
 
 rows = list(csv.DictReader(open("experiments.csv")))
 
+# Prefer a re-run over the row it replaces. The 4k muon point at lr 4e-4 trained
+# to ms 0.9036 (collapsed) and its delta is ~2x inflated; the lr 2e-4 re-run
+# reaches ms 0.9968. Sorting replacements first makes the curve use the good one.
+PREFER = ("plan_muon_eps1e17_4k_bs256_lr2e-4",)
+
+
 def pick(prefixes, n):
-    for r in rows:
+    for r in sorted(rows, key=lambda r: r["run_id"] not in PREFER):
         rid = r["run_id"]
-        if not rid.endswith("_bs256"):
+        # a re-run is suffixed (…_bs256_lr2e-4), so endswith alone drops it
+        if not (rid.endswith("_bs256") or "_bs256_" in rid):
             continue
         if not rid.startswith(prefixes):
             continue
