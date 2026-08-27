@@ -49,19 +49,19 @@ generalise up to dataset size **N = 1M** for now.
 EK-FAC proponent-filter delta vs corpus size (bs256, 2 epochs)
 A = adamw   M = muon   | = 95% CI
 
- 0.142 |
- 0.133 |                                       |
- 0.124 |                                       A
- 0.115 |                                       |
- 0.106 |
- 0.097 |
- 0.088 |
+ 0.143 |
+ 0.134 |                                       | |
+ 0.125 |                                       A M
+ 0.116 |                                       | |
+ 0.107 |                                       |
+ 0.098 |
+ 0.089 |
  0.080 |                     | |
  0.071 |                     | |
  0.062 |                     | |      | |
  0.053 |                     A M      A M
- 0.044 |            |        | |      | |
- 0.035 |            | |      | |
+ 0.045 |            |        | |      | |
+ 0.036 |            | |      | |
  0.027 |            A M
  0.018 |   | |      | |
  0.009 |   A M        |
@@ -71,11 +71,38 @@ A = adamw   M = muon   | = 95% CI
 
   N     steps   adamw delta            muon delta             ms(A)   ms(M)
   4k    31      0.01153 [0.00886,0.01516] 0.00943 [0.00659,0.01393] 0.9946    -   
-  8k    62      0.02923 [0.01916,0.04601] 0.02258 [0.01311,0.03853] 0.9924  0.9962
-  16k   125     0.05288 [0.03630,0.08014] 0.05040 [0.03461,0.07639] 0.9930  0.9964
+  8k    62      0.02923 [0.01916,0.04601] 0.02258 [0.01305,0.03880] 0.9924  0.9962
+  16k   125     0.05288 [0.03636,0.07932] 0.05040 [0.03450,0.07720] 0.9930  0.9964
   32k   250     0.05353 [0.04760,0.05983] 0.05365 [0.04767,0.05998] 0.9937  0.9948
-  64k   500     0.12307 [0.11110,0.13481]      retraining        0.9876  0.9947
+  64k   500     0.12307 [0.11110,0.13481] 0.12397 [0.11155,0.13616] 0.9876  0.9947
 ```
+
+## Alternative corpus: london
+
+No bank was built for these rows, so there is no LDS and no filter delta.
+ms only. Regenerate with `python scripts/london_table.py --readme`.
+
+```
+metasmoothness on london (distribution-shift corpus), 2 epochs
+
+run_id                   opt           N     bs    steps         ms
+london16k_bs16_adamw     adamw     16000     16     2000     0.9058
+london16k_bs16_muon      muon      16000     16     2000      0.964
+london16k_bs256_adamw    adamw     16000    256      125     0.9867
+london16k_bs256_muon     muon      16000    256      125     0.9321
+london32k_bs256_adamw    adamw     32000    256      250     0.9712
+london32k_bs256_muon     muon      32000    256      250     0.9619
+london64k_bs256_adamw    adamw     64000    256      500     0.6744
+london64k_bs256_muon     muon      64000    256      500     0.4475
+london128k_bs256_adamw   adamw    128000    256     1000    pending
+london128k_bs256_muon    muon     128000    256     1000    pending
+```
+
+At bs256 ms holds up to 32k and then collapses at 64k (0.674 adamw, 0.447 muon)
+where smollm2 stays near 0.99. That collapse is confounded with learning rate:
+the 64k rows ran at lr 1.6e-3 and re-running at 8e-4 recovers most of it
+(+0.26 adamw, +0.42 muon), leaving a smaller genuine N effect at fixed lr
+(-0.041 adamw, -0.093 muon from 32k to 64k).
 
 ## Results
 
