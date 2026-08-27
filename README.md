@@ -4,6 +4,72 @@ Understanding how training-algorithm design choices affect training function **s
 Score (LDS)** of attribution methods (MAGIC, EK-FAC). Target setting: LLM post-training
 (GPT-2 fine-tuned on SmolLM2 512-token chunks), with token-scaling and batch size-scaling axes.
 
+## Proponent filter scaling (EK-FAC)
+
+```
+EK-FAC proponent-filter delta vs corpus size (bs256, 2 epochs)
+A = adamw   M = muon   | = 95% CI   lowercase a/m = ms below 0.98,
+                       training collapsed, point not trustworthy
+
+ 0.062 |                     | |      | |
+ 0.058 |                     | |      | |
+ 0.054 |                     A |      A M
+ 0.050 |                     | M      | |
+ 0.046 |            |        | |      | |
+ 0.042 |            |        | |
+ 0.039 |            | |      | |
+ 0.035 |            | |      | |
+ 0.031 |            A |
+ 0.027 |     |      | |
+ 0.023 |     |      | M
+ 0.019 |     m      | |
+ 0.015 |   | |        |
+ 0.012 |   A |        |
+ 0.008 |   |
+ 0.004 |
+ 0.000 |
+       +---------------------------------------------
+            4k       8k      16k      32k      64k   
+
+  N     steps   adamw delta            muon delta             ms(A)   ms(M)
+  4k    31      0.01153 [0.00886,0.01516] 0.01844 [0.01251,0.02755] 0.9946  0.9037   <- muon ms collapsed
+  8k    62      0.02923 [0.01919,0.04631] 0.02258 [0.01309,0.03843] 0.9924  0.9962
+  16k   125     0.05288 [0.03611,0.07984] 0.05040 [0.03437,0.07748] 0.9930  0.9964
+  32k   250     0.05353 [0.04760,0.05983] 0.05365 [0.04764,0.06017] 0.9937  0.9948
+  64k   500          retraining             retraining        0.9876  0.9947
+```
+
+
+Regenerate with `python scripts/scaling_plot.py --readme` after rebuilding
+experiments.csv. Do not hand-edit the block above.
+
+What it shows, and what it does not:
+
+- **The delta rises ~4.5x from 4k to 16k, then flattens.** adamw moves 0.05288 ->
+  0.05353 across the 16k->32k doubling, a change of +0.0006 against a CI half-width
+  of roughly 0.006. So on current evidence the curve saturates by 16k, and the 64k
+  points are expected to confirm a plateau rather than extend a trend. The
+  informative region is 4k-16k; intermediate points at 6k and 12k would constrain
+  the rise better than anything above 32k.
+- **adamw and muon are indistinguishable except at 4k.** At 8k, 16k and 32k the two
+  series sit inside each other's intervals.
+- **The 4k muon point is not usable.** Its training collapsed (ms 0.9036, against
+  0.992-0.996 everywhere else in the series), so its delta confounds "small corpus"
+  with "bad training". Both direction seeds on that row are low (0.9036 and 0.9302),
+  so it is the configuration, not the probe direction. A replacement at lr 2e-4 is
+  being built: that lr measures ms 0.9968.
+- **N and step count are not separated in this series.** batch is fixed at 256, so
+  steps = 2N/256 moves with N. A control at fixed N does exist, and it says the
+  delta tracks N rather than steps: at N=32k, going from 250 steps (bs256) to 2000
+  steps (bs32) moves the delta by -0.003 (adamw) and -0.004 (muon).
+- **Intervals are wide at 8k and 16k** - the CI half-width there is comparable to
+  the 16k->32k change - so the plateau is a claim about the trend, not about any
+  single pair of adjacent points.
+
+The 64k row for both optimizers is retraining now (20 query retrains for adamw,
+which reuses its bank as the control, and 7+7+6 queries across three shards for
+muon, each shard carrying its own 3 random controls).
+
 ## Start here
 
 | file | what it holds |
