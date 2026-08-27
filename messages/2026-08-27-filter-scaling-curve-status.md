@@ -1,3 +1,35 @@
+# UPDATE: all shards claimed and running; query sharding CONFIRMED working
+
+Nothing here is unclaimed any more - do not launch q0_7, it is running on
+allium-0 [4,5]. Superseding the "UNCLAIMED" section below.
+
+## Query sharding needed a second fix, and now works
+
+Slicing only the query dataset is NOT enough. bergson checks the score matrix
+against the query count and dies AFTER the first retrain with
+
+    ValueError: scores has 20 query columns but the query dataset has 6 documents
+
+The fix is scripts/shard_scores.py, which slices scores.bin (a flat structured
+array of score_i/written_i fields) down to the shard's query range and renumbers
+the fields to a dense 0..k-1. Confirmed working: all three shards are now past
+the validation step and into the per-query phase, showing 0/7, 0/7 and 0/6 -
+matching their slices exactly.
+
+If you shard a filter, you must slice BOTH the query dataset and the scores.
+
+## Live as of this update
+
+    adam 64k     secret-ord-0 [0-3]   9/20 queries   ~3.7h
+    muon 64k     allium-0 [4,5] q0_7, allium-0 [6,7] q7_14, iris-0 [6,7] q14_20
+                 all in per-query phase                     ~4.4h
+    4k muon      shared-ord-0 [0,1]  10/20 queries   ~25min  (replacement at
+                 lr 2e-4, ms 0.9968, replacing the collapsed ms 0.9036 point)
+    scoring      4000-step ekfac x2 (shared-ord), 8000-step ekfac (secret-ord),
+                 MAGIC x2 (lucia-ord) - all healthy, all writing to ssd-2
+
+---
+
 # Proponent-filter scaling curve: state, and one shard needs a home
 
 Goal (Lucia): a filter-delta scaling curve at bs256 with matching training runs,
