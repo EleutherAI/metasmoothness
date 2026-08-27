@@ -4,40 +4,6 @@ Understanding how training-algorithm design choices affect training function **s
 Score (LDS)** of attribution methods (MAGIC, EK-FAC). Target setting: LLM post-training
 (GPT-2 fine-tuned on SmolLM2 512-token chunks), with token-scaling and batch size-scaling axes.
 
-## Proponent filter scaling (EK-FAC)
-
-```
-EK-FAC proponent-filter delta vs corpus size (bs256, 2 epochs)
-A = adamw   M = muon   | = 95% CI   lowercase a/m = ms below 0.98
-
- 0.062 |                     | |      | |
- 0.058 |                     | |      | |
- 0.054 |                     A |      A M
- 0.050 |                     | M      | |
- 0.046 |            |        | |      | |
- 0.042 |            |        | |
- 0.039 |            | |      | |
- 0.035 |            | |      | |
- 0.031 |            A |
- 0.027 |     |      | |
- 0.023 |     |      | M
- 0.019 |     m      | |
- 0.015 |   | |        |
- 0.012 |   A |        |
- 0.008 |   |
- 0.004 |
- 0.000 |
-       +---------------------------------------------
-            4k       8k      16k      32k      64k   
-
-  N     steps   adamw delta            muon delta             ms(A)   ms(M)
-  4k    31      0.01153 [0.00886,0.01516] 0.01844 [0.01251,0.02755] 0.9946  0.9037   <- muon ms collapsed
-  8k    62      0.02923 [0.01919,0.04631] 0.02258 [0.01309,0.03843] 0.9924  0.9962
-  16k   125     0.05288 [0.03611,0.07984] 0.05040 [0.03437,0.07748] 0.9930  0.9964
-  32k   250     0.05353 [0.04760,0.05983] 0.05365 [0.04764,0.06017] 0.9937  0.9948
-  64k   500          retraining             retraining        0.9876  0.9947
-```
-
 ## Start here
 
 | file | what it holds |
@@ -76,6 +42,40 @@ prioritised against these.
 
 The strongest findings -- meaning the ones cheapest to investigate -- should
 generalise up to dataset size **N = 1M** for now.
+
+## Proponent filter scaling (EK-FAC)
+
+```
+EK-FAC proponent-filter delta vs corpus size (bs256, 2 epochs)
+A = adamw   M = muon   | = 95% CI   lowercase a/m = ms below 0.98
+
+ 0.062 |                     | |      | |
+ 0.058 |                     | |      | |
+ 0.054 |                     A |      A M
+ 0.050 |                     | M      | |
+ 0.046 |            |        | |      | |
+ 0.042 |            |        | |
+ 0.039 |            | |      | |
+ 0.035 |            | |      | |
+ 0.031 |            A |
+ 0.027 |     |      | |
+ 0.023 |     |      | M
+ 0.019 |     m      | |
+ 0.015 |   | |        |
+ 0.012 |   A |        |
+ 0.008 |   |
+ 0.004 |
+ 0.000 |
+       +---------------------------------------------
+            4k       8k      16k      32k      64k   
+
+  N     steps   adamw delta            muon delta             ms(A)   ms(M)
+  4k    31      0.01153 [0.00886,0.01516] 0.01844 [0.01251,0.02755] 0.9946  0.9037   <- muon ms collapsed
+  8k    62      0.02923 [0.01919,0.04631] 0.02258 [0.01309,0.03843] 0.9924  0.9962
+  16k   125     0.05288 [0.03611,0.07984] 0.05040 [0.03437,0.07748] 0.9930  0.9964
+  32k   250     0.05353 [0.04760,0.05983] 0.05365 [0.04764,0.06017] 0.9937  0.9948
+  64k   500          retraining             retraining        0.9876  0.9947
+```
 
 ## Results
 

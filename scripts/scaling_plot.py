@@ -114,7 +114,12 @@ if args.readme:
         i = lines.index(HDR)
         j = next((k for k in range(i + 1, len(lines)) if lines[k].startswith("## ")), len(lines))
         lines = lines[:i] + lines[j:]
-    anchor = next((k for k, l in enumerate(lines) if l.startswith("## ")), len(lines))
+    # Lucia: this section belongs under "Research questions", not at the top.
+    try:
+        rq = lines.index("## Research questions")
+        anchor = next(k for k in range(rq + 1, len(lines)) if lines[k].startswith("## "))
+    except (ValueError, StopIteration):
+        anchor = next((k for k, l in enumerate(lines) if l.startswith("## ")), len(lines))
     new = [HDR, "", "```", block, "```", ""]
     lines = lines[:anchor] + new + lines[anchor:]
     p.write_text("\n".join(lines))
