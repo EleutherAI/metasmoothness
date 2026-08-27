@@ -352,6 +352,20 @@ for bs in [16, 32, 64, 128]:
 # Measured results for completed clean-env banks (env = the pinned paper env,
 # ENVIRONMENT.md; identity recorded per row in notes).
 BANK_RESULTS = {
+    # First 500-step bank to complete. Built as 12 shards across marisa-0 and
+    # shivam2-0 (both A100, so D17 holds) with the tail, subsets 37-39, finished
+    # on lotus-0 after marisa-0 wedged. merge_bank.py reports the full
+    # 100 subsets x 20 queries = 2000 rows with no INCOMPLETE line.
+    #
+    # This is the first (LDS, filter-delta) pair we have had at 500 steps -- the
+    # rest of the correlation sits at 125. Its EK-FAC filter delta is retraining
+    # now on secret-ord-0; the MAGIC side needs MAGIC scores, which this row
+    # does not have yet.
+    "plan_adam_eps1e17_64k_bs256": dict(
+        ekfac_lds=0.4336, ekfac_ci_lo=0.3826, ekfac_ci_hi=0.4796,
+        ekfac_n_subsets=100,
+    ),
+
     # Second gpt2-medium point, at bs32 rather than bs256 -- the config D11 was
     # meant to register, and an exact match to plan_adam_eps1e17_16k_bs32 (gpt2,
     # ms 0.9800, MAGIC 0.9201) with only the model swapped. ms came in at 0.7402,
