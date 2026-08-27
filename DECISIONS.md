@@ -638,3 +638,43 @@ Consequence to plan around: **lotus-0 is now our only A100.** Bank shards are
 A100-only under D17 (a mixed-hardware bank scored 0.055 low), so all bank work is
 single-node from here. The muon 64k bank is days, not hours, at that rate.
 
+## D22: no more LDS, no more retrain banks (Lucia, 2026-08-27)
+
+**We stop computing LDS.** No new 100-retrain banks. The only attribution
+quality metric we collect from here is the **proponent filter delta**.
+
+What this changes:
+
+  - `scripts/gen_bank.py` is DEPRECATED for new work. Do not generate
+    bank_build/bank_shard configs. The `--shard` mode I added earlier today
+    stays only so an in-flight bank can be finished if someone deliberately
+    chooses to.
+  - Any bank still running should be stopped unless it is nearly complete and
+    someone has a specific reason.
+  - `scripts/gen_filter.py` must now be run with **`--no-bank`**. Its default
+    draws the matched random control from the row's own leave-k-out bank; with
+    no banks, it draws a fresh random control instead (3 random retrains, per
+    the standing ruling that the random-removal control is 3 retrains with no
+    escalation). A filter run therefore costs 20 query retrains + 3 controls.
+  - **Scoring is still required.** EK-FAC and MAGIC scoring runs are NOT bank
+    work - the proponent filter removes the documents a scorer ranks most
+    influential, so it cannot run without scores. Keep them.
+
+Why this is the right trade, in the numbers we already have: a bank is 100
+retrains and yields one LDS; a filter is 23 retrains and yields one delta. And
+the deltas are the better-behaved measurement - across 24 rows the
+LDS<->filter-delta correlation is +0.792 [+0.413, +0.901] for MAGIC but only
++0.367 [-0.035, +0.662] for EK-FAC, whose interval crosses zero and whose two
+most influential rows are its two lowest-signal ones.
+
+Prefer LOW batch size at fixed 2 epochs. steps = 2N/bs, so bs32 buys 8x the
+steps of bs256 at the same N. The measured ms cost of doing so is nil:
+
+    plan_adam_eps1e17_64k_bs32    ms 0.9869   4000 steps
+    plan_adam_eps1e17_64k_bs256   ms 0.9876    500 steps
+    plan_muon_eps1e17_64k_bs32    ms 0.9936   4000 steps
+    plan_muon_eps1e17_64k_bs256   ms 0.9947    500 steps
+
+A 0.0007-0.0011 ms difference, inside noise, for 8x the step count. Schedule on
+steps, and pick the lowest batch whose ms is within noise of the best.
+

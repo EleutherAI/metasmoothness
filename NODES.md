@@ -213,3 +213,6 @@ Consequence to plan around: **lotus-0 is now our only A100.** Bank shards are
 A100-only under D17 (a mixed-hardware bank scored 0.055 low), so all bank work is
 single-node from here. The muon 64k bank is days, not hours, at that rate.
 
+## D22
+
+No more LDS or retrain banks; proponent filters only. See DECISIONS.md. Bank shard requests previously posted in messages/ are withdrawn.

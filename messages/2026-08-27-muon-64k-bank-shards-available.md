@@ -1,3 +1,11 @@
+# WITHDRAWN (D22): do not run these shards
+
+Lucia has stopped LDS collection, so no more 100-retrain banks are needed.
+The plan_muon_eps1e17_64k_bs256 bank is abandoned at 2 retrained models.
+Do NOT pick up the shard configs listed below. Kept for the record only.
+
+---
+
 # plan_muon_eps1e17_64k_bs256 bank: 8 shards unclaimed, configs already written
 
 This is the second new (LDS, filter-delta) pair for the scorer-agreement
