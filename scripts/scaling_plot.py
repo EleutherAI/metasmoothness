@@ -67,7 +67,7 @@ H, COLW = args.height, 9
 
 out = []
 out.append("EK-FAC proponent-filter delta vs corpus size (bs256, 2 epochs)")
-out.append("A = adamw   M = muon   | = 95% CI   lowercase a/m = ms below 0.98")
+out.append("A = adamw   M = muon   | = 95% CI")
 out.append("")
 for row in range(H, -1, -1):
     y = hi * row / H
@@ -82,8 +82,6 @@ for row in range(H, -1, -1):
             band = hi / H / 2.0
             if abs(d - y) <= band:
                 c = mark
-                if ms is not None and ms < 0.98:
-                    c = mark.lower()
                 pos = 3 if name == "adam" else 5
                 cell = cell[:pos] + c + cell[pos + 1:]
             elif lo is not None and hi_ is not None and lo - band <= y <= hi_ + band:
@@ -108,7 +106,7 @@ for i, n in enumerate(NS):
         return "%.4f" % p[4] if p[4] is not None else "  -   "
     out.append("  %-5s %-7d %-22s %-22s %s  %s%s"
                % ("%dk" % (n // 1000), 2 * n // 256, fmt(a), fmt(m), msf(a), msf(m),
-                  "   <- muon ms collapsed" if (m[4] is not None and m[4] < 0.98) else ""))
+                  ""))
 
 block = "\n".join(out)
 print(block)

@@ -47,7 +47,7 @@ generalise up to dataset size **N = 1M** for now.
 
 ```
 EK-FAC proponent-filter delta vs corpus size (bs256, 2 epochs)
-A = adamw   M = muon   | = 95% CI   lowercase a/m = ms below 0.98
+A = adamw   M = muon   | = 95% CI
 
  0.062 |                     | |      | |
  0.058 |                     | |      | |
