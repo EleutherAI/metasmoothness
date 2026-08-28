@@ -42,7 +42,7 @@ steps:
     num_subsets: 0
     subset_fraction: 0.01
     query_method: none
-    save_models: false
+    save_models: true
     save_optimizer_state: none
     save_mode: interval
-    save_interval: 1000000000
+    save_interval: 62
