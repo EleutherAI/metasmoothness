@@ -28,6 +28,15 @@ ap.add_argument("--source", choices=["magic", "ekfac"], default="ekfac")
 ap.add_argument("--shards", type=int, default=4)
 ap.add_argument("--queries", type=int, default=20)
 ap.add_argument("--mirror", default="/mnt/ssd-2/lucia/datasets_local")
+ap.add_argument("--controls", choices=["shared", "per-shard"], default="shared",
+                help="shared (default): every shard READS one control bank and "
+                     "retrains none, so the row costs 3 control retrains total. "
+                     "per-shard: each shard retrains its own 3, costing 3*shards.")
+ap.add_argument("--bank", default="",
+                help="control bank for --controls shared (default "
+                     "<run>/bank_from_filter). Build it with gen_bank.py.")
+ap.add_argument("--force", action="store_true",
+                help="proceed even when the plan exceeds queries+controls retrains")
 args = ap.parse_args()
 
 root = None
@@ -60,6 +69,24 @@ for i in range(args.shards):
     s["query"]["dataset"] = str(qds)
     out_dir = root / ("filter_proponents_%s_q%d_%d" % (args.source, a, b))
     s["run_path"] = str(out_dir)
+
+    # Point the shard at its OWN score slice. This used to be left at the full
+    # 20-column file, which dies inside validate_scores AFTER the shard has
+    # trained -- so each failure costs a whole retrain.
+    sl = root / ("scores_q%d_%d" % (a, b))
+    if (sl / "info.json").is_file():
+        s["scores"] = str(sl)
+    elif "scores" in s:
+        raise SystemExit(
+            "missing score slice %s -- run scripts/shard_scores.py first, or this "
+            "shard trains a full retrain and then dies with 'scores has N query "
+            "columns but the query dataset has %d documents'" % (sl, b - a))
+
+    # Controls: read ONE shared bank instead of retraining 3 per shard.
+    if args.controls == "shared":
+        s["retrained_dir"] = args.bank or str(root / "bank_from_filter")
+
+    # --- shard config assembled, now write it ---
     out = root / ("filter_proponents_%s_q%d_%d.yaml" % (args.source, a, b))
     with open(out, "w") as f:
         yaml.safe_dump({"steps": [{"validate": s}], "run_path": str(out_dir)},
@@ -70,5 +97,34 @@ print("wrote %d shard configs for %s (%s)" % (len(made), args.run_id, args.sourc
 for out, qds, ns in made:
     print("  %s  queries=%s  random_control=%s" % (out.name, qds.name, ns))
 print()
-print("total retrains %d (%d per shard) vs %d serial"
-      % (args.shards * (per + 3), per + 3, args.queries + 3))
+
+# --- cost guard -------------------------------------------------------------
+# The row needs `queries` retrains plus `n_ctrl` controls. Sharding must not
+# multiply the controls; if the plan does, stop rather than warn.
+n_ctrl = int(step.get("num_subsets", 3) or 0)
+minimum = args.queries + n_ctrl
+planned = args.queries + (n_ctrl * args.shards if args.controls == "per-shard" else 0)
+bank = args.bank or str(root / "bank_from_filter")
+
+print("retrain budget: %d planned, %d minimum (%d queries + %d controls)"
+      % (planned, minimum, args.queries, n_ctrl))
+
+if args.controls == "shared":
+    print("controls: shared, read from %s" % bank)
+    if not Path(bank).is_dir():
+        print("WARNING: %s does not exist yet. Build it before the shards finish:"
+              % bank)
+        print("  python scripts/gen_bank.py %s --num-subsets %d --subset-fraction %s"
+              % (args.run_id, n_ctrl, step.get("subset_fraction", "<frac>")))
+elif planned > minimum and not args.force:
+    raise SystemExit(
+        "REFUSING: --controls per-shard makes this %d retrains against a minimum "
+        "of %d.\n"
+        "3 controls are 3 retrained models for the WHOLE row -- scoring them "
+        "against every query is forward passes, not training.\n"
+        "Build the bank once and let all shards read it:\n"
+        "  python scripts/gen_bank.py %s --num-subsets %d --subset-fraction %s\n"
+        "  python scripts/shard_filter.py %s --controls shared\n"
+        "Use --force only if you truly want %d independent control sets."
+        % (planned, minimum, args.run_id, n_ctrl,
+           step.get("subset_fraction", "<frac>"), args.run_id, args.shards))
