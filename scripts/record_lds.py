@@ -20,6 +20,12 @@ VALUES = {
     "london16k_bs256_adamw":       (0.3165, 0.2669, 0.3651, 74),
     "gpt2medium_16k_bs32":         (0.3419, 0.2768, 0.4024, 65),
     "plan_muon_eps1e17_64k_bs256": (0.4591, 0.3861, 0.5210, 57),
+    # 4000 steps -- double the previous maximum in the correlation. Both banks were
+    # finished on disk; only the per-shard validation CSVs had never been merged,
+    # so ekfac_lds.py fell back to a validation.csv that did not exist and the rows
+    # looked like they had no ground truth at all.
+    "plan_adam_eps1e17_64k_bs32":  (0.4443, 0.3947, 0.4899, 100),
+    "plan_muon_eps1e17_64k_bs32":  (0.4033, 0.3352, 0.4642, 78),
 }
 
 rows = list(csv.DictReader(open(EXP)))
