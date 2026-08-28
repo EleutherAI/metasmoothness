@@ -1202,6 +1202,34 @@ for n in [4000, 8000, 32000, 64000]:
         notes="N axis (nested chain, EleutherAI/bergson-smollm2-scaling). 16k measured "
               "(MAGIC 0.9333). lr comes from tuning.csv sweep_group "
               f"tune_adamw_{n//1000}k.")
+# 128k on the adamw arm only. Kept out of the loop above because its lr comes
+# from sweep_group tune_adamw_128k_bs256, not tune_adamw_128k -- the bs256 token
+# axis needed its own sweep at this size, and the loop's note names the wrong
+# group. 2e-4 won that sweep as an ENDPOINT over 1e-4 by 0.0001 nats; the 4e-4
+# extension never ran, so the selection is taken but not confirmed from both
+# sides. The muon arm is deliberately absent: the priority is adding points to
+# the adamw proponent-filter scaling curve.
+# Record the 128k bs256 selections in TUNED_LR rather than inline, so the
+# "tuning group complete but selection not recorded" guard can see them. The
+# muon group IS complete, so the guard requires it; the adamw group is not
+# (its 4e-4 extension never ran), but recording both keeps the two arms read
+# the same way.
+TUNED_LR["plan_adam_eps1e17_128k_bs256"] = 2e-4
+TUNED_LR["plan_muon_eps1e17_128k_bs256"] = 1e-4
+
+add(BASE17, run_id="plan_adam_eps1e17_128k_bs256", n_docs=128000,
+    lr=TUNED_LR["plan_adam_eps1e17_128k_bs256"],
+    notes="N axis at 128k, bs256 (1000 steps). lr from tuning.csv sweep_group "
+          "tune_adamw_128k_bs256, where 2e-4 edged 1e-4 by 0.0001 nats.")
+
+# The muon arm at the same size. Unlike adamw, this one selected cleanly: 1e-4
+# won INTERIOR (3.2108 against 3.2181 at 5e-5 and 3.2114 at 2e-4), so there is
+# no endpoint to extend and no ambiguity to carry into the curve point.
+add(BASE17, run_id="plan_muon_eps1e17_128k_bs256", n_docs=128000, optimizer="muon",
+    lr=TUNED_LR["plan_muon_eps1e17_128k_bs256"],
+    notes="N axis at 128k, bs256 (1000 steps), muon. lr from tuning.csv "
+          "sweep_group tune_muon_128k_bs256, an interior win at 1e-4.")
+
 for n in [4000, 8000, 32000, 64000]:
     rid = f"plan_muon_eps1e17_{n//1000}k_bs256"
     add(BASE17, run_id=rid, n_docs=n, optimizer="muon", lr=TUNED_LR.get(rid, 2e-4),
