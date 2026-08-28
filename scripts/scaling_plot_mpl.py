@@ -2,16 +2,21 @@
 """Render the proponent-filter figures from experiments.csv with matplotlib.
 
     python scripts/scaling_plot_mpl.py    # write figures/filter_scaling.png (main,
-                                          # AdamW: corpus scaling + 16k batch sweep)
-                                          # and figures/filter_scaling_appendix.png
-                                          # (AdamW vs Muon corpus scaling)
+                                          # AdamW: 1% filter + fixed-40-document
+                                          # filter vs corpus size) and
+                                          # figures/filter_scaling_appendix.png
+                                          # (AdamW vs Muon, 1% filter)
 
 Run selection (bs256 rows, the lr 2e-4 re-run preferred at muon 4k) mirrors
-scripts/scaling_plot.py; regenerate whenever experiments.csv is rebuilt.
+scripts/scaling_plot.py; the fixed-40 deltas mirror scripts/top40_curve.py.
+Regenerate whenever experiments.csv is rebuilt or a top-40 filter lands.
 """
 import argparse
 import csv
+import os
 import pathlib
+import random
+import statistics
 
 import matplotlib.pyplot as plt
 
@@ -25,7 +30,12 @@ args = ap.parse_args()
 SERIES = [("AdamW", "#2a78d6", 0.98, ("plan_adam_eps1e17_", "sm_adamw_eps1e17_")),
           ("Muon", "#eb6834", 1.02, ("plan_muon_eps1e17_", "sm_muon_eps1e17_"))]
 NS = [4000, 8000, 16000, 32000, 64000, 128000]
-BATCHES = [16, 32, 64, 128, 256, 512]
+ROOTS = ["/mnt/ssd-2/lucia/paper_runs/experiments", "/mnt/ssd-1/lucia/paper_runs/experiments"]
+TOP40_ROWS = [(4000, "plan_adam_eps1e17_4k_bs256"),
+              (8000, "plan_adam_eps1e17_8k_bs256"),
+              (16000, "sm_adamw_eps1e17_16k_bs256"),
+              (32000, "plan_adam_eps1e17_32k_bs256"),
+              (64000, "plan_adam_eps1e17_64k_bs256")]
 PREFER = ("plan_muon_eps1e17_4k_bs256_lr2e-4",)
 # Tokens seen in training: 2 epochs over N docs of 512 tokens each.
 tokens = lambda n: 2 * n * 512
@@ -49,12 +59,17 @@ def pick_scaling(prefixes, n):
     return None
 
 
-def pick_batch(prefixes, bs):
-    for r in rows:
-        rid = r["run_id"]
-        if rid.startswith(prefixes) and rid.endswith(f"16k_bs{bs}"):
-            return r
-    return None
+def top40_delta_ci(run, boot=10000):
+    root = next((r for r in ROOTS if os.path.isdir(os.path.join(r, run))), None)
+    path = os.path.join(root, run, "filter_top40_ekfac", "filter_summary.csv") if root else None
+    if not (path and os.path.isfile(path)):
+        return None
+    d = [float(r["filter_change"]) - float(r["random_mean"])
+         for r in csv.DictReader(open(path))]
+    rnd = random.Random(0)
+    bs = sorted(statistics.fmean([rnd.choice(d) for _ in d]) for _ in range(boot))
+    m = statistics.fmean(d)
+    return m, m - bs[int(.025 * boot)], bs[int(.975 * boot)] - m
 
 
 def delta_ci(r):
@@ -91,15 +106,20 @@ args.outdir.mkdir(parents=True, exist_ok=True)
 tok_ticks = [tokens(n) for n in NS]
 tok_labels = [f"{tokens(n) / 1e6:.0f}M" for n in NS]
 
-# Main figure: AdamW corpus scaling beside the AdamW batch sweep at 16k docs.
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 3.8), dpi=200)
+# Main figure: AdamW 1% filter beside the fixed-40-document filter.
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 3.8), dpi=200, sharey=True)
 name, color, _, prefixes = SERIES[0]
 draw(ax1, tok_ticks, scaling_points(prefixes), color)
 style(ax1, tok_ticks, tok_labels, "Number of training tokens")
+ax1.set_title("Top 1% of documents removed", fontsize=10)
 
-batch_points = [delta_ci(pick_batch(prefixes, b)) for b in BATCHES]
-draw(ax2, BATCHES, batch_points, color)
-style(ax2, BATCHES, [str(b) for b in BATCHES], "Batch size")
+top40_points = [top40_delta_ci(run) for _, run in TOP40_ROWS]
+top40_ticks = [tokens(n) for n, _ in TOP40_ROWS]
+draw(ax2, top40_ticks, top40_points, color)
+style(ax2, top40_ticks, [f"{t / 1e6:.0f}M" for t in top40_ticks],
+      "Number of training tokens")
+ax2.set_title("Top 40 documents removed", fontsize=10)
+ax2.set_ylabel(None)
 
 fig.tight_layout()
 out = args.outdir / "filter_scaling.png"
