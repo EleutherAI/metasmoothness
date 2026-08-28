@@ -728,6 +728,25 @@ for opt in ["adamw"]:
           batch_size=256, grad_accum_steps=16,
           notes="Endpoint extension: 2e-4 edged the 3-point grid by 0.0001 nats.")
 
+# Token axis at bs256, 256k = 2000 steps (2026-08-28). This is the next point on the
+# bs256 proponent-filter scaling curve and no bs256 tuning run exists at this size.
+#
+# The two arguments that framed the 128k centre disagree here rather than bracket it:
+# the step drift says the optimum keeps falling as steps grow (256k doubles 128k to
+# 2000 steps), while adamw at 128k took 2e-4 as an ENDPOINT win over 1e-4 by 0.0001
+# nats -- and that endpoint is not settled, because its 4e-4 extension never ran.
+# So rather than centre on a contested value and pay a serial extension round, the
+# full 5e-5..4e-4 grid runs in one pass on four otherwise-idle pairs. Same wall
+# clock as a 3-point grid, and it resolves the endpoint question in the same shot.
+for opt in ["adamw"]:
+    sweep(f"tune_{opt}_256k_bs256",
+          selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_256k_bs256",
+          lrs=[5e-5, 1e-4, 2e-4, 4e-4], priority=2, optimizer=opt, n_docs=256000,
+          batch_size=256, grad_accum_steps=16,
+          notes="Token axis at bs256, 2 epochs (2000 steps). Full grid in one pass: "
+                "the 128k endpoint win at 2e-4 is unresolved, so there is no "
+                "trustworthy centre to extend from.")
+
 # Step-scaling sweep results, measured 2026-08-25 (bs32, ga 2, nproc 2, pinned venv).
 # Both 32k arms win on the INTERIOR point, so the CONTROLS batch-16-32 centre of
 # 5e-5 was right and no endpoint extension is needed. Note how flat they are --
