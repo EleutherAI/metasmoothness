@@ -765,6 +765,31 @@ for opt in ["adamw"]:
                 "from the 128k winner to follow the step drift; 2e-4 retained as "
                 "the top so an endpoint win needs no extension round.")
 
+# A100 endpoint probe at 512k, on lotus, 2026-08-28.
+#
+# The grid above was shifted DOWN on a step-drift argument, and the 256k result
+# has now falsified that argument: 2e-4 won 256k in the INTERIOR (3.1875 against
+# 3.1925 at 1e-4 and 3.1919 at 4e-4), so the optimum is not falling as steps grow
+# across 1000 -> 2000. That makes 2e-4 the likely 512k winner too -- and 2e-4 is
+# the TOP of the A40 grid, so a win there is an endpoint and would force a serial
+# 4.9h extension round exactly when the fleet is busiest.
+#
+# So probe the endpoint now on the idle A100s. This is a SEPARATE sweep group, not
+# an extra leg of the A40 grid, because a single A100 point dropped into an A40
+# grid carries the ~7e-4 D17 hardware offset against differences of ~0.005. Run as
+# its own 2e-4 vs 4e-4 pair on one node, the comparison is hardware-clean and
+# answers the only question that matters: does 4e-4 beat 2e-4 at 4000 steps.
+#
+# Its winner selects nothing on its own -- selects_lr_for points at the same row so
+# the builder can see it, but the A40 grid remains the row's authority.
+for opt in ["adamw"]:
+    sweep(f"tune_{opt}_512k_bs256_a100",
+          selects_lr_for=f"plan_adam_eps1e17_512k_bs256",
+          lrs=[2e-4, 4e-4], priority=3, optimizer=opt, n_docs=512000,
+          batch_size=256, grad_accum_steps=16,
+          notes="A100 endpoint probe at 512k (lotus). Hardware-clean 2e-4 vs 4e-4 "
+                "pair; does NOT select the row lr, the A40 grid does.")
+
 # Step-scaling sweep results, measured 2026-08-25 (bs32, ga 2, nproc 2, pinned venv).
 # Both 32k arms win on the INTERIOR point, so the CONTROLS batch-16-32 centre of
 # 5e-5 was right and no endpoint extension is needed. Note how flat they are --
@@ -1007,6 +1032,20 @@ BS32_STEP_HELDOUT = {
     # 1e-4 comes in WORSE than 5e-5, so 5e-5 is now an interior winner and the
     # adamw 128k lr is settled at 5e-5 -- no further extension.
     "tune_adamw_128k_bs32_lr0.0001":   3.2224,
+
+    # 256k at bs256, 2000 steps, measured 2026-08-28 on lotus-0 (A100, nproc 2,
+    # all four points on the same node so the comparison is hardware-clean).
+    # 2e-4 wins INTERIOR -- it beats 1e-4 by 0.0050 and 4e-4 by 0.0044 -- so the
+    # grid needs no extension.
+    #
+    # This also settles the 128k ambiguity in the other direction from what the
+    # step-drift argument predicted. 128k took 2e-4 as an endpoint over 1e-4 by
+    # 0.0001 with its 4e-4 leg never run; 256k now takes 2e-4 in the interior at
+    # twice the steps. The optimum is NOT falling as steps grow across this range.
+    "tune_adamw_256k_bs256_lr5e-05":  3.2018,
+    "tune_adamw_256k_bs256_lr0.0001": 3.1925,
+    "tune_adamw_256k_bs256_lr0.0002": 3.1875,
+    "tune_adamw_256k_bs256_lr0.0004": 3.1919,
     "tune_adamw_32k_bs32_lr2.5e-05": 3.2380,
     "tune_adamw_32k_bs32_lr5e-05":   3.2342,
     "tune_adamw_32k_bs32_lr0.0001":  3.2380,

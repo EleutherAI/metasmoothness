@@ -1216,6 +1216,7 @@ for n in [4000, 8000, 32000, 64000]:
 # the same way.
 TUNED_LR["plan_adam_eps1e17_128k_bs256"] = 2e-4
 TUNED_LR["plan_muon_eps1e17_128k_bs256"] = 1e-4
+TUNED_LR["plan_adam_eps1e17_256k_bs256"] = 2e-4
 
 add(BASE17, run_id="plan_adam_eps1e17_128k_bs256", n_docs=128000,
     lr=TUNED_LR["plan_adam_eps1e17_128k_bs256"],
@@ -1225,6 +1226,18 @@ add(BASE17, run_id="plan_adam_eps1e17_128k_bs256", n_docs=128000,
 # The muon arm at the same size. Unlike adamw, this one selected cleanly: 1e-4
 # won INTERIOR (3.2108 against 3.2181 at 5e-5 and 3.2114 at 2e-4), so there is
 # no endpoint to extend and no ambiguity to carry into the curve point.
+# 256k on the adamw arm, the next point on the bs256 filter scaling curve.
+# 2000 steps. lr 2e-4 won its sweep INTERIOR (3.1875 against 3.1925 at 1e-4 and
+# 3.1919 at 4e-4), so unlike the 128k selection this one is confirmed from both
+# sides and needs no extension leg.
+add(BASE17, run_id="plan_adam_eps1e17_256k_bs256", n_docs=256000,
+    lr=TUNED_LR["plan_adam_eps1e17_256k_bs256"],
+    notes="N axis at 256k, bs256 (2000 steps). lr from tuning.csv sweep_group "
+          "tune_adamw_256k_bs256, an interior win at 2e-4. Base must train on "
+          "A40: its proponent filter has to shard across the A40 fleet and "
+          "retrains have to match the base hardware under D17, and lotus is the "
+          "only A100 left, which is far too few pairs to shard a filter on.")
+
 add(BASE17, run_id="plan_muon_eps1e17_128k_bs256", n_docs=128000, optimizer="muon",
     lr=TUNED_LR["plan_muon_eps1e17_128k_bs256"],
     notes="N axis at 128k, bs256 (1000 steps), muon. lr from tuning.csv "
