@@ -152,6 +152,7 @@ style(ax2, top40_ticks, [f"{t / 1e6:.0f}M" for t in top40_ticks],
       "Number of training tokens")
 ax2.set_title("Top 40 documents removed", fontsize=10)
 ax2.set_ylabel(None)
+main_ylim = ax1.get_ylim()
 save(fig, "filter_scaling.png")
 
 # Appendix figure: AdamW vs Muon corpus scaling.
@@ -173,6 +174,7 @@ for name, color, dodge, prefixes in SERIES:
     points = [delta_ci(pick_batch(prefixes, b)) for b in BATCHES]
     draw(ax, [b * dodge for b in BATCHES], points, color, label=name)
 style(ax, BATCHES, [str(b) for b in BATCHES], "Batch size")
+ax.set_ylim(main_ylim)
 outside_legend(ax, len(SERIES))
 save(fig, "filter_batch_appendix.png")
 
