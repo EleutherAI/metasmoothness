@@ -29,6 +29,8 @@ import argparse, csv, glob, os, re, sys
 ap = argparse.ArgumentParser()
 ap.add_argument("run_id")
 ap.add_argument("--source", default="ekfac")
+ap.add_argument("--prefix", default="filter_proponents",
+                help="shard dir prefix; use filter_top40 for the fixed-40 runs")
 ap.add_argument("--force", action="store_true")
 args = ap.parse_args()
 
@@ -39,9 +41,9 @@ if root is None:
     sys.exit("run dir not found: %s" % args.run_id)
 run = os.path.join(root, args.run_id)
 
-pat = re.compile(r"filter_proponents_%s_q(\d+)_(\d+)$" % re.escape(args.source))
+pat = re.compile(r"%s_%s_q(\d+)_(\d+)$" % (re.escape(args.prefix), re.escape(args.source)))
 shards = []
-for d in sorted(glob.glob(os.path.join(run, "filter_proponents_%s_q*_*" % args.source))):
+for d in sorted(glob.glob(os.path.join(run, "%s_%s_q*_*" % (args.prefix, args.source)))):
     m = pat.search(d)
     s = os.path.join(d, "filter_summary.csv")
     if m and os.path.isfile(s):
@@ -75,7 +77,7 @@ if missing:
     if not args.force:
         sys.exit("refusing to write a partial merge (use --force)")
 
-out_dir = os.path.join(run, "filter_proponents_%s" % args.source)
+out_dir = os.path.join(run, "%s_%s" % (args.prefix, args.source))
 os.makedirs(out_dir, exist_ok=True)
 out = os.path.join(out_dir, "filter_summary.csv")
 if os.path.exists(out) and not args.force:
