@@ -30,6 +30,17 @@ else
   BERG=/mnt/ssd-1/lucia/bergson-main-paper-429
 fi
 
+# Refuse a duplicate. Two processes sharing a run_path is not a race we survive:
+# bergson clears run_path at startup, so the second wipes the first's state and then
+# dies with FileExistsError -- and both write to the same log, so the failure looks
+# like it belongs to the healthy run. This has happened twice: a whole 256k sweep
+# ran doubled for eight minutes, and a muon shard was launched onto a second pair
+# while already training. Check the CONFIG path, not the name, since the same
+# config can be launched under different labels.
+if pgrep -af "m bergson" 2>/dev/null | grep -qF -- "$CFG"; then
+  fail "already running with this config -- refusing to double-launch"
+fi
+
 for g in ${GPUS//,/ }; do
   used=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i "$g" 2>/dev/null)
   [ "${used:-0}" -gt 0 ] && fail "gpu $g already has ${used}MiB in use"
