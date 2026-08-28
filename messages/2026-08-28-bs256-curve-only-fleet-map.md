@@ -49,6 +49,22 @@ for the stopped bs32 filters (adam_128k q7_14=7, q14_20=6; muon_128k q7_14=2). T
 CSV writer opens mode `"w"`, so a naive restart truncates these — merge them back
 with `scripts/merge_filter_shards.py` rather than re-running the queries.
 
+## Two scheduling facts worth knowing before you size a filter
+
+**Give a filter 12 pairs, not 22.** Makespan is `ceil(23/P) x retrain`, a step
+function, so 23 units on 22 pairs and 23 units on 12 pairs are both two waves.
+Anything allocated between 12 and 22 is idle capacity. Only P >= 23 reaches a
+single wave, and the fleet has 22 usable A40 pairs — one short. The 3 random
+controls are already shared across all 20 queries, which is why it is 23 units
+and not 80.
+
+**EK-FAC scoring is much more expensive than the filter planning assumed.** The
+128k pass measured its eigenvalue-correction phase at 8000 iterations, a steady
+1.13 s/it, so 2.5h for that phase alone with more after it — against a 50 min
+estimate for the whole pass. All 8 GPUs are genuinely busy (12 samples, 98-99%),
+so this is real work, not a parallelism bug. If it scales with N, scoring becomes
+co-dominant with the filters at large N rather than a rounding error.
+
 ## 1M is blocked on data, not GPUs
 
 `notes/n1m_blocker.md` still holds: `train_scratch_512k.hf` is exactly 512,000 docs
