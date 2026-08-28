@@ -19,7 +19,15 @@ import sys
 from pathlib import Path
 
 ROOT = Path("/mnt/ssd-2/lucia/paper_runs/experiments") / sys.argv[1]
-main_ckpts = ROOT / sys.argv[2] / "checkpoints"
+# The trajectory lives under the main run's run_path, which is NOT always
+# <row>/<cfg-name>: a config whose run_path is the row root keeps its checkpoints
+# at <row>/checkpoints. Accept an explicit path rather than assuming the layout.
+if "--traj" in sys.argv:
+    main_ckpts = Path(sys.argv[sys.argv.index("--traj") + 1])
+    sys.argv = [a for i, a in enumerate(sys.argv)
+                if i not in (sys.argv.index("--traj"), sys.argv.index("--traj") + 1)]
+else:
+    main_ckpts = ROOT / sys.argv[2] / "checkpoints"
 if not main_ckpts.is_dir():
     sys.exit(f"no trajectory at {main_ckpts}")
 entries = sorted(p for p in main_ckpts.iterdir() if p.name != "per_query")

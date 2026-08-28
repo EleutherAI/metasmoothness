@@ -37,7 +37,8 @@ TOP40_ROWS = [(4000, "plan_adam_eps1e17_4k_bs256"),
               (8000, "plan_adam_eps1e17_8k_bs256"),
               (16000, "sm_adamw_eps1e17_16k_bs256"),
               (32000, "plan_adam_eps1e17_32k_bs256"),
-              (64000, "plan_adam_eps1e17_64k_bs256")]
+              (64000, "plan_adam_eps1e17_64k_bs256"),
+              (128000, "plan_adam_eps1e17_128k_bs256")]
 VARIANT_ROWS = [("Baseline (bs 256)", "sm_adamw_eps1e17_16k_bs256"),
                 ("Weight decay 0.0", "plan_adam_eps1e17_16k_wd0.0"),
                 ("Weight decay 0.1", "plan_adam_eps1e17_16k_wd0.1"),
