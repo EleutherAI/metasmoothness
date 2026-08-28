@@ -768,7 +768,7 @@ for opt in ["adamw"]:
 for opt in ["muon"]:
     sweep(f"tune_{opt}_256k_bs256",
           selects_lr_for="plan_muon_eps1e17_256k_bs256",
-          lrs=[5e-5, 1e-4, 2e-4, 4e-4], priority=3, optimizer=opt, n_docs=256000,
+          lrs=[5e-5, 1e-4, 2e-4, 4e-4, 8e-4, 1.6e-3], priority=3, optimizer=opt, n_docs=256000,
           batch_size=256, grad_accum_steps=16,
           notes="Token axis at bs256, 2 epochs (2000 steps), muon. Same grid as the "
                 "adamw arm at 256k so the arms are comparable.")
@@ -794,7 +794,7 @@ for opt in ["adamw"]:
 for opt in ["adamw"]:
     sweep(f"tune_{opt}_512k_bs256",
           selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_512k_bs256",
-          lrs=[2.5e-5, 5e-5, 1e-4, 2e-4, 4e-4], priority=2, optimizer=opt, n_docs=512000,
+          lrs=[2.5e-5, 5e-5, 1e-4, 2e-4, 4e-4, 8e-4], priority=2, optimizer=opt, n_docs=512000,
           batch_size=256, grad_accum_steps=16,
           notes="Token axis at bs256, 2 epochs (4000 steps). Grid was shifted DOWN "
                 "on a step-drift argument that the 256k result then falsified. "

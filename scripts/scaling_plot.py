@@ -17,7 +17,10 @@ args = ap.parse_args()
 
 SERIES = [("adam", "A", ("plan_adam_eps1e17_", "sm_adamw_eps1e17_")),
           ("muon", "M", ("plan_muon_eps1e17_", "sm_muon_eps1e17_"))]
-NS = [4000, 8000, 16000, 32000, 64000]
+# 128k added 2026-08-28. Its muon arm has no delta yet, so the row is plotted with
+# the adamw point alone rather than held back -- the table shows a dash for muon
+# until that filter lands, instead of hiding a measured adamw point.
+NS = [4000, 8000, 16000, 32000, 64000, 128000]
 
 rows = list(csv.DictReader(open("experiments.csv")))
 
