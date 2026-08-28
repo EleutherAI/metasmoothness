@@ -69,9 +69,7 @@ for name, color, dodge, prefixes in SERIES:
                     textcoords="offset points", ha="center", fontsize=7, color="#9a988f")
 
 ax.set_xscale("log", base=2)
-ax.set_xticks([tokens(n) for n in NS],
-              [f"{tokens(n) / 1e6:.0f}M" if tokens(n) >= 1e8 else f"{tokens(n) / 1e6:.1f}M"
-               for n in NS])
+ax.set_xticks([tokens(n) for n in NS], [f"{tokens(n) / 1e6:.0f}M" for n in NS])
 ax.minorticks_off()
 ax.set_xlabel("Number of training tokens")
 ax.set_ylabel("Change in query loss")
