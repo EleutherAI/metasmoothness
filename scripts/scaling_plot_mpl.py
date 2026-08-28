@@ -30,7 +30,7 @@ BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
 # The x dodge separates coincident error bars; multiplicative because x is log.
 SERIES = [("AdamW", BLUE, 0.98, ("plan_adam_eps1e17_", "sm_adamw_eps1e17_")),
           ("Muon", ORANGE, 1.02, ("plan_muon_eps1e17_", "sm_muon_eps1e17_"))]
-NS = [4000, 8000, 16000, 32000, 64000, 128000]
+NS = [4000, 8000, 16000, 32000, 64000, 128000, 256000]
 BATCHES = [16, 32, 64, 128, 256, 512]
 ROOTS = ["/mnt/ssd-2/lucia/paper_runs/experiments", "/mnt/ssd-1/lucia/paper_runs/experiments"]
 TOP40_ROWS = [(4000, "plan_adam_eps1e17_4k_bs256"),
