@@ -3,9 +3,9 @@
 
     python scripts/scaling_plot_mpl.py    # write figures/filter_scaling.png (main,
                                           # AdamW: 1% filter + fixed-40-document
-                                          # filter vs corpus size) and
-                                          # figures/filter_scaling_appendix.png
-                                          # (AdamW vs Muon, 1% filter)
+                                          # filter vs corpus size) and the appendix
+                                          # figures (optimizer comparison, batch
+                                          # sweep, EK-FAC vs MAGIC, 16k variants)
 
 Run selection (bs256 rows, the lr 2e-4 re-run preferred at muon 4k) mirrors
 scripts/scaling_plot.py; the fixed-40 deltas mirror scripts/top40_curve.py.
@@ -26,21 +26,32 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--outdir", type=pathlib.Path, default=ROOT / "figures")
 args = ap.parse_args()
 
+BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
 # The x dodge separates coincident error bars; multiplicative because x is log.
-SERIES = [("AdamW", "#2a78d6", 0.98, ("plan_adam_eps1e17_", "sm_adamw_eps1e17_")),
-          ("Muon", "#eb6834", 1.02, ("plan_muon_eps1e17_", "sm_muon_eps1e17_"))]
+SERIES = [("AdamW", BLUE, 0.98, ("plan_adam_eps1e17_", "sm_adamw_eps1e17_")),
+          ("Muon", ORANGE, 1.02, ("plan_muon_eps1e17_", "sm_muon_eps1e17_"))]
 NS = [4000, 8000, 16000, 32000, 64000, 128000]
+BATCHES = [16, 32, 64, 128, 256, 512]
 ROOTS = ["/mnt/ssd-2/lucia/paper_runs/experiments", "/mnt/ssd-1/lucia/paper_runs/experiments"]
 TOP40_ROWS = [(4000, "plan_adam_eps1e17_4k_bs256"),
               (8000, "plan_adam_eps1e17_8k_bs256"),
               (16000, "sm_adamw_eps1e17_16k_bs256"),
               (32000, "plan_adam_eps1e17_32k_bs256"),
               (64000, "plan_adam_eps1e17_64k_bs256")]
+VARIANT_ROWS = [("Baseline (bs 256)", "sm_adamw_eps1e17_16k_bs256"),
+                ("Weight decay 0.0", "plan_adam_eps1e17_16k_wd0.0"),
+                ("Weight decay 0.1", "plan_adam_eps1e17_16k_wd0.1"),
+                ("Grad clip 1.0", "plan_adam_eps1e17_16k_clip1.0"),
+                ("4 epochs", "plan_adam_eps1e17_16k_ep4"),
+                ("GPT-2 medium", "plan_adam_eps1e17_16k_gpt2-medium"),
+                ("Logit scale 0.5", "plan_adam_eps1e17_16k_scale0.5"),
+                ("Logit scale 0.25", "plan_adam_eps1e17_16k_scale0.25")]
 PREFER = ("plan_muon_eps1e17_4k_bs256_lr2e-4",)
 # Tokens seen in training: 2 epochs over N docs of 512 tokens each.
 tokens = lambda n: 2 * n * 512
 
 rows = list(csv.DictReader(open(ROOT / "experiments.csv")))
+by_id = {r["run_id"]: r for r in rows}
 
 
 def pick_scaling(prefixes, n):
@@ -59,6 +70,14 @@ def pick_scaling(prefixes, n):
     return None
 
 
+def pick_batch(prefixes, bs):
+    for r in rows:
+        rid = r["run_id"]
+        if rid.startswith(prefixes) and rid.endswith(f"16k_bs{bs}"):
+            return r
+    return None
+
+
 def top40_delta_ci(run, boot=10000):
     root = next((r for r in ROOTS if os.path.isdir(os.path.join(r, run))), None)
     path = os.path.join(root, run, "filter_top40_ekfac", "filter_summary.csv") if root else None
@@ -72,11 +91,12 @@ def top40_delta_ci(run, boot=10000):
     return m, m - bs[int(.025 * boot)], bs[int(.975 * boot)] - m
 
 
-def delta_ci(r):
-    if r is None or not (r.get("filter_ekfac_delta") or "").strip():
+def delta_ci(r, method="ekfac"):
+    if r is None or not (r.get(f"filter_{method}_delta") or "").strip():
         return None
-    d = float(r["filter_ekfac_delta"])
-    return d, d - float(r["filter_ekfac_lo"]), float(r["filter_ekfac_hi"]) - d
+    d = float(r[f"filter_{method}_delta"])
+    return (d, d - float(r[f"filter_{method}_lo"]),
+            float(r[f"filter_{method}_hi"]) - d)
 
 
 def draw(ax, xs, points, color, label=None):
@@ -98,8 +118,20 @@ def style(ax, xticks, xlabels, xlabel):
     ax.margins(x=0.09)
 
 
-def scaling_points(prefixes):
-    return [delta_ci(pick_scaling(prefixes, n)) for n in NS]
+def outside_legend(ax, n):
+    ax.legend(frameon=False, loc="lower left", bbox_to_anchor=(0, 1.0),
+              ncols=n, borderaxespad=0)
+
+
+def save(fig, name):
+    fig.tight_layout()
+    out = args.outdir / name
+    fig.savefig(out)
+    print(f"wrote {out}")
+
+
+def scaling_points(prefixes, method="ekfac"):
+    return [delta_ci(pick_scaling(prefixes, n), method) for n in NS]
 
 
 args.outdir.mkdir(parents=True, exist_ok=True)
@@ -120,11 +152,7 @@ style(ax2, top40_ticks, [f"{t / 1e6:.0f}M" for t in top40_ticks],
       "Number of training tokens")
 ax2.set_title("Top 40 documents removed", fontsize=10)
 ax2.set_ylabel(None)
-
-fig.tight_layout()
-out = args.outdir / "filter_scaling.png"
-fig.savefig(out)
-print(f"wrote {out}")
+save(fig, "filter_scaling.png")
 
 # Appendix figure: AdamW vs Muon corpus scaling.
 fig, ax = plt.subplots(figsize=(7, 4.5), dpi=200)
@@ -136,10 +164,42 @@ for name, color, dodge, prefixes in SERIES:
                     textcoords="offset points", ha="center", fontsize=7,
                     color="#9a988f")
 style(ax, tok_ticks, tok_labels, "Number of training tokens")
-ax.legend(frameon=False, loc="lower left", bbox_to_anchor=(0, 1.0),
-          ncols=len(SERIES), borderaxespad=0)
+outside_legend(ax, len(SERIES))
+save(fig, "filter_scaling_appendix.png")
 
-fig.tight_layout()
-out = args.outdir / "filter_scaling_appendix.png"
-fig.savefig(out)
-print(f"wrote {out}")
+# Appendix figure: batch-size sweep at 16k documents.
+fig, ax = plt.subplots(figsize=(7, 4.5), dpi=200)
+for name, color, dodge, prefixes in SERIES:
+    points = [delta_ci(pick_batch(prefixes, b)) for b in BATCHES]
+    draw(ax, [b * dodge for b in BATCHES], points, color, label=name)
+style(ax, BATCHES, [str(b) for b in BATCHES], "Batch size")
+outside_legend(ax, len(SERIES))
+save(fig, "filter_batch_appendix.png")
+
+# Appendix figure: EK-FAC vs MAGIC proponent filters, AdamW corpus scaling.
+fig, ax = plt.subplots(figsize=(7, 4.5), dpi=200)
+prefixes = SERIES[0][3]
+for method, color, dodge in [("ekfac", BLUE, 0.98), ("magic", AQUA, 1.02)]:
+    label = {"ekfac": "EK-FAC", "magic": "MAGIC"}[method]
+    draw(ax, [t * dodge for t in tok_ticks], scaling_points(prefixes, method),
+         color, label=label)
+style(ax, tok_ticks, tok_labels, "Number of training tokens")
+outside_legend(ax, 2)
+save(fig, "filter_method_appendix.png")
+
+# Appendix figure: training-setup variants at 16k documents, AdamW.
+fig, ax = plt.subplots(figsize=(7, 3.8), dpi=200)
+ys = range(len(VARIANT_ROWS))[::-1]
+for y, (label, run) in zip(ys, VARIANT_ROWS):
+    p = delta_ci(by_id[run])
+    if p is None:
+        continue
+    d, lo, hi = p
+    ax.errorbar([d], [y], xerr=[[lo], [hi]], color=BLUE, marker="o",
+                markersize=5, linewidth=2, capsize=3, capthick=1.2)
+ax.set_yticks(list(ys), [label for label, _ in VARIANT_ROWS])
+ax.set_xlabel("Change in query loss")
+ax.grid(axis="x", color="#e6e5e0", linewidth=0.8)
+ax.set_axisbelow(True)
+ax.margins(y=0.12)
+save(fig, "filter_variants_appendix.png")
