@@ -37,7 +37,12 @@ if os.path.exists(out) and not a.force:
     sys.exit("%s already exists (use --force)" % out)
 
 bank = None
-for cand in ("bank_from_filter/validation_merged.csv", "bank_from_filter/validation.csv"):
+# Two bank layouts exist. Rows built through gen_bank keep theirs under
+# bank_from_filter/; rows whose magic step wrote the bank in place keep it at the
+# run root (the london and gpt2medium rows do). Checking only the first made a
+# fully recoverable run look like it had no ground truth at all.
+for cand in ("bank_from_filter/validation_merged.csv", "bank_from_filter/validation.csv",
+             "validation_merged.csv", "validation.csv"):
     p = os.path.join(run, cand)
     if os.path.isfile(p):
         bank = p

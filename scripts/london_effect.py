@@ -21,7 +21,8 @@ for r in rows:
     if lds and d:
         base.append((float(lds), float(d)))
 
-LONDON = [(0.3156, 0.04886, "london16k_bs256_muon")]
+LONDON = [(0.3156, 0.04886, "london16k_bs256_muon"),
+          (0.3165, 0.04979, "london16k_bs256_adamw")]
 
 
 def boot(pts, n=10000):
@@ -40,4 +41,4 @@ r1, lo1, hi1 = boot(withl)
 print("  with london      n=%2d  rho=%+.3f [%+.3f, %+.3f]" % (len(withl), r1, lo1, hi1))
 d = np.array([p[1] for p in base])
 print("  delta range over the other rows: %.4f - %.4f (median %.4f)" % (d.min(), d.max(), np.median(d)))
-print("  london muon sits at lds 0.3156 (below every other row) with delta 0.04886")
+print("  the two lowest LDS rows on the fleet, and their deltas:")
