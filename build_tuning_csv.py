@@ -747,6 +747,24 @@ for opt in ["adamw"]:
                 "the 128k endpoint win at 2e-4 is unresolved, so there is no "
                 "trustworthy centre to extend from.")
 
+# 512k at bs256 = 4000 steps (2026-08-28). Started before the 256k sweep returns,
+# on idle pairs, because the grid below spans the whole plausible range either way
+# and waiting 1.6h for 256k would put this on the critical path for nothing.
+#
+# The grid is deliberately shifted DOWN relative to 128k rather than centred on
+# the 128k winner. The step drift is the one consistent signal across this axis --
+# the optimum falls as steps grow -- and 512k is 4x the steps of 128k. 2e-4 is
+# kept as the top of the grid so that if the drift has stopped, the endpoint is
+# still covered and no extension round is needed.
+for opt in ["adamw"]:
+    sweep(f"tune_{opt}_512k_bs256",
+          selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_512k_bs256",
+          lrs=[2.5e-5, 5e-5, 1e-4, 2e-4], priority=2, optimizer=opt, n_docs=512000,
+          batch_size=256, grad_accum_steps=16,
+          notes="Token axis at bs256, 2 epochs (4000 steps). Grid shifted down "
+                "from the 128k winner to follow the step drift; 2e-4 retained as "
+                "the top so an endpoint win needs no extension round.")
+
 # Step-scaling sweep results, measured 2026-08-25 (bs32, ga 2, nproc 2, pinned venv).
 # Both 32k arms win on the INTERIOR point, so the CONTROLS batch-16-32 centre of
 # 5e-5 was right and no endpoint extension is needed. Note how flat they are --
