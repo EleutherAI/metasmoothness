@@ -5,25 +5,45 @@ time. Prefer the tool that enforces a rule over remembering it.
 
 ## Filters: 3 controls per ROW, not per shard
 
-A proponent filter is 1 baseline retrain + `queries` retrains + 3 control retrains for the whole row -- 24 in total, whatever the shard count.
-row**. The controls are 3 retrained models; scoring them against all 20 queries is
-forward passes and costs nothing. So a filter is 23 retrains, whatever the shard
-count.
+A proponent filter is `queries` retrains plus 3 control retrains for the whole row.
+The controls are 3 trained models; scoring them against all 20 queries is forward
+passes and costs nothing. bergson retrains them per process unless `retrained_dir`
+is set, so sharding S ways turns 3 controls into 3S full trainings -- 30 instead of
+3 on the 128k row at S=10.
 
-bergson retrains controls in-process unless `retrained_dir` is set
-(`bergson/validate.py`: `if dirs: load ... elif num_subsets > 0: retrain ... else:
-skip`). So sharding S ways silently turns 3 controls into 3S full trainings. At
-S=10 on the 128k row that was 30 retrains where 3 would do, about 33 GPU-pair-hours.
+**There is no per-shard baseline retrain.** An earlier version of this file said
+there was. That was wrong: the baseline is a forward pass on the already-trained
+model (`per_doc_query_losses` inside `fwd_state.activate`). The claim came from a
+buffered log where the filter loop bar appeared after a completed training, making
+that training look like a pre-loop baseline. It was query one. An old-shape filter
+is 5 deep and 50 runs, not 6 and 60.
 
-**Do this:** build the control bank once, then let every shard read it.
+Build the bank once and let every shard read it:
 
     python scripts/gen_bank.py <run_id> --num-subsets 3 --subset-fraction 0.01
     python scripts/shard_filter.py <run_id> --controls shared      # the default
 
-`shard_filter.py` now refuses `--controls per-shard` when the plan exceeds
-`queries + controls`, and prints the retrain budget either way. The old version
-*printed* the cost and continued; it was read past for hours. **If a script only
-prints a number you should have reacted to, that is a bug in the script.**
+`shard_filter.py` refuses `--controls per-shard` when the plan exceeds
+`queries + controls`. **If a script only prints a number you should have reacted
+to, that is a bug in the script.**
+
+## Verify that a launch actually started
+
+Three launches have silently no-op'd here: an abort filtered out because the caller
+grepped for the success line, a kill loop that parsed an empty pid from
+right-aligned `ps` output, and config mutations written after the file. Every one
+reported success and nothing re-checked.
+
+`scripts/launch_one.sh` registers each launch in
+`paper_runs/_logs/launch_registry.tsv` and exits non-zero with `LAUNCH-FAILED`, so
+a filtered pipe cannot swallow the failure. Ten minutes later run
+
+    scripts/check_launches.sh
+
+which marks each entry GOOD (alive and holding GPU memory), DONE (exited with real
+log output) or **DEAD** (gone, empty log -- it never started). DEAD is the silent
+failure and the only state that needs a human. Never conclude a run is progressing
+from its own stdout.
 
 ## Sharding a filter needs BOTH halves sliced
 
