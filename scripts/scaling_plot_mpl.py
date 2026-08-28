@@ -79,9 +79,8 @@ ax.set_xlabel("Number of Training Tokens")
 ax.set_ylabel("Change in Query Loss")
 ax.grid(color="#e6e5e0", linewidth=0.8)
 ax.set_axisbelow(True)
-for side in ("top", "right"):
-    ax.spines[side].set_visible(False)
-ax.legend(frameon=False, loc="upper left", ncols=len(SERIES))
+ax.legend(frameon=False, loc="lower left", bbox_to_anchor=(0, 1.0),
+          ncols=len(SERIES), borderaxespad=0)
 ax.margins(x=0.09)
 
 args.out.parent.mkdir(parents=True, exist_ok=True)
