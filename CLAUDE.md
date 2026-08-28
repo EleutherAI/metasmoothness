@@ -5,7 +5,7 @@ time. Prefer the tool that enforces a rule over remembering it.
 
 ## Filters: 3 controls per ROW, not per shard
 
-A proponent filter is `queries` retrains **plus 3 control retrains for the whole
+A proponent filter is 1 baseline retrain + `queries` retrains + 3 control retrains for the whole row -- 24 in total, whatever the shard count.
 row**. The controls are 3 retrained models; scoring them against all 20 queries is
 forward passes and costs nothing. So a filter is 23 retrains, whatever the shard
 count.

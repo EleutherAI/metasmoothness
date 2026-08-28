@@ -102,11 +102,17 @@ print()
 # The row needs `queries` retrains plus `n_ctrl` controls. Sharding must not
 # multiply the controls; if the plan does, stop rather than warn.
 n_ctrl = int(step.get("num_subsets", 3) or 0)
-minimum = args.queries + n_ctrl
-planned = args.queries + (n_ctrl * args.shards if args.controls == "per-shard" else 0)
+# Each shard also retrains an unfiltered BASELINE before its query loop -- the
+# same-conditions reference. Like the controls it is identical across shards, and
+# like the controls a bank supplies it (load_bank_losses returns bank_base), so
+# --controls shared removes both. Measured on the 128k row: 6 retrains per shard
+# (1 baseline + 2 queries + 3 controls) where the row needs 24 in total.
+minimum = 1 + args.queries + n_ctrl
+planned = (args.shards * (1 + args.queries // args.shards + n_ctrl)
+           if args.controls == "per-shard" else args.queries)
 bank = args.bank or str(root / "bank_from_filter")
 
-print("retrain budget: %d planned, %d minimum (%d queries + %d controls)"
+print("retrain budget: %d planned, %d minimum (1 baseline + %d queries + %d controls)"
       % (planned, minimum, args.queries, n_ctrl))
 
 if args.controls == "shared":
@@ -120,8 +126,9 @@ elif planned > minimum and not args.force:
     raise SystemExit(
         "REFUSING: --controls per-shard makes this %d retrains against a minimum "
         "of %d.\n"
-        "3 controls are 3 retrained models for the WHOLE row -- scoring them "
-        "against every query is forward passes, not training.\n"
+        "The baseline and the 3 controls are models for the WHOLE row -- scoring "
+        "them against every query is forward passes, not training. Per-shard, each "
+        "shard repeats BOTH.\n"
         "Build the bank once and let all shards read it:\n"
         "  python scripts/gen_bank.py %s --num-subsets %d --subset-fraction %s\n"
         "  python scripts/shard_filter.py %s --controls shared\n"
