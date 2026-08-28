@@ -73,8 +73,14 @@ if ! mkdir "$CLAIM" 2>/dev/null; then
   # that dies seconds after launching -- FileExistsError is the common one -- locks
   # its pair for the full TTL, and two idle GPUs sit unusable while the queue backs
   # up behind them. Age alone is the fallback for a claim with no readable pid.
-  if [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; then
-    echo "  reclaiming $GPUS: holder pid $holder is gone (claim ${age}s old)"
+  # kill -0 succeeds on a ZOMBIE, so "responds to a signal" is not "alive". A
+  # launcher whose child died leaves a defunct process that holds the claim until
+  # the TTL while its GPUs sit empty -- seen on lotus 6,7. Read the state from
+  # /proc instead: Z means reaped-pending, which is as dead as gone.
+  hstate=""
+  [ -n "$holder" ] && hstate=$(awk '{print $3}' "/proc/$holder/stat" 2>/dev/null)
+  if [ -n "$holder" ] && { ! kill -0 "$holder" 2>/dev/null || [ "$hstate" = "Z" ]; }; then
+    echo "  reclaiming $GPUS: holder pid $holder is ${hstate:-gone} (claim ${age}s old)"
   elif [ "$age" -ge "$CLAIM_TTL" ]; then
     echo "  reclaiming a stale claim on $GPUS (${age}s old)"
   else
