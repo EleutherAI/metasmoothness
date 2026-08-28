@@ -64,8 +64,6 @@ for name, color, dodge, prefixes in SERIES:
     xs = [n * dodge for n in ns]
     ax.errorbar(xs, deltas, yerr=[lo_err, hi_err], color=color, label=name,
                 marker="o", markersize=5, linewidth=2, capsize=3, capthick=1.2)
-    ax.annotate(name, (xs[-1], deltas[-1]), xytext=(10, -4 if name == "Muon" else 0),
-                textcoords="offset points", va="center", color="#52514e")
     for n in missing:
         ax.annotate(f"{name}\nretraining", (tokens(n), 0), xytext=(0, 6),
                     textcoords="offset points", ha="center", fontsize=7, color="#9a988f")
@@ -75,8 +73,8 @@ ax.set_xticks([tokens(n) for n in NS],
               [f"{tokens(n) / 1e6:.0f}M" if tokens(n) >= 1e8 else f"{tokens(n) / 1e6:.1f}M"
                for n in NS])
 ax.minorticks_off()
-ax.set_xlabel("Number of Training Tokens")
-ax.set_ylabel("Change in Query Loss")
+ax.set_xlabel("Number of training tokens")
+ax.set_ylabel("Change in query loss")
 ax.grid(color="#e6e5e0", linewidth=0.8)
 ax.set_axisbelow(True)
 ax.legend(frameon=False, loc="lower left", bbox_to_anchor=(0, 1.0),
