@@ -13,7 +13,17 @@ set -u
 CFG="$1"; GPUS="$2"; PORT="$3"; NAME="$4"
 LOGS=/mnt/ssd-2/lucia/paper_runs/_logs
 REG=$LOGS/launch_registry.tsv
-PY=/home/lucia/envs/paper/bin/python
+# The newer pods (wisteria/jasmine/violet/clover) run as root with no lucia home,
+# so /home/lucia/envs is absent -- but the same pinned env is on the shared volume.
+# Pick whichever exists rather than hardcoding one.
+if [ -x /home/lucia/envs/paper/bin/python ]; then
+  PY=/home/lucia/envs/paper/bin/python
+else
+  PY=/mnt/ssd-2/lucia/envs/paper/bin/python
+fi
+# Those pods write as root. Without this, files land 644/755 and the uid 1000/1001
+# pods cannot write into the run dirs for merges and recovery.
+umask 0000
 mkdir -p "$LOGS"
 
 fail() { echo "  LAUNCH-FAILED $NAME on $(hostname) gpu $GPUS :: $*"; exit 1; }
@@ -41,15 +51,55 @@ if pgrep -af "m bergson" 2>/dev/null | grep -qF -- "$CFG"; then
   fail "already running with this config -- refusing to double-launch"
 fi
 
+# CLAIM the GPUs before checking them. nvidia-smi is not an arbiter: a job takes
+# up to a minute to show memory, so two launchers polling in that window both read
+# the pair as free and both launch onto it. That has now happened twice -- two
+# 2000-step MAGIC jobs onto bellflower 6,7 sixteen seconds apart, and a MAGIC job
+# and a filter shard onto yarrow 6,7 thirteen seconds apart. Both times the second
+# job died and the first looked fine, so nothing surfaced it.
+#
+# mkdir is atomic on the shared volume, so exactly one launcher can create a given
+# claim. Claims older than CLAIM_TTL are stale (the launcher died before
+# releasing) and are reclaimed. The claim is released by the run itself finishing;
+# until then the GPU shows memory and the normal check covers it.
+CLAIMS=$LOGS/gpu_claims
+CLAIM_TTL=900
+mkdir -p "$CLAIMS"
+CLAIM="$CLAIMS/$(hostname)_${GPUS//,/-}"
+if ! mkdir "$CLAIM" 2>/dev/null; then
+  age=$(( $(date +%s) - $(stat -c %Y "$CLAIM" 2>/dev/null || echo 0) ))
+  holder=$(cat "$CLAIM/pid" 2>/dev/null || echo "")
+  # A claim whose holder is gone is stale no matter how young. Without this, a job
+  # that dies seconds after launching -- FileExistsError is the common one -- locks
+  # its pair for the full TTL, and two idle GPUs sit unusable while the queue backs
+  # up behind them. Age alone is the fallback for a claim with no readable pid.
+  if [ -n "$holder" ] && ! kill -0 "$holder" 2>/dev/null; then
+    echo "  reclaiming $GPUS: holder pid $holder is gone (claim ${age}s old)"
+  elif [ "$age" -ge "$CLAIM_TTL" ]; then
+    echo "  reclaiming a stale claim on $GPUS (${age}s old)"
+  else
+    fail "gpu $GPUS claimed ${age}s ago by live pid ${holder:-unknown} -- refusing to stack"
+  fi
+  touch "$CLAIM"
+fi
+release_claim() { rmdir "$CLAIM" 2>/dev/null; }
+
 for g in ${GPUS//,/ }; do
   used=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i "$g" 2>/dev/null)
-  [ "${used:-0}" -gt 0 ] && fail "gpu $g already has ${used}MiB in use"
+  # 100MiB threshold, not 0: a free GPU often reports a few MiB of driver
+  # baseline, and refusing on that blocks legitimate launches.
+  if [ "${used:-0}" -gt 100 ]; then
+    release_claim
+    fail "gpu $g already has ${used}MiB in use"
+  fi
 done
 
-cd /tmp || fail "cannot cd /tmp"
+cd /tmp || { release_claim; fail "cannot cd /tmp"; }
 CUDA_VISIBLE_DEVICES="$GPUS" MASTER_PORT="$PORT" PYTHONNOUSERSITE=1 PYTHONPATH="$BERG" \
   setsid nohup "$PY" -s -P -m bergson "$CFG" >> "$LOGS/$NAME.log" 2>&1 < /dev/null &
 PID=$!
+# Record the holder so a later launcher can tell a live claim from a dead one.
+echo "$PID" > "$CLAIM/pid"
 printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
   "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(date +%s)" "$(hostname)" "$GPUS" "$NAME" "$PID" "$CFG" >> "$REG"
 echo "  launched $NAME on $(hostname) gpu $GPUS pid $PID  (registered)"
