@@ -20,9 +20,11 @@ ap.add_argument("--out", type=pathlib.Path, default=ROOT / "figures" / "filter_s
 args = ap.parse_args()
 
 # The x dodge separates coincident error bars; multiplicative because x is log.
-SERIES = [("adamw", "#2a78d6", 0.98, ("plan_adam_eps1e17_", "sm_adamw_eps1e17_")),
-          ("muon", "#eb6834", 1.02, ("plan_muon_eps1e17_", "sm_muon_eps1e17_"))]
+SERIES = [("AdamW", "#2a78d6", 0.98, ("plan_adam_eps1e17_", "sm_adamw_eps1e17_")),
+          ("Muon", "#eb6834", 1.02, ("plan_muon_eps1e17_", "sm_muon_eps1e17_"))]
 NS = [4000, 8000, 16000, 32000, 64000, 128000]
+# Tokens seen in training: 2 epochs over N docs of 512 tokens each.
+tokens = lambda n: 2 * n * 512
 PREFER = ("plan_muon_eps1e17_4k_bs256_lr2e-4",)
 
 rows = list(csv.DictReader(open(ROOT / "experiments.csv")))
@@ -55,30 +57,31 @@ for name, color, dodge, prefixes in SERIES:
             missing.append(n)
             continue
         d = float(r["filter_ekfac_delta"])
-        ns.append(n)
+        ns.append(tokens(n))
         deltas.append(d)
         lo_err.append(d - float(r["filter_ekfac_lo"]))
         hi_err.append(float(r["filter_ekfac_hi"]) - d)
     xs = [n * dodge for n in ns]
     ax.errorbar(xs, deltas, yerr=[lo_err, hi_err], color=color, label=name,
                 marker="o", markersize=5, linewidth=2, capsize=3, capthick=1.2)
-    ax.annotate(name, (xs[-1], deltas[-1]), xytext=(10, -4 if name == "muon" else 0),
+    ax.annotate(name, (xs[-1], deltas[-1]), xytext=(10, -4 if name == "Muon" else 0),
                 textcoords="offset points", va="center", color="#52514e")
     for n in missing:
-        ax.annotate(f"{name}\nretraining", (n, 0), xytext=(0, 6),
+        ax.annotate(f"{name}\nretraining", (tokens(n), 0), xytext=(0, 6),
                     textcoords="offset points", ha="center", fontsize=7, color="#9a988f")
 
 ax.set_xscale("log", base=2)
-ax.set_xticks(NS, [f"{n // 1000}k" for n in NS])
+ax.set_xticks([tokens(n) for n in NS],
+              [f"{tokens(n) / 1e6:.0f}M" if tokens(n) >= 1e8 else f"{tokens(n) / 1e6:.1f}M"
+               for n in NS])
 ax.minorticks_off()
-ax.set_xlabel("corpus size (documents)")
-ax.set_ylabel("EK-FAC proponent-filter delta")
-ax.set_title("Proponent-filter delta vs corpus size (bs256, 2 epochs)", fontsize=11)
-ax.grid(axis="y", color="#e6e5e0", linewidth=0.8)
+ax.set_xlabel("Number of Training Tokens")
+ax.set_ylabel("Change in Query Loss")
+ax.grid(color="#e6e5e0", linewidth=0.8)
 ax.set_axisbelow(True)
 for side in ("top", "right"):
     ax.spines[side].set_visible(False)
-ax.legend(frameon=False, loc="upper left")
+ax.legend(frameon=False, loc="upper left", ncols=len(SERIES))
 ax.margins(x=0.09)
 
 args.out.parent.mkdir(parents=True, exist_ok=True)
