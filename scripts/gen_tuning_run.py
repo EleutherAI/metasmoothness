@@ -35,6 +35,7 @@ BERGSON = "/mnt/ssd-1/lucia/bergson-main-paper-429"
 # DATA from BERGSON breaks every config the moment BERGSON is repointed.
 DATA = "/mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets"
 LONDON = "/mnt/ssd-2/lucia/datasets_local"
+SSD2_DATA = "/mnt/ssd-2/lucia/datasets_local"
 
 
 def _dataset_for(run_id: str, n: int) -> str:
@@ -49,7 +50,11 @@ def _dataset_for(run_id: str, n: int) -> str:
     if "london" in run_id:
         path = f"{LONDON}/london_{n // 1000}k.hf"
     else:
-        path = f"{DATA}/train_{n // 1000}k.hf"
+        # Prefer the ssd-2 mirror. D23 forbids writing to ssd-1, so corpora built
+        # after that decision -- train_1000k.hf for the 1M rung -- only exist here.
+        # ssd-1 stays as the fallback for the rungs that predate it.
+        cand = f"{SSD2_DATA}/train_{n // 1000}k.hf"
+        path = cand if os.path.isdir(cand) else f"{DATA}/train_{n // 1000}k.hf"
     if not os.path.isdir(path):
         raise SystemExit(
             f"refusing: {run_id} resolves to {path}, which does not exist. "

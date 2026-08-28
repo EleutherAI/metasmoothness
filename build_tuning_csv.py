@@ -738,6 +738,41 @@ for opt in ["adamw"]:
 # So rather than centre on a contested value and pay a serial extension round, the
 # full 5e-5..4e-4 grid runs in one pass on four otherwise-idle pairs. Same wall
 # clock as a 3-point grid, and it resolves the endpoint question in the same shot.
+# The muon arm at 256k. Queued to fill the gap the adam path leaves while 1M is
+# scoring -- scoring and control-building are narrow jobs that cannot use the whole
+# fleet, so muon work there lands at no cost to the adam critical path.
+#
+# Grid matches the adamw arm at this size so the two are directly comparable. The
+# adamw winner was 2e-4 on an INTERIOR win, so 4e-4 is included rather than sitting
+# at the top of the grid.
+# 1M at bs256 = 8000 steps. Grid deliberately shifted UP, not centred on the 2e-4
+# that won at 128k and 256k.
+#
+# The reason is the 512k probe measured 2026-08-28: 1e-4 3.1403, 2e-4 3.1108,
+# 4e-4 3.0803, 8e-4 3.0573 -- still falling at the top of the grid, so the 512k
+# optimum is at or above 8e-4, four times the 128k/256k winner. Whatever is driving
+# that, a 1M grid centred on 2e-4 would sit entirely below the optimum and return an
+# endpoint win with nothing useful either side of it.
+#
+# So the grid starts where 512k ended. If 4e-4 wins the bottom here, that is the
+# signal the rise has stopped and the grid should come back down.
+for opt in ["adamw"]:
+    sweep(f"tune_{opt}_1m_bs256",
+          selects_lr_for="plan_adam_eps1e17_1m_bs256",
+          lrs=[4e-4, 8e-4, 1.6e-3, 3.2e-3], priority=2, optimizer=opt, n_docs=1000000,
+          batch_size=256, grad_accum_steps=16,
+          notes="Token axis at bs256, 2 epochs (8000 steps). Grid shifted UP to "
+                "4e-4..3.2e-3 because the 512k optimum measured at or above 8e-4, "
+                "not because of any prior on 1M.")
+
+for opt in ["muon"]:
+    sweep(f"tune_{opt}_256k_bs256",
+          selects_lr_for="plan_muon_eps1e17_256k_bs256",
+          lrs=[5e-5, 1e-4, 2e-4, 4e-4], priority=3, optimizer=opt, n_docs=256000,
+          batch_size=256, grad_accum_steps=16,
+          notes="Token axis at bs256, 2 epochs (2000 steps), muon. Same grid as the "
+                "adamw arm at 256k so the arms are comparable.")
+
 for opt in ["adamw"]:
     sweep(f"tune_{opt}_256k_bs256",
           selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_256k_bs256",
@@ -759,11 +794,14 @@ for opt in ["adamw"]:
 for opt in ["adamw"]:
     sweep(f"tune_{opt}_512k_bs256",
           selects_lr_for=f"plan_{'adam' if opt == 'adamw' else 'muon'}_eps1e17_512k_bs256",
-          lrs=[2.5e-5, 5e-5, 1e-4, 2e-4], priority=2, optimizer=opt, n_docs=512000,
+          lrs=[2.5e-5, 5e-5, 1e-4, 2e-4, 4e-4], priority=2, optimizer=opt, n_docs=512000,
           batch_size=256, grad_accum_steps=16,
-          notes="Token axis at bs256, 2 epochs (4000 steps). Grid shifted down "
-                "from the 128k winner to follow the step drift; 2e-4 retained as "
-                "the top so an endpoint win needs no extension round.")
+          notes="Token axis at bs256, 2 epochs (4000 steps). Grid was shifted DOWN "
+                "on a step-drift argument that the 256k result then falsified. "
+                "Measured 2026-08-28: 2.5e-5 3.1853, 5e-5 3.1646, 1e-4 3.1397, "
+                "2e-4 3.1105 -- monotone decreasing with the win at the TOP of the "
+                "grid, so 4e-4 is added as the endpoint extension. The optimum may "
+                "be RISING with N here, the opposite of the original assumption.")
 
 # A100 endpoint probe at 512k, on lotus, 2026-08-28.
 #
@@ -785,10 +823,23 @@ for opt in ["adamw"]:
 for opt in ["adamw"]:
     sweep(f"tune_{opt}_512k_bs256_a100",
           selects_lr_for=f"plan_adam_eps1e17_512k_bs256",
-          lrs=[2e-4, 4e-4], priority=3, optimizer=opt, n_docs=512000,
+          lrs=[1e-4, 2e-4, 4e-4, 8e-4, 1.6e-3, 3.2e-3], priority=3, optimizer=opt, n_docs=512000,
           batch_size=256, grad_accum_steps=16,
-          notes="A100 endpoint probe at 512k (lotus). Hardware-clean 2e-4 vs 4e-4 "
-                "pair; does NOT select the row lr, the A40 grid does.")
+          notes="A100 probe at 512k (lotus), 1e-4/2e-4/4e-4/8e-4 on one node so "
+                "the comparison is hardware-clean. Widened from a 2e-4 vs 4e-4 "
+                "pair to a 4-point grid because a pair can only rank two values, "
+                "whereas this can return an INTERIOR winner -- the thing that "
+                "would actually settle whether the A40 grid needs an extension. "
+                "8e-4 is included so a 4e-4 win is not itself a new endpoint. "
+                "Does NOT select the row lr; the A40 grid remains the authority.\n"
+                "MEASURED 2026-08-28: 1e-4 3.1403, 2e-4 3.1108, 4e-4 3.0803, "
+                "8e-4 3.0573 -- monotone decreasing to the TOP of the probe, so "
+                "the optimum is at or above 8e-4, four times the 2e-4 that won at "
+                "both 128k and 256k. Extended to 1.6e-3 and 3.2e-3 to bracket it. "
+                "This is surprising: 512k is 4000 steps against 256k 2000, and more "
+                "steps normally moves the optimum DOWN. The probe agrees with the "
+                "A40 grid to 0.0006 at the two shared points, so it is not a "
+                "hardware artefact.")
 
 # Step-scaling sweep results, measured 2026-08-25 (bs32, ga 2, nproc 2, pinned venv).
 # Both 32k arms win on the INTERIOR point, so the CONTROLS batch-16-32 centre of
