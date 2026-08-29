@@ -3,7 +3,12 @@
 #
 # Launch each job in the queue as GPU pairs free, one at a time.
 #
-# Queue lines are:  <config-path>|<master-port>|<name>
+# Queue lines are:  <config-path>|<master-port>|<name>[|<gpus-needed>]
+#
+# gpus-needed defaults to 2. It matters: MAGIC scoring for the larger rows needs
+# 46-51 GB, which fits two A100s on lotus but needs FOUR A40s anywhere else, and a
+# drainer that only ever looked for pairs left those jobs unqueueable while whole
+# 4-GPU blocks sat idle.
 #
 # Two mistakes this exists to not repeat:
 #   * A launched job takes ~a minute to show memory in nvidia-smi, so a tight loop
@@ -27,12 +32,15 @@ for round in $(seq 1 400); do
   for idx in "${!JOBS[@]}"; do
     line="${JOBS[$idx]}"
     [ -z "$line" ] && continue
-    IFS='|' read -r cfg port name <<< "$line"
+    IFS='|' read -r cfg port name want <<< "$line"
+    want=${want:-2}
     launched=0
     for node in $NODES; do
       pair=$(timeout 40 kubectl exec "$node" -- su - lucia -c \
-        'nvidia-smi --query-gpu=index,memory.used --format=csv,noheader,nounits |
-         awk -F, "{gsub(/ /,\"\",\$2); if (\$2+0<=100) f=f\" \"\$1} END {n=split(f,a,\" \"); if (n>=2) printf \"%s,%s\", a[1], a[2]}"' 2>/dev/null)
+        "nvidia-smi --query-gpu=index,memory.used --format=csv,noheader,nounits |
+         awk -F, -v want=$want '{gsub(/ /,\"\",\$2); if (\$2+0<=100) f=f\" \"\$1}
+                                 END {n=split(f,a,\" \"); if (n>=want) {s=a[1];
+                                   for (i=2;i<=want;i++) s=s\",\"a[i]; printf \"%s\", s}}'" 2>/dev/null)
       [ -z "$pair" ] && continue
       out=$(timeout 120 kubectl exec "$node" -- su - lucia -c \
         "bash /tmp/launch_one.sh $cfg $pair $port $name" 2>&1 | tr -d '\r')
