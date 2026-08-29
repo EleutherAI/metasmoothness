@@ -46,7 +46,16 @@ def status(run_id, method):
     if not r:
         return "missing", "no row in experiments.csv"
     d = os.path.join(E, run_id)
-    running = [c for c in alive if c.startswith(d + os.sep)]
+    # Attribute a running config to the METHOD it advances. Matching any config
+    # under the row made a top-40 shard read as evidence that the second scorer
+    # was running, which is a false confirmation -- the worst kind of audit bug.
+    marks = ("magic",) if method == "magic" else ("filter_proponents", "filter_top40", "ekfac")
+    running = [c for c in alive if c.startswith(d + os.sep)
+               and any(k in os.path.basename(c) for k in marks)]
+    # A row's own base/training config lives in configs/experiments/<run_id>.yaml,
+    # not under the run directory, so the prefix test above cannot see it. Without
+    # this a row whose base is training right now reports MISSING.
+    running += [c for c in alive if os.path.basename(c) == run_id + ".yaml"]
     if running:
         return "running", os.path.basename(running[0])[:34] + (f" (+{len(running)-1})" if len(running) > 1 else "")
     # scores present but no filter yet -> the filter is the missing step
