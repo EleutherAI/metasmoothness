@@ -20,6 +20,8 @@
 #     risk pairing into someone else's work.
 set -u
 QUEUE="$1"
+# Optional bergson checkout override, e.g. the FSDP-fix tree for 7B runs.
+BERG="${2:-}"
 NODES="lucia-ord-0 secret-ord-0 allium-0 shared-ord-0 bellflower-0 lotus-0 wisteria-0 jasmine-0 violet-0 clover-0 yarrow-0 poppy-0 heather-0 orchid-0"
 # macOS ships bash 3.2, which has neither mapfile nor associative arrays.
 JOBS=()
@@ -43,7 +45,7 @@ for round in $(seq 1 400); do
                                    for (i=2;i<=want;i++) s=s\",\"a[i]; printf \"%s\", s}}'" 2>/dev/null)
       [ -z "$pair" ] && continue
       out=$(timeout 120 kubectl exec "$node" -- su - lucia -c \
-        "bash /tmp/launch_one.sh $cfg $pair $port $name" 2>&1 | tr -d '\r')
+        "bash /tmp/launch_one.sh $cfg $pair $port $name ${BERG:-}" 2>&1 | tr -d '\r')
       echo "[$(date -u +%H:%M:%S)] $node $pair :: $(echo "$out" | grep -aE 'launched|LAUNCH-FAILED' | head -1)"
       if echo "$out" | grep -qa launched; then
         JOBS[$idx]=""; done_count=$((done_count + 1)); launched=1
