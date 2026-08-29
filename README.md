@@ -41,7 +41,13 @@ prioritised against these.
   corpus; running some experiments with a corpus of pre-1931 text)
 
 The strongest findings -- meaning the ones cheapest to investigate -- should
-generalise up to dataset size **N = 1M** for now.
+generalise up to dataset size **N = 256k**, which is where the scaling stops.
+
+The earlier target was N = 1M. That is cancelled: the 1% curve is flat from
+128k to 256k (0.21287 -> 0.20803, intervals almost entirely overlapping), so
+further doublings were buying resolution on a curve that had stopped moving.
+The 512k and 1M learning-rate sweeps are stopped and their rows should not be
+read as planned work.
 
 ## Proponent filter scaling (EK-FAC)
 
