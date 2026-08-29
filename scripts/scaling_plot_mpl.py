@@ -161,10 +161,6 @@ fig, ax = plt.subplots(figsize=(7, 4.5), dpi=200)
 for name, color, dodge, prefixes in SERIES:
     missing = draw(ax, [t * dodge for t in tok_ticks], scaling_points(prefixes),
                    color, label=name)
-    for x in missing:
-        ax.annotate(f"{name}\nretraining", (x, 0), xytext=(0, 6),
-                    textcoords="offset points", ha="center", fontsize=7,
-                    color="#9a988f")
 style(ax, tok_ticks, tok_labels, "Number of training tokens")
 outside_legend(ax, len(SERIES))
 save(fig, "filter_scaling_appendix.png")
