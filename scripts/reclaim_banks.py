@@ -27,6 +27,7 @@ import glob
 import os
 import shutil
 import sys
+from pathlib import Path
 
 AP = argparse.ArgumentParser()
 AP.add_argument("--delete", action="store_true")
@@ -41,10 +42,25 @@ rows = {r["run_id"]: r for r in csv.DictReader(open(REPO + "/experiments.csv"))}
 deltas = {r["run"]: r for r in csv.DictReader(open(REPO + "/data/filter_deltas.csv"))}
 
 from huggingface_hub import HfApi
+
+# Ask publish_bank what a run's repo is called rather than re-deriving it. The
+# scheme changed on 2026-08-27 from metasmoothness-bank-<run_id> to
+# LDS-retrain-bank-<opt>-N<n>-bs<bs>, and this file kept searching the old name --
+# so a bank that HAD been published correctly still read as "not on the Hub" and
+# the gate could never pass. Every audit reported 0 GB reclaimable while ~395 GB
+# sat pinned. One source of truth for the name prevents the two drifting again.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from publish_bank import bank_repo_id  # noqa: E402
+
 api = HfApi()
-published = {}
-for d in api.list_datasets(author="EleutherAI", search="metasmoothness-bank"):
-    published[d.id.split("metasmoothness-bank-")[-1]] = d.id
+
+
+def _is_published(run_id: str) -> bool:
+    try:
+        api.dataset_info(bank_repo_id(run_id))
+        return True
+    except Exception:
+        return False
 
 
 def bank_dirs(run_root):
@@ -98,7 +114,7 @@ for root in ROOTS:
         if not dirs:
             continue
         why = []
-        if rid not in published:
+        if not _is_published(rid):
             why.append("not on the Hub")
         vpath, ns, nq = val_ok(p)
         if vpath is None:

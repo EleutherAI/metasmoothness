@@ -26,11 +26,11 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--outdir", type=pathlib.Path, default=ROOT / "figures")
 args = ap.parse_args()
 
-BLUE, ORANGE, AQUA = "#2a78d6", "#eb6834", "#1baf7a"
+BLUE, ORANGE, AQUA, BM25 = "#2a78d6", "#eb6834", "#1baf7a", "#5c5c5c"
 # The x dodge separates coincident error bars; multiplicative because x is log.
 SERIES = [("AdamW", BLUE, 0.98, ("plan_adam_eps1e17_", "sm_adamw_eps1e17_")),
           ("Muon", ORANGE, 1.02, ("plan_muon_eps1e17_", "sm_muon_eps1e17_"))]
-NS = [4000, 8000, 16000, 32000, 64000, 128000, 256000]
+NS = [4000, 8000, 16000, 32000, 64000, 128000, 256000, 512000]
 BATCHES = [16, 32, 64, 128, 256, 512]
 ROOTS = ["/mnt/ssd-2/lucia/paper_runs/experiments", "/mnt/ssd-1/lucia/paper_runs/experiments"]
 TOP40_ROWS = [(4000, "plan_adam_eps1e17_4k_bs256"),
@@ -38,7 +38,9 @@ TOP40_ROWS = [(4000, "plan_adam_eps1e17_4k_bs256"),
               (16000, "sm_adamw_eps1e17_16k_bs256"),
               (32000, "plan_adam_eps1e17_32k_bs256"),
               (64000, "plan_adam_eps1e17_64k_bs256"),
-              (128000, "plan_adam_eps1e17_128k_bs256")]
+              (128000, "plan_adam_eps1e17_128k_bs256"),
+              (256000, "plan_adam_eps1e17_256k_bs256"),
+              (512000, "plan_adam_eps1e17_512k_bs256")]
 VARIANT_ROWS = [("Baseline (bs 256)", "sm_adamw_eps1e17_16k_bs256"),
                 ("Weight decay 0.0", "plan_adam_eps1e17_16k_wd0.0"),
                 ("Weight decay 0.1", "plan_adam_eps1e17_16k_wd0.1"),
@@ -79,17 +81,36 @@ def pick_batch(prefixes, bs):
     return None
 
 
-def top40_delta_ci(run, boot=10000):
+def summary_delta_ci(run, subdir, *, subtract_random=False, boot=10000):
     root = next((r for r in ROOTS if os.path.isdir(os.path.join(r, run))), None)
-    path = os.path.join(root, run, "filter_top40_ekfac", "filter_summary.csv") if root else None
+    path = os.path.join(root, run, subdir, "filter_summary.csv") if root else None
     if not (path and os.path.isfile(path)):
         return None
-    d = [float(r["filter_change"]) - float(r["random_mean"])
-         for r in csv.DictReader(open(path))]
+    d = []
+    for row in csv.DictReader(open(path)):
+        val = float(row["filter_change"])
+        if subtract_random:
+            val -= float(row["random_mean"])
+        d.append(val)
+    if not d:
+        return None
     rnd = random.Random(0)
     bs = sorted(statistics.fmean([rnd.choice(d) for _ in d]) for _ in range(boot))
     m = statistics.fmean(d)
     return m, m - bs[int(.025 * boot)], bs[int(.975 * boot)] - m
+
+
+def top40_delta_ci(run, source="ekfac"):
+    return summary_delta_ci(run, f"filter_top40_{source}", subtract_random=True)
+
+
+def bm25_scaling_points(prefixes):
+    pts = []
+    for n in NS:
+        r = pick_scaling(prefixes, n)
+        pts.append(summary_delta_ci(r["run_id"], "filter_proponents_bm25")
+                   if r else None)
+    return pts
 
 
 def delta_ci(r, method="ekfac"):
@@ -142,17 +163,22 @@ tok_labels = [f"{tokens(n) / 1e6:.0f}M" for n in NS]
 # Main figure: AdamW 1% filter beside the fixed-40-document filter.
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 3.8), dpi=200, sharey=True)
 name, color, _, prefixes = SERIES[0]
-draw(ax1, tok_ticks, scaling_points(prefixes), color)
+draw(ax1, tok_ticks, scaling_points(prefixes), color, label="EK-FAC")
+draw(ax1, tok_ticks, bm25_scaling_points(prefixes), BM25, label="BM25")
 style(ax1, tok_ticks, tok_labels, "Number of training tokens")
 ax1.set_title("Top 1% of documents removed", fontsize=10)
 
-top40_points = [top40_delta_ci(run) for _, run in TOP40_ROWS]
 top40_ticks = [tokens(n) for n, _ in TOP40_ROWS]
-draw(ax2, top40_ticks, top40_points, color)
+draw(ax2, top40_ticks, [top40_delta_ci(run, "ekfac") for _, run in TOP40_ROWS],
+     color, label="EK-FAC")
+draw(ax2, top40_ticks, [top40_delta_ci(run, "bm25") for _, run in TOP40_ROWS],
+     BM25, label="BM25")
 style(ax2, top40_ticks, [f"{t / 1e6:.0f}M" for t in top40_ticks],
       "Number of training tokens")
 ax2.set_title("Top 40 documents removed", fontsize=10)
 ax2.set_ylabel(None)
+outside_legend(ax1, 2)
+outside_legend(ax2, 2)
 main_ylim = ax1.get_ylim()
 save(fig, "filter_scaling.png")
 

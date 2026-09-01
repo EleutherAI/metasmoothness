@@ -24,7 +24,12 @@ import yaml
 
 ap = argparse.ArgumentParser()
 ap.add_argument("run_id")
-ap.add_argument("--source", choices=["magic", "ekfac"], default="ekfac")
+ap.add_argument("--source", choices=["magic", "ekfac", "bm25"], default="ekfac")
+ap.add_argument("--prefix", default="filter_proponents",
+                help="filter config/run prefix; use filter_top40 for fixed-40 runs")
+ap.add_argument("--score-slice-prefix", default="",
+                help="score slice directory prefix. Defaults to scores for magic/ekfac "
+                     "and bm25_scores for bm25.")
 ap.add_argument("--shards", type=int, default=4)
 ap.add_argument("--queries", type=int, default=20)
 ap.add_argument("--mirror", default="/mnt/ssd-2/lucia/datasets_local")
@@ -48,7 +53,7 @@ for base in ("/mnt/ssd-2/lucia/paper_runs/experiments",
 if root is None:
     raise SystemExit("run dir not found: %s" % args.run_id)
 
-src = root / ("filter_proponents_%s.yaml" % args.source)
+src = root / ("%s_%s.yaml" % (args.prefix, args.source))
 if not src.is_file():
     raise SystemExit("generate the unsharded config first: %s" % src)
 
@@ -67,13 +72,14 @@ for i in range(args.shards):
     s = copy.deepcopy(step)
     s["query"] = dict(s.get("query", {}))
     s["query"]["dataset"] = str(qds)
-    out_dir = root / ("filter_proponents_%s_q%d_%d" % (args.source, a, b))
+    out_dir = root / ("%s_%s_q%d_%d" % (args.prefix, args.source, a, b))
     s["run_path"] = str(out_dir)
 
     # Point the shard at its OWN score slice. This used to be left at the full
     # 20-column file, which dies inside validate_scores AFTER the shard has
     # trained -- so each failure costs a whole retrain.
-    sl = root / ("scores_q%d_%d" % (a, b))
+    score_prefix = args.score_slice_prefix or ("bm25_scores" if args.source == "bm25" else "scores")
+    sl = root / ("%s_q%d_%d" % (score_prefix, a, b))
     if (sl / "info.json").is_file():
         s["scores"] = str(sl)
     elif "scores" in s:
@@ -84,10 +90,14 @@ for i in range(args.shards):
 
     # Controls: read ONE shared bank instead of retraining 3 per shard.
     if args.controls == "shared":
-        s["retrained_dir"] = args.bank or str(root / "bank_from_filter")
+        bank = Path(args.bank or str(root / "bank_from_filter"))
+        if bank.is_dir():
+            s["retrained_dir"] = str(bank)
+        else:
+            s.pop("retrained_dir", None)
 
     # --- shard config assembled, now write it ---
-    out = root / ("filter_proponents_%s_q%d_%d.yaml" % (args.source, a, b))
+    out = root / ("%s_%s_q%d_%d.yaml" % (args.prefix, args.source, a, b))
     with open(out, "w") as f:
         yaml.safe_dump({"steps": [{"validate": s}], "run_path": str(out_dir)},
                        f, sort_keys=False)

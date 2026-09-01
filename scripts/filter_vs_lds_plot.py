@@ -36,6 +36,9 @@ def boot(x, y, n=10000):
 def series(scorer):
     out = []
     for r in rows:
+        # Keep one model and one loss: drop the gpt2-medium and logit-scale rows.
+        if r.get("model") != "gpt2" or float(r.get("logit_scale") or 1.0) != 1.0:
+            continue
         lds, delta, steps = (r.get(f"{scorer}_lds") or "").strip(), \
                             (r.get(f"filter_{scorer}_delta") or "").strip(), \
                             (r.get("steps") or "").strip()
@@ -63,14 +66,18 @@ for ax, (scorer, label) in zip(axes, [("magic", "MAGIC"), ("ekfac", "EK-FAC")]):
     ax.text(0.03, 0.96, f">125 steps:  $\\rho$ = {rho_hi:+.3f} [{lo_hi:+.2f}, {hi_hi:+.2f}]"
                         f"   (n = {hi_mask.sum()})",
             transform=ax.transAxes, va="top", fontsize=9, color="#444")
-    ax.set_xlabel(f"{label} LDS  (Spearman vs a 100-retrain bank)")
+    ax.set_xlabel(f"{label} LDS (100 retrains)")
     ax.grid(alpha=0.25, zorder=0)
     print(f"  {label:7s} n={len(x):3d}  rho={rho:+.3f} [{lo:+.3f},{hi:+.3f}]"
           f"   >125 steps n={hi_mask.sum():3d} rho={rho_hi:+.3f} [{lo_hi:+.3f},{hi_hi:+.3f}]")
     print(f"          LDS spans {x.min():.3f}-{x.max():.3f}, "
           f"delta spans {y.min():.3f}-{y.max():.3f}")
 
-axes[0].set_ylabel("Proponent-filter $\\Delta$ (change in query loss)")
+axes[0].set_ylabel("Change in query loss")
+lo_x = min(ax.get_xlim()[0] for ax in axes)
+hi_x = max(ax.get_xlim()[1] for ax in axes)
+for ax in axes:
+    ax.set_xlim(lo_x, hi_x)
 fig.colorbar(sc, ax=axes, label="training steps", pad=0.01)
 out = ROOT / "figures" / "filter_vs_lds.png"
 fig.savefig(out, dpi=160)

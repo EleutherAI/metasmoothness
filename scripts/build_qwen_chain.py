@@ -25,10 +25,13 @@ from bergson.data import tokenize_and_chunk  # noqa: E402
 
 MODEL = "/mnt/ssd-2/lucia/models/Qwen2.5-7B"
 OUT = "/mnt/ssd-2/lucia/datasets_local"
-NS = [4000, 8000, 16000, 32000, 64000, 128000]
+NS = [4000, 8000, 16000, 32000, 64000, 128000, 256000]
 N_QUERY, N_HELDOUT = 20, 4000
-# 1.72 chunks/doc measured on this corpus with this tokenizer; +15% headroom.
-RAW_DOCS = int((N_QUERY + max(NS) + N_HELDOUT) / 1.72 * 1.15)
+# 1.85 chunks/doc measured on this corpus with this tokenizer; +15% headroom.
+# Chunk boundaries depend on the RAW PREFIX SIZE, so every rung must come from
+# ONE chunking pass -- adding a rung later re-chunks and breaks nesting with
+# everything already built. Build the largest rung you will ever want, now.
+RAW_DOCS = int((N_QUERY + max(NS) + N_HELDOUT) / 1.85 * 1.15)
 
 tok = AutoTokenizer.from_pretrained(MODEL)
 print(f"  raw docs requested {RAW_DOCS:,}")

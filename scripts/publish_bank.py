@@ -35,7 +35,16 @@ def bank_repo_id(run_id: str) -> str:
     for a, b in [("plan_adam_", "adamw_"), ("plan_muon_", "muon_"),
                  ("sm_adamw_", "adamw_"), ("sm_muon_", "muon_")]:
         s = s.replace(a, b)
-    opt, _eps, n, var = s.split("_", 3)
+    # Rows outside the plan_/sm_ naming scheme -- gpt2medium_16k_bs32,
+    # london16k_bs256_muon -- have no <opt>_<eps>_<n>_<var> to unpack and used to
+    # die here with "not enough values to unpack", so they could not be published
+    # at all. Fall back to the run_id itself, which is unambiguous even if less
+    # tidy, rather than refusing to archive the bank.
+    bits = s.split("_", 3)
+    if len(bits) < 4:
+        safe = run_id.replace("_", "-")
+        return f"{ORG}/LDS-retrain-bank-{safe}"
+    opt, _eps, n, var = bits
     parts = [opt, "N" + n]
     if var.startswith("bs"):
         parts.append(var)
