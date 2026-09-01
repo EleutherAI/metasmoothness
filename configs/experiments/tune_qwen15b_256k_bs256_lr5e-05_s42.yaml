@@ -1,19 +1,19 @@
-run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_qwen7b_4k_bs256_lr2e-05_s42
+run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_qwen15b_256k_bs256_lr5e-05_s42
 steps:
 - magic:
-    run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_qwen7b_4k_bs256_lr2e-05_s42
+    run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_qwen15b_256k_bs256_lr5e-05_s42
     overwrite: false
     resume: true
-    model: /mnt/ssd-2/lucia/models/Qwen2.5-7B
+    model: /mnt/ssd-2/lucia/models/Qwen2.5-1.5B
     precision: bf16
     use_tf32_matmuls: false
     seed: 42
     cleanup_ckpts: false
     distributed:
       nnode: 1
-      nproc_per_node: 8
+      nproc_per_node: 2
     data:
-      dataset: /mnt/ssd-2/lucia/datasets_local/train_4k_qwen.hf
+      dataset: /mnt/ssd-2/lucia/datasets_local/train_256k_qwen.hf
       split: train
       chunk_length: 0
     query:
@@ -21,13 +21,13 @@ steps:
       split: train
       chunk_length: 0
     batch_size: 256
-    grad_accum_steps: 8
+    grad_accum_steps: 64
     num_epochs: 2
     lr_schedule:
-      lr: 2.0e-05
+      lr: 5.0e-05
       lr_scheduler_type: polynomial
       lr_start: 1.0e-06
-      lr_end: 2.0000000000000003e-06
+      lr_end: 5.0e-06
       warmup_steps: 0.25
     optimizer: adamw
     adam_beta1: 0.95
@@ -44,5 +44,5 @@ steps:
     save_optimizer_state: last
     save_mode: interval
     skip_validation: true
-    fsdp: true
-    save_interval: 30
+    fsdp: false
+    save_interval: 2000

@@ -1,0 +1,48 @@
+run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_qwen15b_128k_bs256_lr2e-05_s42
+steps:
+- magic:
+    run_path: /mnt/ssd-2/lucia/paper_runs/tuning/tune_qwen15b_128k_bs256_lr2e-05_s42
+    overwrite: false
+    resume: true
+    model: /mnt/ssd-2/lucia/models/Qwen2.5-1.5B
+    precision: bf16
+    use_tf32_matmuls: false
+    seed: 42
+    cleanup_ckpts: false
+    distributed:
+      nnode: 1
+      nproc_per_node: 2
+    data:
+      dataset: /mnt/ssd-2/lucia/datasets_local/train_128k_qwen.hf
+      split: train
+      chunk_length: 0
+    query:
+      dataset: /mnt/ssd-2/lucia/datasets_local/query_20_qwen.hf
+      split: train
+      chunk_length: 0
+    batch_size: 256
+    grad_accum_steps: 64
+    num_epochs: 2
+    lr_schedule:
+      lr: 2.0e-05
+      lr_scheduler_type: polynomial
+      lr_start: 1.0e-06
+      lr_end: 2.0000000000000003e-06
+      warmup_steps: 0.25
+    optimizer: adamw
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    adam_eps: 1.0e-08
+    eps_root: 1.0e-17
+    weight_decay: 0.01
+    loss_reduction: mean
+    train_mode: false
+    num_subsets: 0
+    subset_fraction: 0.01
+    query_method: none
+    save_models: true
+    save_optimizer_state: last
+    save_mode: interval
+    skip_validation: true
+    fsdp: false
+    save_interval: 1000
