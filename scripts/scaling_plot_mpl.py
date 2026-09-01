@@ -134,7 +134,7 @@ def style(ax, xticks, xlabels, xlabel):
     ax.set_xticks(xticks, xlabels)
     ax.minorticks_off()
     ax.set_xlabel(xlabel)
-    ax.set_ylabel("Change in query loss")
+    ax.set_ylabel("Query loss difference")
     ax.grid(color="#e6e5e0", linewidth=0.8)
     ax.set_axisbelow(True)
     ax.margins(x=0.09)
@@ -166,7 +166,7 @@ name, color, _, prefixes = SERIES[0]
 draw(ax1, tok_ticks, scaling_points(prefixes), color, label="EK-FAC")
 draw(ax1, tok_ticks, bm25_scaling_points(prefixes), BM25, label="BM25")
 style(ax1, tok_ticks, tok_labels, "Number of training tokens")
-ax1.set_title("Top 1% of documents removed", fontsize=10)
+ax1.set_title("Top 1% of documents removed", fontsize=10, pad=26)
 
 top40_ticks = [tokens(n) for n, _ in TOP40_ROWS]
 draw(ax2, top40_ticks, [top40_delta_ci(run, "ekfac") for _, run in TOP40_ROWS],
@@ -175,7 +175,7 @@ draw(ax2, top40_ticks, [top40_delta_ci(run, "bm25") for _, run in TOP40_ROWS],
      BM25, label="BM25")
 style(ax2, top40_ticks, [f"{t / 1e6:.0f}M" for t in top40_ticks],
       "Number of training tokens")
-ax2.set_title("Top 40 documents removed", fontsize=10)
+ax2.set_title("Top 40 documents removed", fontsize=10, pad=26)
 ax2.set_ylabel(None)
 outside_legend(ax1, 2)
 outside_legend(ax2, 2)
@@ -223,7 +223,7 @@ for y, (label, run) in zip(ys, VARIANT_ROWS):
     ax.errorbar([d], [y], xerr=[[lo], [hi]], color=BLUE, marker="o",
                 markersize=5, linewidth=2, capsize=3, capthick=1.2)
 ax.set_yticks(list(ys), [label for label, _ in VARIANT_ROWS])
-ax.set_xlabel("Change in query loss")
+ax.set_xlabel("Query loss difference")
 ax.grid(axis="x", color="#e6e5e0", linewidth=0.8)
 ax.set_axisbelow(True)
 ax.margins(y=0.12)
