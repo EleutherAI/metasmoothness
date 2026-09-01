@@ -163,22 +163,17 @@ tok_labels = [f"{tokens(n) / 1e6:.0f}M" for n in NS]
 # Main figure: AdamW 1% filter beside the fixed-40-document filter.
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 3.8), dpi=200, sharey=True)
 name, color, _, prefixes = SERIES[0]
-draw(ax1, tok_ticks, scaling_points(prefixes), color, label="EK-FAC")
-draw(ax1, tok_ticks, bm25_scaling_points(prefixes), BM25, label="BM25")
+draw(ax1, tok_ticks, scaling_points(prefixes), color)
 style(ax1, tok_ticks, tok_labels, "Number of training tokens")
-ax1.set_title("Top 1% of documents removed", fontsize=10, pad=26)
+ax1.set_title("Top 1% of documents removed", fontsize=10)
 
 top40_ticks = [tokens(n) for n, _ in TOP40_ROWS]
 draw(ax2, top40_ticks, [top40_delta_ci(run, "ekfac") for _, run in TOP40_ROWS],
-     color, label="EK-FAC")
-draw(ax2, top40_ticks, [top40_delta_ci(run, "bm25") for _, run in TOP40_ROWS],
-     BM25, label="BM25")
+     color)
 style(ax2, top40_ticks, [f"{t / 1e6:.0f}M" for t in top40_ticks],
       "Number of training tokens")
-ax2.set_title("Top 40 documents removed", fontsize=10, pad=26)
+ax2.set_title("Top 40 documents removed", fontsize=10)
 ax2.set_ylabel(None)
-outside_legend(ax1, 2)
-outside_legend(ax2, 2)
 main_ylim = ax1.get_ylim()
 save(fig, "filter_scaling.png")
 
@@ -201,15 +196,17 @@ ax.set_ylim(main_ylim)
 outside_legend(ax, len(SERIES))
 save(fig, "filter_batch_appendix.png")
 
-# Appendix figure: EK-FAC vs MAGIC proponent filters, AdamW corpus scaling.
+# Appendix figure: EK-FAC vs MAGIC vs BM25 proponent filters, AdamW corpus scaling.
 fig, ax = plt.subplots(figsize=(7, 4.5), dpi=200)
 prefixes = SERIES[0][3]
-for method, color, dodge in [("ekfac", BLUE, 0.98), ("magic", AQUA, 1.02)]:
+for method, color, dodge in [("ekfac", BLUE, 0.97), ("magic", AQUA, 1.0)]:
     label = {"ekfac": "EK-FAC", "magic": "MAGIC"}[method]
     draw(ax, [t * dodge for t in tok_ticks], scaling_points(prefixes, method),
          color, label=label)
+draw(ax, [t * 1.03 for t in tok_ticks], bm25_scaling_points(prefixes),
+     BM25, label="BM25")
 style(ax, tok_ticks, tok_labels, "Number of training tokens")
-outside_legend(ax, 2)
+outside_legend(ax, 3)
 save(fig, "filter_method_appendix.png")
 
 # Appendix figure: training-setup variants at 16k documents, AdamW.
