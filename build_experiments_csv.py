@@ -1216,7 +1216,9 @@ for n in [4000, 8000, 32000, 64000]:
 # the same way.
 TUNED_LR["plan_adam_eps1e17_128k_bs256"] = 2e-4
 TUNED_LR["plan_muon_eps1e17_128k_bs256"] = 1e-4
+TUNED_LR["plan_muon_eps1e17_256k_bs256"] = 2e-4
 TUNED_LR["plan_adam_eps1e17_256k_bs256"] = 2e-4
+TUNED_LR["plan_adam_eps1e17_512k_bs256"] = 8e-4
 
 add(BASE17, run_id="plan_adam_eps1e17_128k_bs256", n_docs=128000,
     lr=TUNED_LR["plan_adam_eps1e17_128k_bs256"],
@@ -1238,10 +1240,26 @@ add(BASE17, run_id="plan_adam_eps1e17_256k_bs256", n_docs=256000,
           "retrains have to match the base hardware under D17, and lotus is the "
           "only A100 left, which is far too few pairs to shard a filter on.")
 
+# 512k extends the main proponent-filter scaling curve. The A100 probe is the
+# only complete high-end 512k bs256 model set with the widened grid available on
+# disk; 8e-4 is the best recorded point in the paper notes and remains the
+# current row lr until the 1.6e-3 / 3.2e-3 evaluations are explicitly admitted.
+add(BASE17, run_id="plan_adam_eps1e17_512k_bs256", n_docs=512000,
+    lr=TUNED_LR["plan_adam_eps1e17_512k_bs256"],
+    notes="N axis at 512k, bs256 (4000 steps). lr from the A100 "
+          "tune_adamw_512k_bs256_a100 probe; 8e-4 is the best recorded heldout "
+          "point in build_tuning_csv.py notes. This row exists to add the 512k "
+          "top-1% and top-40 proponent-filter points to the main scaling figure; "
+          "it reuses the winning tuning model as the base under reuse rule 3.")
+
 add(BASE17, run_id="plan_muon_eps1e17_128k_bs256", n_docs=128000, optimizer="muon",
     lr=TUNED_LR["plan_muon_eps1e17_128k_bs256"],
     notes="N axis at 128k, bs256 (1000 steps), muon. lr from tuning.csv "
           "sweep_group tune_muon_128k_bs256, an interior win at 1e-4.")
+add(BASE17, run_id="plan_muon_eps1e17_256k_bs256", n_docs=256000, optimizer="muon",
+    lr=TUNED_LR["plan_muon_eps1e17_256k_bs256"],
+    notes="Tier 2 N-axis muon point at 256k, bs256 (2000 steps). lr from "
+          "the completed tune_muon_256k_bs256 sweep, whose interior winner was 2e-4.")
 
 for n in [4000, 8000, 32000, 64000]:
     rid = f"plan_muon_eps1e17_{n//1000}k_bs256"
@@ -1291,6 +1309,11 @@ add(BASE17, run_id="plan_adam_eps1e17_16k_ep4", num_epochs=4,
           "original kept as validation.csv.premerge.")
 add(BASE17, run_id="plan_adam_eps1e17_16k_bs512", batch_size=512, grad_accum_steps=32,
     notes="D2: uncontrolled double batch (63 steps). lr comes from tune_adamw_16k_bs512.")
+add(BASE17, run_id="plan_muon_eps1e17_16k_bs512", optimizer="muon", batch_size=512,
+    grad_accum_steps=16, lr=2e-4, n_subsets=0,
+    notes="Tier 2 batch-axis muon point at 16k, bs512. This row records the "
+          "existing base, EK-FAC scores, and proponent filter so the batch appendix "
+          "can consume the completed measurement.")
 # The two gpt2-medium bs32 points. Both were measured, both were entered in
 # BANK_RESULTS, and neither had a row here -- so neither reached the CSV. The
 # 64k one also answers the dataset-size question on this model directly: ms
