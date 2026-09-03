@@ -14,6 +14,18 @@ import os
 import re
 import sys
 
+
+def _has_value(cell: str) -> bool:
+    """A recorded delta counts only if it parses to a finite float -- a
+    literal 'nan' in the CSV rendered as a present-but-invisible figure point
+    and hid a dead 128k MAGIC pipeline for days."""
+    try:
+        import math
+        return math.isfinite(float(cell))
+    except (TypeError, ValueError):
+        return False
+
+
 ROOT = "/mnt/ssd-2/lucia/metasmoothness"
 E = "/mnt/ssd-2/lucia/paper_runs/experiments"
 src = open(ROOT + "/scripts/scaling_plot_mpl.py").read()
@@ -41,7 +53,7 @@ def pick(prefixes, suffix):
 def status(run_id, method):
     """PRESENT / RUNNING / PARTIAL / MISSING for one (row, method) point."""
     r = next((x for x in rows if x["run_id"] == run_id), None)
-    if r and (r.get(f"filter_{method}_delta") or "").strip():
+    if r and _has_value(r.get(f"filter_{method}_delta")):
         return "present", ""
     if not r:
         return "missing", "no row in experiments.csv"

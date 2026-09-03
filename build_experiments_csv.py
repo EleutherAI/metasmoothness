@@ -51,6 +51,16 @@ reusable    bank+scores = retrained models on disk; re-score a new method withou
             none        = artifacts deleted; re-run from the parameter columns
 """
 
+import sys as _sys
+if "--overwrite-live-csv" not in _sys.argv:
+    _sys.exit(
+        "REFUSING: experiments.csv has been edited directly since 2026-08-29 "
+        "(ms values, muon 512k row, magic cell corrections) and this builder "
+        "would destroy those edits. Port them into the row tables first, then "
+        "run with --overwrite-live-csv."
+    )
+
+
 import csv
 import sys
 import os

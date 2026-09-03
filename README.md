@@ -22,8 +22,9 @@ python build_experiments_csv.py   # experiments.csv — stage 1: the metasmoothn
 
 One row per run. Empty result cells are work to claim (see NODES.md). Edit results in the
 builder scripts and regenerate — never in the CSVs, except the two node-claim columns.
-Datasets: `EleutherAI/bergson-smollm2-scaling` on the Hub (verified nested train chain +
-disjoint held-out/query sets); tooling in `scripts/`.
+Datasets: `EleutherAI/bergson-smollm2-scaling` on the Hub (verified nested train chain;
+NOTE 2026-09-04: query_20 overlaps train at 64k+ via re-chunked source text --
+use query_20_heldout.hf, drawn from the corpus tail, for clean held-out queries); tooling in `scripts/`.
 
 ## Research questions
 
@@ -41,7 +42,7 @@ prioritised against these.
   corpus; running some experiments with a corpus of pre-1931 text)
 
 The strongest findings -- meaning the ones cheapest to investigate -- should
-generalise up to dataset size **N = 256k** for now.
+generalise up to dataset size **N = 512k** for now.
 
 ## Proponent filter scaling (EK-FAC)
 
@@ -86,9 +87,9 @@ every N instead of 1%. Regenerate with `python scripts/top40_curve.py --readme`.
 Qwen15b EK-FAC Hessians: each rung uses its own model, fit on at most 32k
 documents (the train_32k prefix for 64k+; the full rung dataset below that).
 
-Top-40 filters are EK-FAC only: they feed the two figure-1 subplots and nothing
-else. MAGIC appears in filter_method_appendix alone (adamw rows, no muon), so no
-top-40, muon, or BM25 MAGIC runs are needed.
+Top-40 filters: EK-FAC at every N (the two figure-1 subplots), MAGIC at
+4k-64k (filter_method_appendix). MAGIC 1% stops at 64k; the 128k/256k/512k
+MAGIC points are dropped. No muon MAGIC.
 
 ```
 EK-FAC proponent filter, FIXED 40 documents removed (adamw, bs256, 2 epochs)

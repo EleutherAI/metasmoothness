@@ -1,0 +1,8 @@
+  filter_scaling.png  (left: top 1%): 8/8 points
+  filter_scaling.png  (right: top 40): 8/8 points
+  filter_scaling_appendix.png  (AdamW vs Muon): 15/16 points
+     Muon 512k        MISSING  no row
+  filter_batch_appendix.png  (batch sweep at 16k): 12/12 points
+  filter_method_appendix.png  (EK-FAC vs MAGIC): 14/16 points
+     MAGIC 256k       MISSING  no magic scores
+     MAGIC 512k       MISSING  no magic scores

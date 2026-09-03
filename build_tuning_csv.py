@@ -19,6 +19,15 @@ missing (the gpt2_custom implementation for arch groups, the D11 cost sign-off f
 model-size groups, the bergson logit-scale hook for logit-scale groups).
 """
 
+import sys as _sys
+if "--overwrite-live-csv" not in _sys.argv:
+    _sys.exit(
+        "REFUSING: tuning.csv has direct edits (512k grids + heldouts, muon "
+        "guard arm) newer than this builder. Port them first, then run with "
+        "--overwrite-live-csv."
+    )
+
+
 import csv
 import os
 

@@ -4,8 +4,9 @@
     python scripts/scaling_plot_mpl.py    # write figures/filter_scaling.png (main,
                                           # AdamW: 1% filter + fixed-40-document
                                           # filter vs corpus size) and the appendix
-                                          # figures (optimizer comparison, batch
-                                          # sweep, EK-FAC vs MAGIC, 16k variants)
+                                          # figures (Muon row: corpus scaling +
+                                          # batch sweep, EK-FAC vs MAGIC, 16k
+                                          # variants)
 
 Run selection (bs256 rows, the lr 2e-4 re-run preferred at muon 4k) mirrors
 scripts/scaling_plot.py; the fixed-40 deltas mirror scripts/top40_curve.py.
@@ -26,7 +27,7 @@ ap = argparse.ArgumentParser()
 ap.add_argument("--outdir", type=pathlib.Path, default=ROOT / "figures")
 args = ap.parse_args()
 
-BLUE, ORANGE, AQUA, BM25 = "#2a78d6", "#eb6834", "#1baf7a", "#5c5c5c"
+BLUE, ORANGE, AQUA, BM25, RANDOM = "#2a78d6", "#eb6834", "#1baf7a", "#5c5c5c", "#8f8f8f"
 # The x dodge separates coincident error bars; multiplicative because x is log.
 SERIES = [("AdamW", BLUE, 0.98, ("plan_adam_eps1e17_", "sm_adamw_eps1e17_")),
           ("Muon", ORANGE, 1.02, ("plan_muon_eps1e17_", "sm_muon_eps1e17_"))]
@@ -81,14 +82,15 @@ def pick_batch(prefixes, bs):
     return None
 
 
-def summary_delta_ci(run, subdir, *, subtract_random=False, boot=10000):
+def summary_delta_ci(run, subdir, *, subtract_random=False,
+                     column="filter_change", boot=10000):
     root = next((r for r in ROOTS if os.path.isdir(os.path.join(r, run))), None)
     path = os.path.join(root, run, subdir, "filter_summary.csv") if root else None
     if not (path and os.path.isfile(path)):
         return None
     d = []
     for row in csv.DictReader(open(path)):
-        val = float(row["filter_change"])
+        val = float(row[column])
         if subtract_random:
             val -= float(row["random_mean"])
         d.append(val)
@@ -100,15 +102,13 @@ def summary_delta_ci(run, subdir, *, subtract_random=False, boot=10000):
     return m, m - bs[int(.025 * boot)], bs[int(.975 * boot)] - m
 
 
-def top40_delta_ci(run, source="ekfac"):
-    return summary_delta_ci(run, f"filter_top40_{source}", subtract_random=True)
-
-
-def bm25_scaling_points(prefixes):
+def summary_scaling_points(prefixes, subdir, column="filter_change",
+                           subtract_random=False):
     pts = []
     for n in NS:
         r = pick_scaling(prefixes, n)
-        pts.append(summary_delta_ci(r["run_id"], "filter_proponents_bm25")
+        pts.append(summary_delta_ci(r["run_id"], subdir, column=column,
+                                    subtract_random=subtract_random)
                    if r else None)
     return pts
 
@@ -160,53 +160,86 @@ args.outdir.mkdir(parents=True, exist_ok=True)
 tok_ticks = [tokens(n) for n in NS]
 tok_labels = [f"{tokens(n) / 1e6:.0f}M" for n in NS]
 
-# Main figure: AdamW 1% filter beside the fixed-40-document filter.
+# Main figure: AdamW 1% filter beside the fixed-40-document filter. Both series
+# are raw changes in query loss relative to the unfiltered run (no random
+# subtraction), so proponent and random filters share an axis and QLD is the
+# gap between the curves; the other figures keep plotting QLD itself.
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 3.8), dpi=200, sharey=True)
 name, color, _, prefixes = SERIES[0]
-draw(ax1, tok_ticks, scaling_points(prefixes), color)
+draw(ax1, tok_ticks,
+     summary_scaling_points(prefixes, "filter_proponents_ekfac"),
+     color, label="EK-FAC proponents")
+draw(ax1, tok_ticks,
+     summary_scaling_points(prefixes, "filter_proponents_ekfac",
+                            column="random_mean"),
+     RANDOM, label="Random filter")
 style(ax1, tok_ticks, tok_labels, "Number of training tokens")
-ax1.set_title("Top 1% of documents removed", fontsize=10)
+ax1.set_ylabel("Change in query loss")
+ax1.set_title("(a) Top 1% of documents removed", fontsize=10)
+ax1.legend(loc="upper left", frameon=False, fontsize=9)
 
 top40_ticks = [tokens(n) for n, _ in TOP40_ROWS]
-draw(ax2, top40_ticks, [top40_delta_ci(run, "ekfac") for _, run in TOP40_ROWS],
+draw(ax2, top40_ticks,
+     [summary_delta_ci(run, "filter_top40_ekfac") for _, run in TOP40_ROWS],
      color)
+draw(ax2, top40_ticks,
+     [summary_delta_ci(run, "filter_top40_ekfac", column="random_mean")
+      for _, run in TOP40_ROWS], RANDOM)
 style(ax2, top40_ticks, [f"{t / 1e6:.0f}M" for t in top40_ticks],
       "Number of training tokens")
-ax2.set_title("Top 40 documents removed", fontsize=10)
+ax2.set_title("(b) Top 40 documents removed", fontsize=10)
 ax2.set_ylabel(None)
 main_ylim = ax1.get_ylim()
 save(fig, "filter_scaling.png")
 
-# Appendix figure: AdamW vs Muon corpus scaling.
-fig, ax = plt.subplots(figsize=(7, 4.5), dpi=200)
+# Appendix figure: the Muon comparison — corpus scaling beside the batch-size
+# sweep, one row, shared y so the flat sweep reads at the scaling panel's scale.
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 3.8), dpi=200, sharey=True)
 for name, color, dodge, prefixes in SERIES:
-    missing = draw(ax, [t * dodge for t in tok_ticks], scaling_points(prefixes),
-                   color, label=name)
-style(ax, tok_ticks, tok_labels, "Number of training tokens")
-outside_legend(ax, len(SERIES))
-save(fig, "filter_scaling_appendix.png")
-
-# Appendix figure: batch-size sweep at 16k documents.
-fig, ax = plt.subplots(figsize=(7, 4.5), dpi=200)
-for name, color, dodge, prefixes in SERIES:
+    draw(ax1, [t * dodge for t in tok_ticks], scaling_points(prefixes),
+         color, label=name)
     points = [delta_ci(pick_batch(prefixes, b)) for b in BATCHES]
-    draw(ax, [b * dodge for b in BATCHES], points, color, label=name)
-style(ax, BATCHES, [str(b) for b in BATCHES], "Batch size")
-ax.set_ylim(main_ylim)
-outside_legend(ax, len(SERIES))
-save(fig, "filter_batch_appendix.png")
+    draw(ax2, [b * dodge for b in BATCHES], points, color)
+style(ax1, tok_ticks, tok_labels, "Number of training tokens")
+style(ax2, BATCHES, [str(b) for b in BATCHES], "Batch size")
+ax1.set_title("Corpus scaling", fontsize=10)
+ax2.set_title("Batch size (16k documents)", fontsize=10)
+ax2.set_ylabel(None)
+ax1.set_ylim(main_ylim)
+ax1.legend(frameon=False, loc="upper left")
+save(fig, "filter_muon_appendix.png")
 
-# Appendix figure: EK-FAC vs MAGIC vs BM25 proponent filters, AdamW corpus scaling.
-fig, ax = plt.subplots(figsize=(7, 4.5), dpi=200)
+# Appendix figure: EK-FAC vs MAGIC vs BM25 proponent filters, AdamW corpus
+# scaling. Serial MAGIC scoring stops at 64k documents, so the 1% panel is
+# truncated to that common range; the top-40 panel shows EK-FAC and BM25 over
+# the full chain (add MAGIC when its top-40 filter runs land). Both panels
+# plot QLD (random control subtracted).
+CUT = NS.index(64000) + 1
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 3.8), dpi=200, sharey=True)
 prefixes = SERIES[0][3]
 for method, color, dodge in [("ekfac", BLUE, 0.97), ("magic", AQUA, 1.0)]:
     label = {"ekfac": "EK-FAC", "magic": "MAGIC"}[method]
-    draw(ax, [t * dodge for t in tok_ticks], scaling_points(prefixes, method),
-         color, label=label)
-draw(ax, [t * 1.03 for t in tok_ticks], bm25_scaling_points(prefixes),
+    draw(ax1, [t * dodge for t in tok_ticks[:CUT]],
+         scaling_points(prefixes, method)[:CUT], color, label=label)
+draw(ax1, [t * 1.03 for t in tok_ticks[:CUT]],
+     summary_scaling_points(prefixes, "filter_proponents_bm25",
+                            subtract_random=True)[:CUT],
      BM25, label="BM25")
-style(ax, tok_ticks, tok_labels, "Number of training tokens")
-outside_legend(ax, 3)
+style(ax1, tok_ticks[:CUT], tok_labels[:CUT], "Number of training tokens")
+ax1.set_title("(a) Top 1% of documents removed", fontsize=10)
+ax1.legend(loc="upper left", frameon=False, fontsize=9)
+
+t40_ticks = [tokens(n) for n, _ in TOP40_ROWS]
+draw(ax2, [t * 0.97 for t in t40_ticks],
+     [summary_delta_ci(run, "filter_top40_ekfac", subtract_random=True)
+      for _, run in TOP40_ROWS], BLUE)
+draw(ax2, [t * 1.03 for t in t40_ticks],
+     [summary_delta_ci(run, "filter_top40_bm25", subtract_random=True)
+      for _, run in TOP40_ROWS], BM25)
+style(ax2, t40_ticks, [f"{t / 1e6:.0f}M" for t in t40_ticks],
+      "Number of training tokens")
+ax2.set_title("(b) Top 40 documents removed", fontsize=10)
+ax2.set_ylabel(None)
 save(fig, "filter_method_appendix.png")
 
 # Appendix figure: training-setup variants at 16k documents, AdamW.
