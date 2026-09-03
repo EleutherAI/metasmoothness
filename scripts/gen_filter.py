@@ -60,6 +60,17 @@ scores = root / ("scores" if args.source == "magic" else "ekfac_scores/scores")
 if not scores.exists():
     sys.exit(f"no {args.source} scores at {scores}")
 
+# Scores that exist can still be all zeros -- an interrupted inverse application
+# plus resume-from-existence produced fully "written" zero scores for the first
+# three qwen15b rungs, and 69 retrains measured a random removal. Gate content,
+# not existence, before any filter consumes a score file.
+if args.source == "ekfac":
+    import subprocess
+    _gate = Path(__file__).resolve().parent / "gate_ekfac.py"
+    if subprocess.run([sys.executable, "-P", str(_gate), "scores",
+                      str(scores.parent)]).returncode:
+        sys.exit(f"refusing: EK-FAC score gate failed for {scores.parent}")
+
 # The random control comes from the bank's own subsets, so the filter must
 # remove the same number of documents they do.
 fraction = args.fraction if args.fraction is not None else magic.get("subset_fraction")
@@ -125,6 +136,7 @@ out_dir = _out_root(root) / f"filter_{args.method.replace('filter-', '')}_{args.
 # fresh (num_subsets above, default 3) and do not pass retrained_dir, which is
 # what makes bergson reuse a bank instead.
 cfg.update(
+    resume=True,
     run_path=str(out_dir),
     scores=str(scores),
     method=args.method,

@@ -1,5 +1,9 @@
 # Working rules for this repo
 
+**Before relaunching ANY interrupted run, read RESUME.md.** Resume-by-existence
+has silently poisoned results three times; the gates and playbook there are
+mandatory.
+
 Short, hard-won rules. Each one exists because it was violated and cost real GPU
 time. Prefer the tool that enforces a rule over remembering it.
 

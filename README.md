@@ -83,6 +83,13 @@ A = adamw   M = muon   | = 95% CI
 Same rows as the scaling curve above, but removing a fixed 40 documents at
 every N instead of 1%. Regenerate with `python scripts/top40_curve.py --readme`.
 
+Qwen15b EK-FAC Hessians: each rung uses its own model, fit on at most 32k
+documents (the train_32k prefix for 64k+; the full rung dataset below that).
+
+Top-40 filters are EK-FAC only: they feed the two figure-1 subplots and nothing
+else. MAGIC appears in filter_method_appendix alone (adamw rows, no muon), so no
+top-40, muon, or BM25 MAGIC runs are needed.
+
 ```
 EK-FAC proponent filter, FIXED 40 documents removed (adamw, bs256, 2 epochs)
 

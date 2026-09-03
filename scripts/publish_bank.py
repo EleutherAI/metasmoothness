@@ -87,6 +87,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("run_id")
     ap.add_argument("--delete-local", action="store_true")
+    ap.add_argument("--partial", action="store_true")
     a = ap.parse_args()
 
     root = find_root(a.run_id)
@@ -95,7 +96,11 @@ def main():
 
     n_models = len(list((root / "retrained").glob("subset_*")))
     if n_models != 100:
-        sys.exit(f"refusing: bank is {n_models}/100")
+        if a.partial:
+            repo_id = repo_id.replace(f"{ORG}/", f"{ORG}/PARTIAL_", 1)
+            print(f"partial bank: {n_models}/100 -> {repo_id}")
+        else:
+            sys.exit(f"refusing: bank is {n_models}/100 (use --partial)")
 
     # Counting subset_* directories only proves the directory entries exist. It
     # does not prove this process can READ them, and on this fleet that is a real
