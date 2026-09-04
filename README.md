@@ -20,8 +20,9 @@ python build_tuning_csv.py        # tuning.csv      — stage 0: lr selection ru
 python build_experiments_csv.py   # experiments.csv — stage 1: the metasmoothness/LDS grid
 ```
 
-One row per run. Empty result cells are work to claim (see NODES.md). Edit results in the
-builder scripts and regenerate — never in the CSVs, except the two node-claim columns.
+One row per run. Empty result cells are work to claim (see NODES.md). The CSVs are now
+edited directly (builders deprecated 2026-09-04; their consistency checks are slated for a
+standalone lint). data/filter_deltas.csv syncs into experiments.csv via scripts/sync_filter_deltas.py.
 Datasets: `EleutherAI/bergson-smollm2-scaling` on the Hub (verified nested train chain;
 NOTE 2026-09-04: query_20 overlaps train at 64k+ via re-chunked source text --
 use query_20_heldout.hf, drawn from the corpus tail, for clean held-out queries); tooling in `scripts/`.

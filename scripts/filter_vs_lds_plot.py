@@ -75,14 +75,14 @@ for ax, (scorer, label) in zip(axes, [("magic", "MAGIC"), ("ekfac", "EK-FAC")]):
     x = np.array([p[0] for p in pts])
     y = np.array([p[1] for p in pts])
     s = np.array([p[2] for p in pts])
+    muon = np.array([p[4] for p in pts])
     rho = spearmanr(x, y).statistic
     lo, hi = boot(x, y)
     hi_mask = s > 125
     rho_hi = spearmanr(x[hi_mask], y[hi_mask]).statistic
     lo_hi, hi_hi = boot(x[hi_mask], y[hi_mask])
 
-    sc = ax.scatter(x, y, c=s, norm=LogNorm(), cmap="viridis",
-                    s=55, edgecolor="white", linewidth=0.6, zorder=3)
+    sc = split_scatter(ax, x, y, s, muon)
     ax.set_title(f"{label}   $\\rho$ = {rho:+.3f} [{lo:+.2f}, {hi:+.2f}]  (n = {len(x)})",
                  fontsize=11)
     ax.text(0.03, 0.96, f">125 steps:  $\\rho$ = {rho_hi:+.3f} [{lo_hi:+.2f}, {hi_hi:+.2f}]"
@@ -131,7 +131,7 @@ grid[1][0].legend(handles=[
     Line2D([], [], marker="^", linestyle="", color="#777", label="Muon")],
     frameon=False, loc="upper left", fontsize=9)
 
-fig.colorbar(sc, ax=grid, label="training steps", pad=0.01)
+fig.colorbar(sc, ax=grid, label="Training steps", pad=0.01)
 out = ROOT / "figures" / "filter_vs_lds.png"
 fig.savefig(out, dpi=160)
 print(f"  wrote {out}")

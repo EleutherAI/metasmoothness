@@ -14,6 +14,7 @@ Regenerate whenever experiments.csv is rebuilt or a top-40 filter lands.
 """
 import argparse
 import csv
+import math
 import os
 import pathlib
 import random
@@ -93,6 +94,11 @@ def summary_delta_ci(run, subdir, *, subtract_random=False,
         val = float(row[column])
         if subtract_random:
             val -= float(row["random_mean"])
+        # A single NaN query (e.g. a diverged retrain) would turn the whole
+        # point into NaN and drop it from the figure silently. Skip it and
+        # let the remaining queries carry the mean.
+        if not math.isfinite(val):
+            continue
         d.append(val)
     if not d:
         return None
@@ -229,13 +235,19 @@ style(ax1, tok_ticks[:CUT], tok_labels[:CUT], "Number of training tokens")
 ax1.set_title("(a) Top 1% of documents removed", fontsize=10)
 ax1.legend(loc="upper left", frameon=False, fontsize=9)
 
-t40_ticks = [tokens(n) for n, _ in TOP40_ROWS]
+# Top-40 panel capped at 64k docs (66M tokens) so all three methods span the
+# same range as panel (a) and the MAGIC series; 128k+ dropped.
+T40 = [(n, run) for n, run in TOP40_ROWS if n <= 64000]
+t40_ticks = [tokens(n) for n, _ in T40]
 draw(ax2, [t * 0.97 for t in t40_ticks],
      [summary_delta_ci(run, "filter_top40_ekfac", subtract_random=True)
-      for _, run in TOP40_ROWS], BLUE)
+      for _, run in T40], BLUE)
+draw(ax2, [t for t in t40_ticks],
+     [summary_delta_ci(run, "filter_top40_magic", subtract_random=True)
+      for _, run in T40], AQUA)
 draw(ax2, [t * 1.03 for t in t40_ticks],
      [summary_delta_ci(run, "filter_top40_bm25", subtract_random=True)
-      for _, run in TOP40_ROWS], BM25)
+      for _, run in T40], BM25)
 style(ax2, t40_ticks, [f"{t / 1e6:.0f}M" for t in t40_ticks],
       "Number of training tokens")
 ax2.set_title("(b) Top 40 documents removed", fontsize=10)

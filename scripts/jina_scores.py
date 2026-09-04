@@ -102,6 +102,7 @@ def main():
     ap.add_argument("--batch-size", type=int, default=16)
     ap.add_argument("--device", default="cuda:0")
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--query-dataset", default=None)
     args = ap.parse_args()
 
     root = next((b / args.run_id for b in EXP if (b / args.run_id).is_dir()), None)
@@ -113,7 +114,7 @@ def main():
     exp = run_config.load(root)
     magic = next(s["magic"] for s in exp["steps"] if "magic" in s)
     train_ds = mirrored(magic["data"]["dataset"])
-    query_ds = mirrored(magic["query"]["dataset"])
+    query_ds = args.query_dataset or mirrored(magic["query"]["dataset"])
     # datasets here are pre-tokenized gpt2 input_ids; decode back to text
     from transformers import AutoTokenizer
     gpt2_tok = AutoTokenizer.from_pretrained("gpt2")

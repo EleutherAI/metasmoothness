@@ -168,6 +168,7 @@ def main():
     ap.add_argument("--ngram-max", type=int, default=2)
     ap.add_argument("--min-df", type=int, default=1)
     ap.add_argument("--force", action="store_true")
+    ap.add_argument("--query-dataset", default=None)
     args = ap.parse_args()
 
     root = root_for(args.run_id)
@@ -179,7 +180,7 @@ def main():
     exp = run_config.load(root)
     magic = next(s["magic"] for s in exp["steps"] if "magic" in s)
     train_ds_s = mirrored(magic["data"]["dataset"])
-    query_ds_s = mirrored(magic["query"]["dataset"])
+    query_ds_s = args.query_dataset or mirrored(magic["query"]["dataset"])
     train = load_data_string(train_ds_s, magic["data"].get("split", "train"))
     query = load_data_string(query_ds_s, magic["query"].get("split", "train"))
     train_docs, train_mode = docs(train, magic["data"].get("prompt_column", "text"), magic["model"])

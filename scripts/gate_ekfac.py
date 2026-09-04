@@ -52,7 +52,7 @@ def check_inverse(run, purge=False):
         print("inverse: gradients.bin is EMPTY (0 bytes) -> GATE FAIL")
         if purge:
             d = os.path.dirname(p)
-            os.rename(d, d + ".invalid")
+            os.rename(d, d + ".invalid_" + __import__("time").strftime("%Y%m%d_%H%M%S"))
             print(f"purged: {d} -> .invalid")
         return False
     s = sample(np.memmap(p, dtype=np.float32, mode="r"))
@@ -65,7 +65,7 @@ def check_inverse(run, purge=False):
         # bergson's resume checks the DIRECTORY, not file content -- purging only
         # gradients.bin leaves kfac_query/ "complete" and scoring runs gradient-less.
         d = os.path.dirname(p)
-        os.rename(d, d + ".invalid")
+        os.rename(d, d + ".invalid_" + __import__("time").strftime("%Y%m%d_%H%M%S"))
         print(f"purged: {d} -> .invalid (resume will recompute the stage)")
     return ok
 

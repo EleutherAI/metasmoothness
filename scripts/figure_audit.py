@@ -100,7 +100,11 @@ FIGS.append(("filter_batch_appendix.png  (batch sweep at 16k)",
               for name, pre in SERIES for b in BATCHES]))
 FIGS.append(("filter_method_appendix.png  (EK-FAC vs MAGIC)",
              [(f"{m.upper()} {n//1000}k", pick(SERIES[0][1], f"{n//1000}k_bs256"), m)
-              for m in ("ekfac", "magic") for n in NS]))
+              # Panel (b) top-40 caps at 128k (66M tokens); serial MAGIC scoring
+              # stops at 64k. Beyond those the figure has no point, so auditing
+              # them produced permanent false MISSING flags.
+              for m in ("ekfac", "magic") for n in NS
+              if n <= 64000]))
 
 for title, points in FIGS:
     holes = []
