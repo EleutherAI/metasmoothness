@@ -52,6 +52,9 @@ VARIANT_ROWS = [("Baseline (bs 256)", "sm_adamw_eps1e17_16k_bs256"),
                 ("Logit scale 0.5", "plan_adam_eps1e17_16k_scale0.5"),
                 ("Logit scale 0.25", "plan_adam_eps1e17_16k_scale0.25")]
 PREFER = ("plan_muon_eps1e17_4k_bs256_lr2e-4",)
+# The Muon corpus-scaling series stops at 256k documents (2026-09-04: the
+# 512k Muon filter was dropped from the plan).
+SERIES_MAX_N = {"Muon": 256000}
 # Tokens seen in training: 2 epochs over N docs of 512 tokens each.
 tokens = lambda n: 2 * n * 512
 
@@ -202,7 +205,9 @@ save(fig, "filter_scaling.png")
 # sweep, one row, shared y so the flat sweep reads at the scaling panel's scale.
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 3.8), dpi=200, sharey=True)
 for name, color, dodge, prefixes in SERIES:
-    draw(ax1, [t * dodge for t in tok_ticks], scaling_points(prefixes),
+    ns = [n for n in NS if n <= SERIES_MAX_N.get(name, NS[-1])]
+    draw(ax1, [tokens(n) * dodge for n in ns],
+         [delta_ci(pick_scaling(prefixes, n)) for n in ns],
          color, label=name)
     points = [delta_ci(pick_batch(prefixes, b)) for b in BATCHES]
     draw(ax2, [b * dodge for b in BATCHES], points, color)

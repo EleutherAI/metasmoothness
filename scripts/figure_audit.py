@@ -94,7 +94,8 @@ FIGS.append(("filter_scaling.png  (right: top 40)",
               for n, rid in TOP40]))
 FIGS.append(("filter_scaling_appendix.png  (AdamW vs Muon)",
              [(f"{name} {n//1000}k", pick(pre, f"{n//1000}k_bs256"), "ekfac")
-              for name, pre in SERIES for n in NS]))
+              for name, pre in SERIES for n in NS
+              if not (name == "Muon" and n > 256000)]))
 FIGS.append(("filter_batch_appendix.png  (batch sweep at 16k)",
              [(f"{name} bs{b}", pick(pre, f"16k_bs{b}"), "ekfac")
               for name, pre in SERIES for b in BATCHES]))
