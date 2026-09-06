@@ -1,0 +1,2 @@
+query,n_removed,baseline_loss,filtered_loss,loss_change
+0,400,1.439953327178955,1.465896487236023,0.02594316005706787

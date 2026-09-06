@@ -1,0 +1,21 @@
+{
+  "attribute_tokens": false,
+  "num_items": 8000,
+  "num_rows": 8000,
+  "num_scores": 1,
+  "dtype": {
+    "names": [
+      "score_0",
+      "written_0"
+    ],
+    "formats": [
+      "float32",
+      "bool"
+    ],
+    "offsets": [
+      0,
+      4
+    ],
+    "itemsize": 8
+  }
+}

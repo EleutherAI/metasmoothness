@@ -1,0 +1,44 @@
+steps:
+- validate:
+    model: gpt2
+    model_kwargs: resid_pdrop=0.0,attn_pdrop=0.0,embd_pdrop=0.0
+    precision: fp32
+    use_tf32_matmuls: false
+    seed: 42
+    distributed:
+      nnode: 1
+      nproc_per_node: 2
+    data:
+      dataset: /mnt/ssd-2/lucia/datasets_local/train_256k.hf
+      split: train
+      chunk_length: 0
+    query:
+      dataset: /mnt/ssd-2/lucia/datasets_local/query_20_q0_2.hf
+      split: train
+      chunk_length: 0
+    batch_size: 256
+    grad_accum_steps: 8
+    num_epochs: 2
+    lr_schedule:
+      lr: 0.0002
+      lr_scheduler_type: polynomial
+      lr_start: 1.0e-06
+      lr_end: 2.0e-05
+      warmup_steps: 0.25
+    optimizer: adamw
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    adam_eps: 1.0e-08
+    eps_root: 1.0e-17
+    weight_decay: 0.01
+    loss_reduction: mean
+    subset_fraction: 0.00015625
+    query_method: none
+    num_subsets: 3
+    save_mode: interval
+    save_interval: 1000000000
+    run_path: /mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_256k_bs256/filter_top40_ekfac_q0_2
+    scores: /mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_256k_bs256/scores_q0_2
+    method: filter-proponents
+    retrained_dir: /mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_256k_bs256/bank_top40
+run_path: /mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_256k_bs256/filter_top40_ekfac_q0_2

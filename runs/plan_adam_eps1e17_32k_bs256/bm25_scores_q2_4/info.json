@@ -1,0 +1,1 @@
+{"attribute_tokens": false, "num_items": 32000, "num_rows": 32000, "num_scores": 2, "dtype": {"names": ["score_0", "written_0", "score_1", "written_1"], "formats": ["float32", "bool", "float32", "bool"], "offsets": [0, 4, 5, 9], "itemsize": 10}}

@@ -1,0 +1,33 @@
+steps:
+- train:
+    model: gpt2
+    precision: fp32
+    use_tf32_matmuls: false
+    seed: 42
+    distributed:
+      nnode: 1
+      nproc_per_node: 2
+    data:
+      dataset: /mnt/ssd-2/lucia/datasets_local/train_32k_qswap.hf
+      split: train
+      chunk_length: 0
+    batch_size: 256
+    grad_accum_steps: 8
+    num_epochs: 2
+    lr_schedule:
+      lr: 0.0002
+      lr_scheduler_type: polynomial
+      lr_start: 1.0e-06
+      lr_end: 2.0e-05
+      warmup_steps: 0.25
+    optimizer: adamw
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    eps_root: 1.0e-17
+    weight_decay: 0.01
+    loss_reduction: mean
+    run_path: /mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_32k_bs256_qswap/base
+    save_models: true
+    save_mode: interval
+    save_interval: 1000000000
+run_path: /mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_32k_bs256_qswap/base

@@ -1,0 +1,33 @@
+steps:
+- bif:
+    run_path: /mnt/ssd-2/lucia/paper_runs/experiments/sm_adamw_eps1e17_16k_bs256/bif_scores_v2
+    model: /mnt/ssd-2/lucia/paper_runs/experiments/sm_adamw_eps1e17_16k_bs256/base/model
+    precision: fp32
+    autocast: bf16
+    data:
+      dataset: /mnt/ssd-2/lucia/datasets_local/train_16k.hf
+    query:
+      dataset: /mnt/ssd-2/lucia/datasets_local/query_20.hf
+    distributed:
+      nnode: 1
+      nproc_per_node: 4
+    chains: 4
+    steps: 1000
+    burn_in: 100
+    thin: 5
+    step_size: 8.0e-07
+    nbeta: 2000.0
+    gamma: 7000.0
+    minibatch: 64
+    eval_batch_size: 32
+    loss_reduction: sum
+    drift_loss: token_mean
+    normalize: covariance
+    trace_dtype: fp32
+    seed: 0
+    overwrite: false
+    resume: false
+run_path: /mnt/ssd-2/lucia/paper_runs/experiments/sm_adamw_eps1e17_16k_bs256/bif_scores_v2
+metadata:
+  note: 'BIF v2 (16k): fixed drift (token-mean loss, bergson-bif 1846c89c), reference
+    defaults from bif_4k_ref.yaml; query_20. 2026-09-06'

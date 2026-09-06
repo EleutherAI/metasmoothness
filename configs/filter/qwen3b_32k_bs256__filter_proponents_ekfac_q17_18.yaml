@@ -1,0 +1,43 @@
+steps:
+- validate:
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    adam_eps: 1.0e-08
+    batch_size: 256
+    data:
+      chunk_length: 0
+      dataset: /mnt/ssd-2/lucia/datasets_local/train_32k_qwen.hf
+      split: train
+    distributed:
+      nnode: 1
+      nproc_per_node: 2
+    eps_root: 1.0e-17
+    fsdp: false
+    grad_accum_steps: 64
+    loss_reduction: mean
+    lr_schedule:
+      lr: 2.0e-05
+      lr_scheduler_type: polynomial
+      lr_start: 1.0e-06
+      lr_end: 2.0e-06
+      warmup_steps: 0.25
+    method: filter-proponents
+    model: /mnt/ssd-2/lucia/models/Qwen2.5-3B
+    num_epochs: 2
+    num_subsets: 0
+    optimizer: adamw
+    precision: bf16
+    query:
+      chunk_length: 0
+      dataset: /mnt/ssd-2/lucia/datasets_local/query_20_qwen_q17_18.hf
+      split: train
+    query_method: none
+    resume: true
+    run_path: /mnt/ssd-2/lucia/paper_runs/experiments/qwen3b_32k_bs256/filter_proponents_ekfac_q17_18
+    save_interval: 1000000000
+    save_mode: interval
+    scores: /mnt/ssd-2/lucia/paper_runs/experiments/qwen3b_32k_bs256/sc3b_q17_18
+    seed: 42
+    subset_fraction: 0.01
+    use_tf32_matmuls: false
+    weight_decay: 0.01

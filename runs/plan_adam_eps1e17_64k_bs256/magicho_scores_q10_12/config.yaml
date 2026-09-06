@@ -1,0 +1,5 @@
+steps:
+- score:
+    score_cfg:
+      higher_is_better: false
+      score: individual

@@ -1,0 +1,67 @@
+steps:
+- bif:
+    run_path: /mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_8k_bs256/bif_scores
+    overwrite: false
+    model: /mnt/ssd-2/lucia/paper_runs/experiments/plan_adam_eps1e17_8k_bs256/base/model
+    precision: fp32
+    revision: null
+    distributed:
+      nnode: 1
+      nproc_per_node: 4
+      node_rank: null
+    fsdp: false
+    peft_init_kwargs: ''
+    model_kwargs: ''
+    logit_scale: 1.0
+    data:
+      dataset: /mnt/ssd-2/lucia/datasets_local/train_8k.hf
+      split: train
+      subset: null
+      prompt_column: text
+      completion_column: ''
+      conversation_column: ''
+      reward_column: ''
+      skip_nan_rewards: false
+      truncation: false
+      format_template: ''
+      data_kwargs: ''
+      chunk_length: 0
+    tokenizer: ''
+    drop_columns: true
+    max_tokens: null
+    use_tf32_matmuls: false
+    debug: false
+    query:
+      dataset: /mnt/ssd-2/lucia/datasets_local/query_20.hf
+      split: train
+      subset: null
+      prompt_column: text
+      completion_column: ''
+      conversation_column: ''
+      reward_column: ''
+      skip_nan_rewards: false
+      truncation: false
+      format_template: ''
+      data_kwargs: ''
+      chunk_length: 0
+    chains: 4
+    steps: 1000
+    burn_in: 100
+    thin: 5
+    step_size: 1.0e-08
+    nbeta: 300.0
+    gamma: 300.0
+    minibatch: 32
+    eval_batch_size: 32
+    loss_reduction: sum
+    normalize: covariance
+    center: pooled
+    remove_common_modes: 0
+    autocast: bf16
+    trace_dtype: fp32
+    seed: 0
+    resume: false
+metadata:
+  bergson_version: null
+  created: '2026-09-05T18:45:43+00:00'
+  nccl_version: 2.29.3

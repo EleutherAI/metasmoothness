@@ -1,0 +1,7 @@
+subset,query,n_removed,baseline_loss,filtered_loss,loss_change
+0,0,40,2.8400943279266357,nan,nan
+0,1,40,3.3314049243927,nan,nan
+1,0,40,2.8400943279266357,nan,nan
+1,1,40,3.3314049243927,nan,nan
+2,0,40,2.8400943279266357,nan,nan
+2,1,40,3.3314049243927,nan,nan

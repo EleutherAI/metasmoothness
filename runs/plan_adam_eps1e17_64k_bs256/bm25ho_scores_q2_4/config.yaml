@@ -1,0 +1,12 @@
+steps:
+- score:
+    score_cfg:
+      score: individual
+      higher_is_better: true
+bm25:
+  train_dataset: /mnt/ssd-2/lucia/datasets_local/train_64k.hf
+  query_dataset: /mnt/ssd-2/lucia/datasets_local/query_20_heldout.hf
+  ngram_range:
+  - 1
+  - 2
+  min_df: 1

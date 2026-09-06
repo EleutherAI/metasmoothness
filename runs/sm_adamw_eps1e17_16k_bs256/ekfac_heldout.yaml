@@ -1,0 +1,101 @@
+metadata:
+  bergson_version: null
+  created: '2026-08-21T15:06:57+00:00'
+  git_sha: 3c66bb51
+steps:
+- ekfac:
+    hessian_cfg:
+      ev_correction: true
+      hessian_dtype: fp32
+      method: kfac
+      use_dataset_labels: false
+    hessian_pipeline_cfg:
+      inversion_cfg:
+        damping_factor: 0.1
+        inversion: damped_inverse
+      query:
+        chunk_length: 0
+        completion_column: ''
+        conversation_column: ''
+        data_kwargs: ''
+        dataset: /mnt/ssd-2/lucia/datasets_local/query_20_heldout.hf
+        format_template: ''
+        prompt_column: text
+        reward_column: ''
+        skip_nan_rewards: false
+        split: train
+        subset: null
+        truncation: false
+      query_aggregation: none
+      resume: true
+    index_cfg:
+      attention:
+        head_dim: 0
+        head_size: 0
+        num_heads: 0
+      attribute_tokens: false
+      auto_batch_size: false
+      data:
+        chunk_length: 0
+        completion_column: ''
+        conversation_column: ''
+        data_kwargs: ''
+        dataset: /mnt/ssd-2/lucia/datasets_local/train_16k.hf
+        format_template: ''
+        prompt_column: text
+        reward_column: ''
+        skip_nan_rewards: false
+        split: train
+        subset: null
+        truncation: false
+      debug: false
+      distributed:
+        nnode: 1
+        node_rank: null
+        nproc_per_node: 2
+      drop_columns: true
+      filter_modules: lm_head
+      force_math_sdp: false
+      fsdp: false
+      include_bias: false
+      label_smoothing: 0.0
+      loss_fn: ce
+      loss_reduction: sum
+      max_batch_size: 64
+      max_tokens: null
+      model: /mnt/ssd-2/lucia/paper_runs/experiments/sm_adamw_eps1e17_16k_bs256/base/model
+      model_kwargs: ''
+      modules: []
+      optimizer_state: ''
+      overwrite: true
+      peft_init_kwargs: ''
+      precision: fp32
+      profile: false
+      projection_dim: 0
+      projection_scale: jl
+      projection_target: per_module
+      projection_type: rademacher
+      reshape_to_square: false
+      revision: null
+      run_path: /mnt/ssd-2/lucia/paper_runs/experiments/sm_adamw_eps1e17_16k_bs256/ekfac_scores_heldout
+      split_attention_modules: []
+      token_batch_size: 1024
+      tokenizer: ''
+      use_tf32_matmuls: false
+    preprocess_cfg:
+      aggregation: none
+      ev_correction: false
+      hessian_path: null
+      inversion_cfg:
+        damping_factor: 0.1
+        inversion: damped_inverse
+      normalize_aggregated_grad: false
+      unit_normalize: false
+    score_cfg:
+      batch_size: 1024
+      higher_is_better: true
+      modules: []
+      precision: fp32
+      query_batch_size: null
+      query_path: ''
+      score: individual

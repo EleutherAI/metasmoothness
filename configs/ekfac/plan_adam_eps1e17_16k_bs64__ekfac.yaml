@@ -14,7 +14,7 @@ steps:
       peft_init_kwargs: ''
       model_kwargs: ''
       data:
-        dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/train_16k.hf
+        dataset: /mnt/ssd-2/lucia/datasets_local/train_16k.hf
         split: train
         subset: null
         prompt_column: text
@@ -78,7 +78,7 @@ steps:
       normalize_aggregated_grad: false
     hessian_pipeline_cfg:
       query:
-        dataset: /mnt/ssd-1/lucia/bergson-damping/runs/ekfac_vs_n/datasets/query_20.hf
+        dataset: /mnt/ssd-2/lucia/datasets_local/query_20.hf
         split: train
         subset: null
         prompt_column: text

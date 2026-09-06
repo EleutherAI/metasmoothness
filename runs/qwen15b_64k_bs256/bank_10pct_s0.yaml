@@ -1,0 +1,46 @@
+steps:
+- validate:
+    adam_beta1: 0.95
+    adam_beta2: 0.975
+    adam_eps: 1.0e-08
+    batch_size: 256
+    data:
+      chunk_length: 0
+      dataset: /mnt/ssd-2/lucia/datasets_local/train_64k_qwen.hf
+      split: train
+    distributed:
+      nnode: 1
+      nproc_per_node: 2
+    eps_root: 1.0e-17
+    fsdp: false
+    grad_accum_steps: 64
+    loss_reduction: mean
+    lr_schedule:
+      lr: 5.0e-05
+      lr_end: 5.0e-06
+      lr_scheduler_type: polynomial
+      lr_start: 1.0e-06
+      warmup_steps: 0.25
+    method: lds
+    model: /mnt/ssd-2/lucia/models/Qwen2.5-1.5B
+    num_epochs: 2
+    num_subsets: 3
+    optimizer: adamw
+    precision: bf16
+    query:
+      chunk_length: 0
+      dataset: /mnt/ssd-2/lucia/datasets_local/query_20_qwen.hf
+      split: train
+    query_method: none
+    resume: true
+    run_path: /mnt/ssd-2/lucia/paper_runs/experiments/qwen15b_64k_bs256/bank_10pct_s0
+    save_interval: 1000000000
+    save_mode: interval
+    scores: /mnt/ssd-2/lucia/paper_runs/experiments/qwen15b_64k_bs256/ekfac_scores_64k/scores
+    seed: 42
+    subset_fraction: 0.1
+    use_tf32_matmuls: false
+    weight_decay: 0.01
+    subset_start: 0
+    subset_stop: 1
+    save_models: true

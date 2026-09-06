@@ -1,0 +1,12 @@
+steps:
+- score:
+    score_cfg:
+      score: individual
+      higher_is_better: true
+jina:
+  model: jinaai/jina-embeddings-v5-text-small
+  train_dataset: /mnt/ssd-2/lucia/datasets_local/train_16k.hf
+  query_dataset: /mnt/ssd-2/lucia/datasets_local/query_20.hf
+  tasks:
+  - retrieval/document
+  - retrieval/query
