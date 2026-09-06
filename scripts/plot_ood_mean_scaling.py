@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Plot completed WikiText-103 and BioForget mean-query filtering sweeps."""
+"""Plot completed WikiText-103 and BioForget mean-query filtering sweeps.
+
+Writes ood_mean_scaling_diagnostic.pdf next to the sweep data (not into
+figures/; not part of scripts/make_figures.py).
+"""
 
 from __future__ import annotations
 
@@ -43,7 +47,7 @@ def load_curve(dataset: str) -> list[dict[str, float]]:
 
 
 def main() -> None:
-    output = ROOT / "ood_mean_scaling_diagnostic.png"
+    output = ROOT / "ood_mean_scaling_diagnostic.pdf"
     curves = {
         dataset: load_curve(dataset) for dataset in ("wikitext103", "bioforget")
     }
@@ -104,7 +108,7 @@ def main() -> None:
         ax.legend(frameon=False)
 
     fig.tight_layout()
-    fig.savefig(output, dpi=180)
+    fig.savefig(output)
     print(table)
     print(output)
 

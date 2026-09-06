@@ -70,20 +70,20 @@ combined.
 
 | figure | rows | LDS | MAGIC | EK-FAC | QLD | total | exclusive |
 |---|---|---|---|---|---|---|---|
-| `filter_scaling.png` | 8 | — | — | 134 | 893 | **1,047** | 397 |
-| `filter_muon_appendix.png` | 25 | — | — | 224 | 666 | **923** | 211 |
-| `filter_method_appendix.png` | 5 | — | 328 | 20 | 295 | **646** | 148 |
-| `filter_variants_appendix.png` | 8 | — | — | 29 | 61 | **93** | 30 |
-| `filter_vs_lds.png` | 24 | 727 | 1,106 | 59 | 353 | **2,254** | 1,644 |
-| `qwen15b_heldout_trend.png` | 4 | — | — | 416 | 154 | **573** | 573 |
-| `heldout_in_vs_out_partial.png` | 8 | — | — | 134 | 329 | **483** | 329 |
+| `filter_scaling.pdf` | 8 | — | — | 134 | 893 | **1,047** | 397 |
+| `filter_muon_appendix.pdf` | 25 | — | — | 224 | 666 | **923** | 211 |
+| `filter_method_appendix.pdf` | 5 | — | 328 | 20 | 295 | **646** | 148 |
+| `filter_variants_appendix.pdf` | 8 | — | — | 29 | 61 | **93** | 30 |
+| `filter_vs_lds.pdf` | 24 | 727 | 1,106 | 59 | 353 | **2,254** | 1,644 |
+| `filter_scaling_qwen.pdf` | 4 | — | — | 416 | 154 | **573** | 573 |
+| `filter_heldout.pdf` | 8 | — | — | 134 | 329 | **483** | 329 |
 | **union, deduplicated** | **39** | **727** | **1,106** | **662** | **1,986** | **4,521** | |
 
 GPU-hours. Rows are shared between figures, so the totals double-count on purpose:
 *total* is everything a figure draws on, *exclusive* is what cutting only that
 figure would save.
 
-The shape of this table is the paper's own argument. `filter_vs_lds.png` is the only
+The shape of this table is the paper's own argument. `filter_vs_lds.pdf` is the only
 figure that needs a 100-retrain bank or a MAGIC scoring pass, and it costs more than
 the other six combined. Every other figure is built from 23-retrain QLDs.
 

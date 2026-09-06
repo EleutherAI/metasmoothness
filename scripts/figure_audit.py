@@ -7,12 +7,18 @@ sitting in data/filter_deltas.csv but not synced across is still a hole in the
 figure, and that is exactly how the Muon 128k point stayed invisible.
 
 Pass a file of live config paths to distinguish RUNNING from MISSING.
+
+Ends by checking figures/ holds exactly the PDF set scripts/make_figures.py
+produces (EXPECTED_FIGURES there); a missing or stray figure exits non-zero.
+Point holes are reported, not fatal -- they are the state of the experiment.
 """
 import csv
 import glob
 import os
 import re
 import sys
+
+from make_figures import EXPECTED_FIGURES, check_figure_set
 
 
 def _has_value(cell: str) -> bool:
@@ -87,19 +93,21 @@ def status(run_id, method):
 
 
 FIGS = []
-FIGS.append(("filter_scaling.png  (left: top 1%)",
+FIGS.append(("filter_scaling.pdf  (left: top 1%)",
              [(f"{n//1000}k", pick(SERIES[0][1], f"{n//1000}k_bs256"), "ekfac") for n in NS]))
-FIGS.append(("filter_scaling.png  (right: top 40)",
+FIGS.append(("filter_scaling.pdf  (right: top 40)",
              [(f"{n//1000}k", next((x for x in rows if x["run_id"] == rid), None), "top40")
               for n, rid in TOP40]))
-FIGS.append(("filter_scaling_appendix.png  (AdamW vs Muon)",
+# The Muon appendix is one figure: corpus scaling (AdamW vs Muon, Muon to 256k)
+# beside the 16k batch sweep. Its *_absolute companion draws the same points.
+FIGS.append(("filter_muon_appendix.pdf  (left: AdamW vs Muon corpus scaling)",
              [(f"{name} {n//1000}k", pick(pre, f"{n//1000}k_bs256"), "ekfac")
               for name, pre in SERIES for n in NS
-              if not (name == "Muon" and n > 256000)]))
-FIGS.append(("filter_batch_appendix.png  (batch sweep at 16k)",
+              if n <= 256000]))
+FIGS.append(("filter_muon_appendix.pdf  (right: batch sweep at 16k)",
              [(f"{name} bs{b}", pick(pre, f"16k_bs{b}"), "ekfac")
               for name, pre in SERIES for b in BATCHES]))
-FIGS.append(("filter_method_appendix.png  (EK-FAC vs MAGIC)",
+FIGS.append(("filter_method_appendix.pdf  (EK-FAC vs MAGIC)",
              [(f"{m.upper()} {n//1000}k", pick(SERIES[0][1], f"{n//1000}k_bs256"), m)
               # Panel (b) top-40 caps at 128k (66M tokens); serial MAGIC scoring
               # stops at 64k. Beyond those the figure has no point, so auditing
@@ -129,3 +137,11 @@ for title, points in FIGS:
     print(f"  {title}: {n_present}/{len(points)} points")
     for label, st, note in holes:
         print(f"     {label:16s} {st.upper():8s} {note}")
+
+# filter_variants_appendix, filter_heldout, filter_scaling_qwen, qwen15b_heldout_trend
+# and filter_vs_lds read their own sources (experiments.csv rows, per-run
+# summaries, data/qwen15b_heldout_v2.csv); their scripts print what they drew.
+print(f"  figure files ({len(EXPECTED_FIGURES)} expected in figures/):")
+missing, stray = check_figure_set()
+if missing or stray:
+    sys.exit(f"figure set mismatch: missing={missing} stray={stray}")

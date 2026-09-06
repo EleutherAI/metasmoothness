@@ -40,12 +40,12 @@ for n in NS:
     add(pick(ADAM, f"{n//1000}k_bs256"), "filter_method_appendix", "ekfac delta")
     add(pick(ADAM, f"{n//1000}k_bs256"), "filter_method_appendix", "magic delta")
     for name, pre in (("AdamW", ADAM), ("Muon", MUON)):
-        add(pick(pre, f"{n//1000}k_bs256"), "filter_scaling_appendix", "ekfac delta")
+        add(pick(pre, f"{n//1000}k_bs256"), "filter_muon_appendix (scaling)", "ekfac delta")
 for _, rid in TOP40:
     add(rid, "filter_scaling (top-40)", "top-40 delta")
 for b in BATCHES:
     for pre in (ADAM, MUON):
-        add(pick(pre, f"16k_bs{b}"), "filter_batch_appendix", "ekfac delta")
+        add(pick(pre, f"16k_bs{b}"), "filter_muon_appendix (batch)", "ekfac delta")
 for _, rid in VARIANTS:
     add(rid, "filter_variants_appendix", "ekfac delta")
 # The LDS-vs-delta scatter takes every row carrying both halves, either scorer.

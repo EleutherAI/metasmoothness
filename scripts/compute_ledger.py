@@ -375,10 +375,10 @@ def need(fig, run, *components):
             FIG[fig].add((run, c))
 
 
-F1, F2 = "filter_scaling.png", "filter_muon_appendix.png"
-F3, F4 = "filter_method_appendix.png", "filter_variants_appendix.png"
-F5, F6 = "filter_vs_lds.png", "qwen15b_heldout_trend.png"
-F7 = "heldout_in_vs_out_partial.png"
+F1, F2 = "filter_scaling.pdf", "filter_muon_appendix.pdf"
+F3, F4 = "filter_method_appendix.pdf", "filter_variants_appendix.pdf"
+F5, F6 = "filter_vs_lds.pdf", "filter_scaling_qwen.pdf"
+F7 = "filter_heldout.pdf"
 FIG_LABEL = {F1: "EK-FAC 1% and top-40 vs corpus size, AdamW",
              F2: "Muon vs AdamW: corpus scaling and the 16k batch sweep",
              F3: "EK-FAC vs MAGIC vs BM25, 1% and top-40, to 64k",

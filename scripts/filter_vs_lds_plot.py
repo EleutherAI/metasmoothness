@@ -14,6 +14,7 @@ Spearman rho and its bootstrap CI are printed per panel, and again for the rows
 above 125 steps, which is where the EK-FAC relationship falls apart.
 """
 import csv
+import os
 from pathlib import Path
 
 import matplotlib
@@ -23,9 +24,28 @@ import numpy as np
 from matplotlib.colors import LogNorm
 from scipy.stats import spearmanr
 
+import absolute_losses as absl
+
 ROOT = Path("/mnt/ssd-2/lucia/metasmoothness")
+FIGURES = Path(os.environ.get("FIGURES_DIR") or ROOT / "figures")
 rows = list(csv.DictReader(open(ROOT / "experiments.csv")))
+import absolute_losses as absl  # noqa: E402
+rows = [r for r in rows if r["run_id"] not in absl.EXCLUDE_RUNS]  # logit-scale variants excluded (2026-09-06)
 rng = np.random.default_rng(0)
+
+
+def filter_delta(r, scorer):
+    """The row's filter_<scorer>_delta, or under QLD_STAT=median the median
+    over queries recomputed from its merged summary (experiments.csv holds only
+    the mean); '' when the row has no delta, the csv mean if no summary."""
+    yv = (r.get(f"filter_{scorer}_delta") or "").strip()
+    if yv and absl.STAT != "mean":
+        p = absl.qld_from_summary(r["run_id"], f"filter_proponents_{scorer}")
+        if p is not None:
+            return str(p[0])
+        print(f"  warning: {r['run_id']}/filter_proponents_{scorer}: no complete summary, "
+              f"{absl.STAT} point falls back to the experiments.csv mean")
+    return yv
 
 
 def boot(x, y, n=10000):
@@ -46,7 +66,7 @@ def series(scorer, y_field=None, require_ms=False):
             continue
         lds, steps = (r.get(f"{scorer}_lds") or "").strip(), \
                      (r.get("steps") or "").strip()
-        yv = (r.get(y_field or f"filter_{scorer}_delta") or "").strip()
+        yv = (r.get(y_field) or "").strip() if y_field else filter_delta(r, scorer)
         ms = (r.get("metasmoothness") or "").strip()
         if require_ms and not ms:
             continue
@@ -95,7 +115,7 @@ for ax, (scorer, label) in zip(axes, [("magic", "MAGIC"), ("ekfac", "EK-FAC")]):
     print(f"          LDS spans {x.min():.3f}-{x.max():.3f}, "
           f"delta spans {y.min():.3f}-{y.max():.3f}")
 
-axes[0].set_ylabel("Change in query loss")
+axes[0].set_ylabel(absl.label("Change in query loss"))
 lo_x = min(ax.get_xlim()[0] for ax in axes)
 hi_x = max(ax.get_xlim()[1] for ax in axes)
 for ax in axes:
@@ -132,6 +152,6 @@ grid[1][0].legend(handles=[
     frameon=False, loc="upper left", fontsize=9)
 
 fig.colorbar(sc, ax=grid, label="Training steps", pad=0.01)
-out = ROOT / "figures" / "filter_vs_lds.png"
-fig.savefig(out, dpi=160)
+out = FIGURES / "filter_vs_lds.pdf"
+fig.savefig(out)
 print(f"  wrote {out}")

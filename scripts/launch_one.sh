@@ -88,7 +88,24 @@ if ! mkdir "$CLAIM" 2>/dev/null; then
   fi
   touch "$CLAIM"
 fi
-release_claim() { rmdir "$CLAIM" 2>/dev/null; }
+release_claim() { rmdir "$CLAIM" 2>/dev/null; for g in ${GPUS//,/ }; do rmdir "$CLAIMS/$(hostname)_g$g" 2>/dev/null; done; }
+# PERGPU claims: a 4-GPU job (claim host_0-1-2-3) and a 2-GPU job (claim host_0-1) have different group keys, so
+# the group claim alone let a MAGIC quad and two pair jobs stack on rose 4-7 (2026-09-05). Every GPU also gets its
+# own marker dir; a live marker from another launcher refuses the launch, a dead one is reclaimed.
+for g in ${GPUS//,/ }; do
+  m="$CLAIMS/$(hostname)_g$g"
+  if ! mkdir "$m" 2>/dev/null; then
+    mh=$(cat "$m/pid" 2>/dev/null || echo ""); ms=""
+    [ -n "$mh" ] && ms=$(awk '{print $3}' "/proc/$mh/stat" 2>/dev/null)
+    mage=$(( $(date +%s) - $(stat -c %Y "$m" 2>/dev/null || echo 0) ))
+    if [ -n "$mh" ] && kill -0 "$mh" 2>/dev/null && [ "$ms" != "Z" ]; then
+      release_claim; fail "gpu $g claimed by live pid $mh (another launcher, ${mage}s ago) -- refusing to stack"
+    elif [ -z "$mh" ] && [ "$mage" -lt "$CLAIM_TTL" ]; then
+      release_claim; fail "gpu $g has a fresh claim marker without pid (${mage}s old) -- refusing to stack"
+    fi
+    echo "  reclaiming gpu $g marker (holder ${mh:-none} ${ms:-gone}, ${mage}s old)"; touch "$m"
+  fi
+done
 
 for g in ${GPUS//,/ }; do
   used=$(nvidia-smi --query-gpu=memory.used --format=csv,noheader,nounits -i "$g" 2>/dev/null)
@@ -105,7 +122,7 @@ CUDA_VISIBLE_DEVICES="$GPUS" MASTER_PORT="$PORT" PYTHONNOUSERSITE=1 PYTHONPATH="
   setsid nohup "$PY" -s -P -m bergson "$CFG" >> "$LOGS/$NAME.log" 2>&1 < /dev/null &
 PID=$!
 # Record the holder so a later launcher can tell a live claim from a dead one.
-echo "$PID" > "$CLAIM/pid"
+echo "$PID" > "$CLAIM/pid"; for g in ${GPUS//,/ }; do echo "$PID" > "$CLAIMS/$(hostname)_g$g/pid"; done
 printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
   "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$(date +%s)" "$(hostname)" "$GPUS" "$NAME" "$PID" "$CFG" >> "$REG"
 echo "  launched $NAME on $(hostname) gpu $GPUS pid $PID  (registered)"
