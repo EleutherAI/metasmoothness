@@ -50,6 +50,7 @@ PRODUCERS = [
                               "filter_scaling_qwen_relative"]),
     ("qwen15b_heldout_trend.py", ["qwen15b_heldout_trend"]),
     ("filter_vs_lds_plot.py", ["filter_vs_lds"]),
+    ("lds_vs_size_plot.py", ["lds_vs_size"]),  # LDS vs training-set size, MAGIC and EK-FAC panels (2026-09-06)
     # writes tables/qld_lds_adamw_muon.tex, no figure (replaces the corpus-scaling
     # panel formerly in filter_muon_appendix)
     ("qld_lds_table.py", []),

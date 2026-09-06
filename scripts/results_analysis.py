@@ -15,6 +15,9 @@ Sections (each states its inputs):
   6. Robustness: second seed at 16k; EK-FAC 1% QLD across batch size and optimizer at 16k; per-query dispersion.
   7. LDS vs QLD: Spearman with bootstrap CI over the rows filter_vs_lds_plot.py uses (logit-scale and gpt2-medium
      excluded), all rows and >125 steps; MAGIC restricted to LDS > 0.7.
+  8. Patterns across plots: held-out top-40 / top-400 / 1% series exponents, joint law with k in {1%N, 40, 400}
+     (top-400 assembled from its 2-query shards), per-query rank consistency across sizes vs the seed-replicate
+     ceiling, per-query dispersion at every size.
 All statistics are means over the 20 queries of (filter_change - random_mean); CIs are 95% percentile bootstraps over
 queries (10k resamples unless noted). Runs in absolute_losses.EXCLUDE_RUNS are skipped everywhere.
 """
@@ -155,11 +158,12 @@ def gpt2_pts(sub_pct, sub_40, ns_ok):
 joint("GPT-2 held-out EK-FAC 4k-512k, k = 1%N and 40", gpt2_pts("filter_proponents_ekfac_heldout", "filter_top40_ekfac_heldout", set(ADAM)))
 joint("GPT-2 in-dist EK-FAC 4k-32k, k = 1%N and 40", gpt2_pts("filter_proponents_ekfac", "filter_top40_ekfac", {4000, 8000, 16000, 32000}))
 qp = []
-for n, run in QWEN.items():
-    for sub, k in (("filter_proponents_ekfac", int(round(0.01 * n))), ("filter_top40_ekfac", 40), ("filter_top200_ekfac", 200), ("filter_top400_ekfac", 400)):
-        d = perq(run, sub)
+for n, run in QWEN.items():  # every Figure 2 series, aliases as drawn; cells with the same (N, k) counted once
+    for sub, k in (("filter_proponents_ekfac", int(round(0.01 * n))), ("filter_prop5pct_ekfac", int(round(0.05 * n))), ("filter_prop10pct_ekfac", int(round(0.1 * n))),
+                   ("filter_top40_ekfac", 40), ("filter_top200_ekfac", 200), ("filter_top400_ekfac", 400)):
+        d = perq(run, QWEN_ALIAS.get((n, sub), sub))
         if d is not None and not any(nn == n and kk == k for nn, kk, _ in qp): qp.append((n, k, d))
-joint("Qwen 1.5B EK-FAC 4k-64k, k = 40, 200, 400, 1%N", qp)
+joint("Qwen 1.5B EK-FAC 4k-64k, all Figure 2 series (k = 40, 200, 400, 1%N, 5%N, 10%N)", qp)
 
 # ---------------------------------------------------------------- 3. Qwen series
 say("\n## 3. Qwen 1.5B series (Figure 2, series as drawn incl. aliases)")
@@ -173,7 +177,8 @@ for lab, sub in (("Top 1%", "filter_proponents_ekfac"), ("Top 5%", "filter_prop5
 
 # ---------------------------------------------------------------- 5. paired methods
 say("\n## 5. Methods table: paired per-query differences (same 20 queries)")
-RUNS4 = {4000: ADAM[4000], 8000: ADAM[8000], 16000: ADAM[16000], 32000: ADAM[32000]}
+RUNS4 = {4000: ADAM[4000], 8000: ADAM[8000], 16000: ADAM[16000], 32000: ADAM[32000],
+         64000: "plan_adam_eps1e17_64k_bs256_qswap"}  # 64k: swapped-corpus row (queries' rows replaced), same 20 queries; no LDS bank
 
 
 def paired(a, b):
@@ -190,11 +195,38 @@ for n, run in RUNS4.items():
         say(f"- {n//1000}k {lab}: EK-FAC - BM25 = {p1[0]:+.4f} [{p1[1]:+.4f}, {p1[2]:+.4f}] nats, EK-FAC wins {100*p1[3]:.0f}% of queries; "
             f"MAGIC - EK-FAC = {p2[0]:+.4f} [{p2[1]:+.4f}, {p2[2]:+.4f}], MAGIC wins {100*p2[3]:.0f}%")
 
+# ---------------------------------------------------------------- 5b. BM25 relative to EK-FAC: QLD vs LDS
+say("\n## 5b. BM25 relative to EK-FAC (ratio of means; LDS from experiments.csv, BM25 LDS via ekfac_lds.py as in the table)")
+_rows = {r["run_id"]: r for r in csv.DictReader(open(ROOT / "experiments.csv"))}
+for n, run in RUNS4.items():
+    sub40 = (lambda m: f"filter_proponents_{m}") if n == 4000 else (lambda m: f"filter_top40_{m}")
+    e1, b1 = perq(run, f"filter_proponents_ekfac"), perq(run, f"filter_proponents_bm25")
+    e4, b4 = perq(run, sub40("ekfac")), perq(run, sub40("bm25"))
+    r = _rows.get(run, {}); el = (r.get("ekfac_lds") or "").strip()
+    import re, subprocess
+    out = subprocess.run([sys.executable, "-P", str(ROOT / "scripts" / "ekfac_lds.py"), "--scores", str(E / run / "bm25_scores"), "--bank", str(E / run), "--n-boot", "2000"], capture_output=True, text=True, cwd="/tmp").stdout
+    m = re.search(r"ekfac_lds\s+(-?[\d.]+)", out); bl = float(m[1]) if m else float("nan")
+    if any(x is None for x in (e1, b1, e4, b4)) or not el: continue
+    say(f"- {n//1000}k: BM25/EK-FAC QLD ratio 1% = {b1.mean()/e1.mean():.2f}, top-40 = {b4.mean()/e4.mean():.2f}; BM25/EK-FAC LDS ratio = {bl/float(el):.2f} (BM25 LDS {bl:.2f}, EK-FAC LDS {float(el):.2f})")
+
 # ---------------------------------------------------------------- 6. robustness
 say("\n## 6. Robustness")
 s0, s1 = perq("sm_adamw_eps1e17_16k_bs256", "filter_proponents_ekfac"), perq("sm_adamw_eps1e17_16k_bs256_s43", "filter_proponents_ekfac")
 if s0 is not None and s1 is not None:
     say(f"- second seed at 16k, EK-FAC 1%: {s0.mean():.4f} (seed 42) vs {s1.mean():.4f} (seed 43), {100*abs(s1.mean()/s0.mean()-1):.1f}% relative difference")
+# held-out (Figure 1) query set: seed-43 shards filter_proponents_ekfac_heldout_q{a}_{a+2} with in-job controls (2026-09-06)
+h0 = perq(ADAM[16000], "filter_proponents_ekfac_heldout"); h1 = None
+_h = {}
+for a in range(0, 20, 2):
+    p = E / "sm_adamw_eps1e17_16k_bs256_s43" / f"filter_proponents_ekfac_heldout_q{a}_{a+2}" / "filter_summary.csv"
+    if p.is_file():
+        for i, r in enumerate(csv.DictReader(open(p))): _h[a + i] = float(r["filter_change"]) - float(r["random_mean"])
+if len(_h) == 20: h1 = np.array([_h[q] for q in range(20)])
+if h0 is not None and h1 is not None:
+    dd = h1 - h0; bs = [dd[rng.integers(0, 20, 20)].mean() for _ in range(BOOT)]
+    say(f"- second seed at 16k on the held-out (Figure 1) queries, EK-FAC 1%: {h0.mean():.4f} (seed 42) vs {h1.mean():.4f} (seed 43), "
+        f"{100*abs(h1.mean()/h0.mean()-1):.1f}% relative difference; paired difference {dd.mean():+.4f} [{np.percentile(bs,2.5):+.4f}, {np.percentile(bs,97.5):+.4f}]; "
+        f"per-query Spearman {spearmanr(h0, h1).statistic:.2f}")
 for opt in ("adam", "muon"):
     vals = []
     for b in (16, 32, 64, 128, 256, 512):
@@ -233,6 +265,62 @@ for scorer, lab in (("magic", "MAGIC"), ("ekfac", "EK-FAC")):
     if scorer == "magic":
         k = P[:, 0] > 0.7; r3, lo3, hi3 = rho_ci(P[k, 0], P[k, 1]); extra = f"; LDS > 0.7 only (n = {k.sum()}): rho = {r3:+.2f} [{lo3:+.2f}, {hi3:+.2f}]"
     say(f"- {lab}: rho = {r:+.2f} [{lo:+.2f}, {hi:+.2f}] (n = {len(P)}); > 125 steps (n = {m.sum()}): rho = {r2_:+.2f} [{lo2:+.2f}, {hi2:+.2f}]{extra}")
+
+# ---------------------------------------------------------------- 8. patterns across plots
+say("\n## 8. Patterns across plots: fixed-k series, joint law with three k values, per-query consistency")
+
+
+def perq_shards(run, prefix, width=2):
+    """Per-query QLD assembled from unmerged 2-query filter shards <run>/<prefix>_q{a}_{a+2}/filter_summary.csv (in-job
+    random controls); None unless all 20 queries are present."""
+    out = {}
+    for a in range(0, 20, width):
+        p = E / run / f"{prefix}_q{a}_{a+width}" / "filter_summary.csv"
+        if not p.is_file(): continue
+        for i, r in enumerate(csv.DictReader(open(p))): out[a + i] = float(r["filter_change"]) - float(r["random_mean"])
+    return np.array([out[q] for q in range(20)]) if len(out) == 20 else None
+
+
+HO = {"1%": ("filter_proponents_ekfac_heldout", lambda n: int(round(0.01 * n))), "top-40": ("filter_top40_ekfac_heldout", lambda n: 40)}
+S8 = {}
+for n, run in ADAM.items():
+    S8[("1%", n)] = perq(run, HO["1%"][0]); S8[("top-40", n)] = S8[("1%", n)] if n == 4000 else perq(run, HO["top-40"][0])
+    S8[("top-400", n)] = perq_shards(run, "filter_top400_ekfac_heldout")
+for lab in ("top-40", "top-400", "1%"):
+    pts = [(n, S8[(lab, n)]) for n in ADAM if S8.get((lab, n)) is not None]
+    if len(pts) < 3: say(f"- {lab} series: {len(pts)} sizes only"); continue
+    ns8 = np.array([n for n, _ in pts]); ys8 = np.array([d.mean() for _, d in pts]); a8, _, r8 = fit_pl(ns8, ys8); lo8, hi8 = boot_alpha(ns8, [d for _, d in pts])
+    say(f"- {lab} series ({', '.join(f'{n//1000}k' for n in ns8)}): QLD {', '.join(f'{y:.4f}' for y in ys8)}; alpha = {a8:+.3f} [{lo8:+.3f}, {hi8:+.3f}], R^2 = {r8:.2f}; last/first = {ys8[-1]/ys8[0]:.2f}x")
+P8 = [(n, {"1%": int(round(0.01 * n)), "top-40": 40, "top-400": 400}[lab], d) for (lab, n), d in S8.items() if d is not None and not (lab == "top-40" and n == 4000)]
+joint("GPT-2 held-out EK-FAC, k = 1%N, 40 and 400 (top-400 where complete)", P8)
+say("- per-query consistency across sizes (Spearman of the 20 per-query QLDs between adjacent sizes; seed replicate at 16k as the noise ceiling):")
+for lab in ("1%", "top-40"):
+    Ns8 = [n for n in ADAM if S8.get((lab, n)) is not None]
+    adj = [f"{Ns8[i]//1000}k-{Ns8[i+1]//1000}k {spearmanr(S8[(lab, Ns8[i])], S8[(lab, Ns8[i+1])]).statistic:.2f}" for i in range(len(Ns8) - 1)]
+    M = np.array([S8[(lab, n)] for n in Ns8]); Z = M / M.mean(axis=1, keepdims=True); qm = Z.mean(axis=0); share = qm.var() / (qm.var() + (Z - qm).var())
+    say(f"  - {lab}: {', '.join(adj)}; query identity explains {100*share:.0f}% of the variance of mean-normalised QLD across all sizes")
+if s0 is not None and s1 is not None:
+    say(f"  - seed replicate (16k in-dist 1%, seeds 42 vs 43): Spearman {spearmanr(s0, s1).statistic:.2f}")
+for n in ADAM:
+    d = S8.get(("1%", n))
+    if d is not None: say(f"  - dispersion, 1% held-out at {n//1000}k: std/mean = {d.std(ddof=1)/d.mean():.2f}, max/mean = {d.max()/d.mean():.2f}, min = {d.min():+.4f}")
+# per-query power laws (held-out 1% series): one fit per query over all sizes; 512k predicted from fits on 8k-256k
+Ns9 = [n for n in ADAM if S8.get(("1%", n)) is not None]
+if len(Ns9) >= 5:
+    M9 = np.array([S8[("1%", n)] for n in Ns9]); x9 = np.log(np.array(Ns9, dtype=float))
+    def pq_fit(mask, q):
+        y = np.log(M9[mask, q]); b, a = np.polyfit(x9[mask], y, 1); pred = a + b * x9[mask]
+        return b, a, 1 - ((y - pred) ** 2).sum() / ((y - y.mean()) ** 2).sum()
+    fits = [pq_fit(np.ones(len(Ns9), bool), q) for q in range(M9.shape[1])]
+    bq = np.array([f[0] for f in fits]); rq = np.array([f[2] for f in fits]); order = np.argsort(bq)
+    say(f"- per-query power laws (held-out 1%, {len(Ns9)} sizes): exponent min/median/max = {bq.min():.2f}/{np.median(bq):.2f}/{bq.max():.2f}, "
+        f"R^2 min/median/max = {rq.min():.2f}/{np.median(rq):.2f}/{rq.max():.2f}; lowest exponents: " + ", ".join(f"q{q} {bq[q]:.2f} (R^2 {rq[q]:.2f})" for q in order[:2]))
+    if 512000 in Ns9 and 8000 in Ns9:
+        m = (np.array(Ns9) >= 8000) & (np.array(Ns9) <= 256000); t = Ns9.index(512000); act = M9[t]
+        pq_pred = np.array([math.exp(pq_fit(m, q)[1] + pq_fit(m, q)[0] * x9[t]) for q in range(M9.shape[1])])
+        bp, ap = np.polyfit(x9[m], np.log(M9[m].mean(axis=1)), 1); pool_pred = math.exp(ap + bp * x9[t])
+        say(f"  - predicting each query at 512k from fits on 8k-256k: per-query law mean |rel. error| = {np.mean(np.abs(pq_pred-act)/act):.2f} "
+            f"(corr with actual {np.corrcoef(pq_pred, act)[0,1]:.2f}); pooled mean law = {np.mean(np.abs(pool_pred-act)/act):.2f}")
 
 OUT.parent.mkdir(exist_ok=True)
 OUT.write_text("\n".join(lines) + "\n")

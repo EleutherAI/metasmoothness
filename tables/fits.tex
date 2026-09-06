@@ -1,0 +1,24 @@
+\begin{table}[t]
+\centering
+\caption{Power-law fits over QLD in Section~\ref{sec:results}, for the GPT-2 series of Figure~\ref{fig:filter_scaling} and the Qwen series of Figure~\ref{fig:qwen}. Fits are least squares in log space on the mean QLD over $Q=20$ queries, with 95\% confidence intervals from bootstrapping over queries. Single-variable fits are $\mathrm{QLD} \propto x^{\alpha}$ in the stated variable; joint fits are $\mathrm{QLD} = a k^{\alpha} N^{\beta}$ with $k$ the number of documents removed and $N$ the training-set size. Fitting the GPT-2 top-1\% series on 8,000--256,000 documents over-predicts the QLD at 512,000 documents by 15\%; on 4,000--256,000 documents by 34\%.}
+\label{tab:fits}
+\small
+\begin{tabular}{@{}llcllcr@{}}
+\toprule
+Model & Series & Variable & $\alpha$ [95\% CI] & $\beta$ [95\% CI] & $R^2$ & Points \\
+\midrule
+GPT-2 & Top 1\% & $k$ & 0.51 [0.45, 0.55] & -- & 0.95 & 8 \\
+ & Top 40 & $N$ & 0.09 [-0.10, 0.24] & -- & 0.30 & 8 \\
+ & Joint, 1\% and top 40 & $k, N$ & 0.48 [0.38, 0.61] & 0.04 [-0.14, 0.19] & 0.94 & 15 \\
+ & Joint, $\beta = 0$ & $k$ & 0.50 & 0 & 0.94 & 15 \\
+\addlinespace
+Qwen 1.5B & Top 1\% & $N$ & 0.21 [0.05, 0.41] & -- & 0.61 & 5 \\
+ & Top 5\% & $N$ & 0.30 [0.17, 0.45] & -- & 0.91 & 5 \\
+ & Top 10\% & $N$ & 0.34 [0.24, 0.45] & -- & 0.98 & 5 \\
+ & Top 40 & $N$ & -0.58 [-1.03, -0.29] & -- & 0.81 & 5 \\
+ & Top 200 & $N$ & -0.30 [-0.45, -0.13] & -- & 0.75 & 5 \\
+ & Top 400 & $N$ & -0.29 [-0.39, -0.18] & -- & 0.88 & 5 \\
+ & Joint, all series & $k, N$ & 0.66 [0.60, 0.79] & -0.37 [-0.54, -0.23] & 0.95 & 26 \\
+\bottomrule
+\end{tabular}
+\end{table}

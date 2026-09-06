@@ -15,7 +15,9 @@ table); BM25 is not recorded there and is computed here with scripts/ekfac_lds.p
 on <run>/bm25_scores against the row's 100-subset bank (BM25 is higher-is-better,
 the sign convention ekfac_lds.py assumes). Below 64k the in-distribution query set
 is absent from every training corpus, so these are out-of-distribution queries;
-the 64k point is the swapped-corpus row and is not in this table.
+the 64k row is the swapped-corpus run (plan_adam_eps1e17_64k_bs256_qswap: the 22 rows
+containing the queries replaced by unseen documents), all three methods from its merged
+filter summaries; LDS is not computed at 64k (no 100-subset bank), shown as --.
 
 Per rung the method with the largest top-1% QLD is set in bold. Emitted as a
 complete table environment (caption/label included); needs booktabs.
@@ -34,15 +36,17 @@ import absolute_losses as absl  # noqa: E402  (boot_ci: the figure's bootstrap)
 
 OUT = pathlib.Path(os.environ.get("TABLES_DIR") or ROOT / "tables") / "qld_methods_4k_32k.tex"
 ROOTS = ["/mnt/ssd-2/lucia/paper_runs/experiments", "/mnt/ssd-1/lucia/paper_runs/experiments"]
-NS = [4000, 8000, 16000, 32000]
+NS = [4000, 8000, 16000, 32000, 64000]
 RUNS = {4000: "plan_adam_eps1e17_4k_bs256", 8000: "plan_adam_eps1e17_8k_bs256",
-        16000: "sm_adamw_eps1e17_16k_bs256", 32000: "plan_adam_eps1e17_32k_bs256"}  # TOP40_ROWS in scaling_plot_mpl.py
+        16000: "sm_adamw_eps1e17_16k_bs256", 32000: "plan_adam_eps1e17_32k_bs256",
+        64000: "plan_adam_eps1e17_64k_bs256_qswap"}  # 64k: swapped-corpus row, values from merged summaries, no LDS  # TOP40_ROWS in scaling_plot_mpl.py
 METHODS = [("MAGIC", "magic"), ("EK-FAC", "ekfac"), ("BM25", "bm25")]
 tokens = lambda n: 2 * n * 512
 BOOT = 10000
 CAPTION = (r"Mean effect of proponent filtering on query loss for BM25, EK-FAC, and MAGIC, with the linear "
            r"datamodelling score (LDS) of each method's scores on the same runs. Values are means with 95\% "
-           r"confidence intervals, bootstrapped over $N=20$ held-out queries.")
+           r"confidence intervals, bootstrapped over $Q=20$ held-out queries. At 64,000 documents the training corpus has the "
+           r"rows containing the queries replaced by unseen documents, and LDS is not computed.")
 if absl.STAT == "median":  # QLD_STAT=median: same table with the per-query median (make_figures.py --stat median)
     CAPTION = CAPTION.replace("Mean effect", "Median effect").replace("Values are means", "Values are medians")
 LABEL = "tab:proponent-filtering"
@@ -142,12 +146,12 @@ for n in NS:
     run = RUNS[n]
     vals = {}
     for name, m in METHODS:
-        pct = delta_ci(run, m) if m in ("ekfac", "magic") else summary_delta_ci(run, f"filter_proponents_{m}")
+        pct = delta_ci(run, m) if (m in ("ekfac", "magic") and n < 64000) else summary_delta_ci(run, f"filter_proponents_{m}")
         top = summary_delta_ci(run, f"filter_top40_{m}")
         if n == 4000 and top is None:  # 40 docs is 1% of 4k: the figure reuses the 1% run
             top = pct
-        vals[m] = (pct, top, lds(run, m))
-        if pct is None or top is None or vals[m][2] is None:
+        vals[m] = (pct, top, lds(run, m) if n < 64000 else None)
+        if pct is None or top is None or (vals[m][2] is None and n < 64000):
             missing.append((n, name, pct is None, top is None, vals[m][2] is None))
     best = max((m for m in vals if vals[m][0]), key=lambda m: vals[m][0][0], default=None)
     for i, (name, m) in enumerate(METHODS):

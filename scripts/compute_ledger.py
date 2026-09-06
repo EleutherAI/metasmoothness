@@ -344,7 +344,7 @@ def const(name, pat=r"(\[.*?\])\n"):
 
 NS = const("NS", r"(\[[^\]]*\])")
 BATCHES = const("BATCHES", r"(\[[^\]]*\])")
-VARIANT_ROWS = const("VARIANT_ROWS")
+VARIANT_ROWS = const("VARIANT_ROWS", r"(\[[^\]]*\])")  # trailing comment after the list (2026-09-06)
 SERIES_MAX_N = const("SERIES_MAX_N", r"(\{[^}]*\})")
 PREFER = const("PREFER", r"(\([^)]*\))")
 ADAM, MUON = ("plan_adam_eps1e17_", "sm_adamw_eps1e17_"), ("plan_muon_eps1e17_", "sm_muon_eps1e17_")
