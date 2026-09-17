@@ -1,0 +1,4 @@
+probe,model,gpu,batch_size,lr,use_tf32_matmuls,ms,total_movement_l1,fd_step,direction_seed,heldout_forget_loss_delta,wmdp_bio_loss_delta,config
+fp32,EleutherAI/deep-ignorance-e2e-strong-filter,GH200,128,1e-05,false,0.9338317513465881,3352.75244140625,0.1,0,-0.1678,-0.7091,configs/deep_ignorance_7b/fp32.yaml
+tf32,EleutherAI/deep-ignorance-e2e-strong-filter,GH200,128,1e-05,true,0.9337918162345886,3479.541015625,0.1,0,-0.1678,-0.7082,configs/deep_ignorance_7b/tf32.yaml
+fp32_bs256,EleutherAI/deep-ignorance-e2e-strong-filter,GH200,256,1e-05,false,0.8896469473838806,2206.854248046875,0.1,0,-0.1461,-0.6585,configs/deep_ignorance_7b/fp32_bs256.yaml

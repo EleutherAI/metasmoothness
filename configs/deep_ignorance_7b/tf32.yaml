@@ -1,0 +1,69 @@
+steps:
+- metasmoothness:
+    run_path: runs/deep_ignorance_ms/tf32
+    overwrite: false
+    model: EleutherAI/deep-ignorance-e2e-strong-filter
+    precision: fp32
+    revision: null
+    distributed:
+      nnode: 4
+      nproc_per_node: 4
+      node_rank: null
+    fsdp: false
+    peft_init_kwargs: r=32,lora_alpha=64,lora_dropout=0.0,target_modules=query_key_value|dense|dense_h_to_4h|dense_4h_to_h
+    model_kwargs: ''
+    logit_scale: 1.0
+    data:
+      dataset: runs/deep_ignorance_ms/mix_85_15
+      split: train
+      subset: null
+      prompt_column: text
+      completion_column: ''
+      conversation_column: ''
+      reward_column: ''
+      skip_nan_rewards: false
+      truncation: false
+      format_template: ''
+      data_kwargs: ''
+      chunk_length: 1024
+    tokenizer: ''
+    drop_columns: true
+    max_tokens: null
+    use_tf32_matmuls: true
+    debug: false
+    lr_schedule:
+      lr: 1.0e-05
+      lr_scheduler_type: constant_with_warmup
+      lr_start: 0.0
+      lr_end: 0.0
+      warmup_steps: 20.0
+      num_cycles: 0.5
+      power: 1.0
+    batch_size: 128
+    num_epochs: 1
+    seed: 42
+    adam_beta1: 0.9
+    adam_beta2: 0.999
+    eps_root: 1.0e-17
+    adam_eps: 1.0e-08
+    loss_reduction: mean
+    optimizer: adamw
+    train_mode: false
+    save_optimizer_state: none
+    save_models: true
+    save_mode: sqrt
+    save_interval: 0
+    weight_decay: 0.0
+    max_grad_norm: null
+    grad_checkpointing: true
+    grad_accum_steps: 2
+    double_backward_batch_size: null
+    resume: false
+    wandb_project: ''
+    fd_step: 0.1
+    direction_seed: 0
+metadata:
+  bergson_version: 0.9.1
+  created: '2026-09-17T03:22:09+00:00'
+  git_sha: 34cb2058
+  nccl_version: 2.27.5
