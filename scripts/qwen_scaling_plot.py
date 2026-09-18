@@ -1,5 +1,5 @@
 """Qwen2.5-1.5B proponent-filter scaling, same shape as figures/filter_scaling.pdf:
-(a) top x% of documents removed (1%, 5%, 10%), (b) top-k documents removed (40, 200, 400 as available).
+(a) top x% of documents removed (1%, 5%, 10%, and 20%, 50% from 16k up), (b) top-k documents removed (40, 200, 400 as available).
 QLD = filter_change - random_mean per query, 95% CI over the 20 queries; x = training tokens (2 epochs x N docs x 512).
 Writes figures/filter_scaling_qwen.pdf, its companion filter_scaling_qwen_absolute.pdf (unfiltered / random-control /
 filtered mean query loss per condition, same points and CI; scripts/absolute_losses.py) and
@@ -16,10 +16,11 @@ FIG = os.environ.get("FIGURES_DIR") or "/mnt/ssd-2/lucia/metasmoothness/figures"
 OUT = f"{FIG}/filter_scaling_qwen.pdf"
 OUT_ABS = f"{FIG}/filter_scaling_qwen_absolute.pdf"
 NS = [4000, 8000, 16000, 32000, 64000, 128000, 256000, 512000]
-BLUE, GREEN, ORANGE, PURPLE = "#2a78d6", "#1baf7a", "#eb6834", "#8e5bd6"
-PCT = [("Top 1%", "filter_proponents_ekfac", BLUE), ("Top 5%", "filter_prop5pct_ekfac", GREEN), ("Top 10%", "filter_prop10pct_ekfac", ORANGE)]
+BLUE, GREEN, ORANGE, PURPLE, RED = "#2a78d6", "#1baf7a", "#eb6834", "#8e5bd6", "#d6455d"
+PCT = [("Top 1%", "filter_proponents_ekfac", BLUE), ("Top 5%", "filter_prop5pct_ekfac", GREEN), ("Top 10%", "filter_prop10pct_ekfac", ORANGE),
+       ("Top 20%", "filter_20pct_ekfac", PURPLE), ("Top 50%", "filter_50pct_ekfac", RED)]
 TOPK = [("Top 40", "filter_top40_ekfac", BLUE), ("Top 200", "filter_top200_ekfac", GREEN), ("Top 400", "filter_top400_ekfac", ORANGE)]
-DODGE = (0.97, 1.0, 1.03)
+DODGE = (0.97, 1.0, 1.03, 1.06, 1.09)
 tokens = lambda n: 2 * n * 512
 run = lambda n: f"qwen15b_{n // 1000}k_bs256"
 
