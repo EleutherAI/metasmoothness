@@ -35,17 +35,8 @@ rng = np.random.default_rng(0)
 
 
 def filter_delta(r, scorer):
-    """The row's filter_<scorer>_delta, or under QLD_STAT=median the median
-    over queries recomputed from its merged summary (experiments.csv holds only
-    the mean); '' when the row has no delta, the csv mean if no summary."""
-    yv = (r.get(f"filter_{scorer}_delta") or "").strip()
-    if yv and absl.STAT != "mean":
-        p = absl.qld_from_summary(r["run_id"], f"filter_proponents_{scorer}")
-        if p is not None:
-            return str(p[0])
-        print(f"  warning: {r['run_id']}/filter_proponents_{scorer}: no complete summary, "
-              f"{absl.STAT} point falls back to the experiments.csv mean")
-    return yv
+    """The row's filter_<scorer>_delta; '' when the row has no delta."""
+    return (r.get(f"filter_{scorer}_delta") or "").strip()
 
 
 def boot(x, y, n=10000):
@@ -115,7 +106,7 @@ for ax, (scorer, label) in zip(axes, [("magic", "MAGIC"), ("ekfac", "EK-FAC")]):
     print(f"          LDS spans {x.min():.3f}-{x.max():.3f}, "
           f"delta spans {y.min():.3f}-{y.max():.3f}")
 
-axes[0].set_ylabel(absl.label("Change in query loss"))
+axes[0].set_ylabel("Change in query loss")
 lo_x = min(ax.get_xlim()[0] for ax in axes)
 hi_x = max(ax.get_xlim()[1] for ax in axes)
 for ax in axes:

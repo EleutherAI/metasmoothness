@@ -48,32 +48,6 @@ WRITE_RELATIVE = os.environ.get("QLD_RELATIVE", "0") == "1"
 # paper; excluded from the variants figure and the LDS-vs-QLD scatter.
 EXCLUDE_RUNS = {"plan_adam_eps1e17_16k_scale0.5", "plan_adam_eps1e17_16k_scale0.25"}
 
-# 2026-09-06: QLD_STAT=median swaps the per-query aggregate every QLD point
-# draws (and what boot_ci resamples) from the mean to the median.
-# scripts/make_figures.py --stat median sets it for every producer and writes
-# the set into figures_median/ (FIGURES_DIR) and tables_median/ (TABLES_DIR);
-# unset, nothing changes.
-STAT = os.environ.get("QLD_STAT", "mean")
-if STAT not in ("mean", "median"):
-    raise SystemExit(f"QLD_STAT must be 'mean' or 'median', not {STAT!r}")
-
-
-def agg(vals):
-    """The per-query aggregate: mean, or the median under QLD_STAT=median."""
-    return statistics.median(vals) if STAT == "median" else statistics.fmean(vals)
-
-
-def label(text):
-    """Axis label naming the aggregate: unchanged for the mean; under
-    QLD_STAT=median 'Query loss difference' -> 'Median query loss difference'
-    and 'Mean query loss' -> 'Median query loss'."""
-    if STAT == "mean":
-        return text
-    if text.startswith("Mean "):
-        return "Median " + text[5:]
-    return "Median " + text[0].lower() + text[1:]
-
-
 SERIES = ("unfiltered", "random", "filtered")
 STYLE = {"unfiltered": dict(linestyle=":", marker="^", markersize=4, linewidth=1.6),
          "random": dict(linestyle="--", marker="s", markersize=4, linewidth=1.6),
@@ -164,10 +138,7 @@ def per_query(run, subdir, min_rows=20, pool_summary=True):
 
 def sem_ci(vals):
     """(mean, err_lo, err_hi): 1.96 x SEM over queries, as heldout_plot.py and
-    qwen_scaling_plot.py draw their QLD bars. A median has no SEM, so under
-    QLD_STAT=median this is the bootstrap interval of the median (boot_ci)."""
-    if STAT != "mean":
-        return boot_ci(vals)
+    qwen_scaling_plot.py draw their QLD bars."""
     m = statistics.fmean(vals)
     e = 1.96 * statistics.stdev(vals) / math.sqrt(len(vals)) if len(vals) > 1 else 0.0
     return m, e, e
@@ -175,32 +146,11 @@ def sem_ci(vals):
 
 def boot_ci(vals, boot=10000):
     """(mean, err_lo, err_hi): seeded bootstrap of the mean over queries, the
-    interval scaling_plot_mpl.py draws on every summary-derived point. Under
-    QLD_STAT=median the statistic bootstrapped is the median (agg)."""
+    interval scaling_plot_mpl.py draws on every summary-derived point."""
     rnd = random.Random(0)
-    bs = sorted(agg([rnd.choice(vals) for _ in vals]) for _ in range(boot))
-    m = agg(vals)
+    bs = sorted(statistics.fmean([rnd.choice(vals) for _ in vals]) for _ in range(boot))
+    m = statistics.fmean(vals)
     return m, m - bs[int(.025 * boot)], bs[int(.975 * boot)] - m
-
-
-def qld_from_summary(run, subdir, min_rows=20, boot=10000):
-    """(agg, err_lo, err_hi) of filter_change - random_mean over the summary's
-    finite queries, boot_ci over queries as every summary-derived point, or
-    None below min_rows. The summary is the canonical <run>/<subdir>/ file or,
-    when that is incomplete, the pooled shards (_read). Under QLD_STAT=median
-    this replaces the experiments.csv filter_<m>_delta/_lo/_hi columns, which
-    hold only the mean (scripts/filter_deltas.py)."""
-    d = []
-    for r in _read(run, subdir, "filter_summary.csv", min_rows).values():
-        try:
-            v = float(r["filter_change"]) - float(r["random_mean"])
-        except (KeyError, ValueError):
-            continue
-        if math.isfinite(v):
-            d.append(v)
-    if len(d) < min_rows:
-        return None
-    return boot_ci(d, boot)
 
 
 def point(run, subdir, *, ci=sem_ci, min_rows=20, min_queries=2, pool_summary=True):

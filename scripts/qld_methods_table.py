@@ -47,8 +47,6 @@ CAPTION = (r"Mean effect of proponent filtering on query loss for BM25, EK-FAC, 
            r"datamodelling score (LDS) of each method's scores on the same runs. Values are means with 95\% "
            r"confidence intervals, bootstrapped over $Q=20$ held-out queries. At 64,000 documents the training corpus has the "
            r"rows containing the queries replaced by unseen documents, and LDS is not computed.")
-if absl.STAT == "median":  # QLD_STAT=median: same table with the per-query median (make_figures.py --stat median)
-    CAPTION = CAPTION.replace("Mean effect", "Median effect").replace("Values are means", "Values are medians")
 LABEL = "tab:proponent-filtering"
 
 rows = list(csv.DictReader(open(ROOT / "experiments.csv", newline="")))
@@ -80,12 +78,6 @@ def delta_ci(run, method):
     r = by_id.get(run)
     if r is None or not (r.get(f"filter_{method}_delta") or "").strip():
         return None
-    if absl.STAT != "mean":  # the csv holds only the mean: recompute, as the figure does
-        p = absl.qld_from_summary(run, f"filter_proponents_{method}")
-        if p is not None:
-            return p
-        print(f"  warning: {run}/filter_proponents_{method}: no complete summary, "
-              f"{absl.STAT} cell falls back to the experiments.csv mean")
     d = float(r[f"filter_{method}_delta"])
     return (d, d - float(r[f"filter_{method}_lo"]), float(r[f"filter_{method}_hi"]) - d)
 

@@ -133,14 +133,6 @@ def summary_scaling_points(prefixes, subdir, column="filter_change",
 def delta_ci(r, method="ekfac"):
     if r is None or not (r.get(f"filter_{method}_delta") or "").strip():
         return None
-    if absl.STAT != "mean":
-        # experiments.csv holds only the mean and its CI: recompute the point
-        # from the merged summary, as summary_delta_ci does for BM25 / top-40.
-        p = absl.qld_from_summary(r["run_id"], f"filter_proponents_{method}")
-        if p is not None:
-            return p
-        print(f"  warning: {r['run_id']}/filter_proponents_{method}: no complete "
-              f"summary, {absl.STAT} point falls back to the experiments.csv mean")
     d = float(r[f"filter_{method}_delta"])
     return (d, d - float(r[f"filter_{method}_lo"]),
             float(r[f"filter_{method}_hi"]) - d)
@@ -159,7 +151,7 @@ def style(ax, xticks, xlabels, xlabel):
     ax.set_xticks(xticks, xlabels)
     ax.minorticks_off()
     ax.set_xlabel(xlabel)
-    ax.set_ylabel(absl.label("Query loss difference"))
+    ax.set_ylabel("Query loss difference")
     ax.grid(color="#e6e5e0", linewidth=0.8)
     ax.set_axisbelow(True)
     ax.margins(x=0.09)
@@ -199,7 +191,7 @@ def absolute_scaling_points(prefixes, subdir, ns=NS):
 
 def style_absolute(ax, xticks, xlabels, xlabel):
     style(ax, xticks, xlabels, xlabel)
-    ax.set_ylabel(absl.label("Mean query loss"))
+    ax.set_ylabel("Mean query loss")
 
 
 args.outdir.mkdir(parents=True, exist_ok=True)
@@ -226,7 +218,7 @@ draw(ax1, tok_ticks,
      summary_scaling_points(prefixes, HELDOUT_1PCT, column="random_mean"),
      RANDOM, label="Random filter")
 style(ax1, tok_ticks, tok_labels, "Number of training tokens")
-ax1.set_ylabel(absl.label("Change in query loss"))
+ax1.set_ylabel("Change in query loss")
 ax1.set_title("(a) Top 1% of documents removed", fontsize=10)
 ax1.legend(loc="upper left", frameon=False, fontsize=9)
 
@@ -378,7 +370,7 @@ for y, (label, run) in zip(ys, VARIANT_ROWS):
     ax.errorbar([d], [y], xerr=[[lo], [hi]], color=BLUE, marker="o",
                 markersize=5, linewidth=2, capsize=3, capthick=1.2)
 ax.set_yticks(list(ys), [label for label, _ in VARIANT_ROWS])
-ax.set_xlabel(absl.label("Query loss difference"))
+ax.set_xlabel("Query loss difference")
 ax.grid(axis="x", color="#e6e5e0", linewidth=0.8)
 ax.set_axisbelow(True)
 ax.margins(y=0.12)
@@ -396,7 +388,7 @@ for y, (label, run) in zip(ys, VARIANT_ROWS):
         ax.errorbar([m], [y], xerr=[[lo], [hi]], linestyle="", capsize=3, capthick=1.2,
                     color=absl.NEUTRAL.get(s, BLUE), **st)
 ax.set_yticks(list(ys), [label for label, _ in VARIANT_ROWS])
-ax.set_xlabel(absl.label("Mean query loss"))
+ax.set_xlabel("Mean query loss")
 ax.grid(axis="x", color="#e6e5e0", linewidth=0.8)
 ax.set_axisbelow(True)
 ax.margins(y=0.12)
@@ -433,7 +425,7 @@ def draw_rel(ax, rows, subdir, color, label=None, dodge=1.0):
 
 def style_rel(ax, xticks, xlabels, xlabel):
     style(ax, xticks, xlabels, xlabel)
-    ax.set_ylabel(absl.label("Query loss increase (%)"))
+    ax.set_ylabel("Query loss increase (%)")
 
 
 def rows_for(prefixes, ns):
@@ -484,7 +476,7 @@ for y, (label, run) in zip(ys, VARIANT_ROWS):
                 markersize=5, linewidth=2, capsize=3, capthick=1.2)
     print(f"  {label:20s} relative={p[0]:5.2f}% [-{p[1]:.2f} +{p[2]:.2f}]")
 ax.set_yticks(list(ys), [label for label, _ in VARIANT_ROWS])
-ax.set_xlabel(absl.label("Query loss increase (%)"))
+ax.set_xlabel("Query loss increase (%)")
 ax.grid(axis="x", color="#e6e5e0", linewidth=0.8)
 ax.set_axisbelow(True)
 ax.margins(y=0.12)

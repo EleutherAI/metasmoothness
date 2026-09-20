@@ -42,8 +42,6 @@ def qld(n, d):
     if len(rows) < 20:
         return None
     q = [float(r["filter_change"]) - float(r["random_mean"]) for r in rows]
-    if absl.STAT != "mean":  # (median, err_lo, err_hi): bootstrap of the median
-        return absl.boot_ci(q)
     e = 1.96 * st.stdev(q) / math.sqrt(len(q))
     return st.mean(q), e, e
 
@@ -73,7 +71,7 @@ def style(ax, title, legend=True):
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 3.8), dpi=200, sharey=True)
 draw(ax1, PCT)
 style(ax1, "(a) Top x% of documents removed")
-ax1.set_ylabel(absl.label("Query loss difference"))
+ax1.set_ylabel("Query loss difference")
 draw(ax2, TOPK)
 style(ax2, "(b) Top k documents removed")
 fig.tight_layout()
@@ -106,7 +104,7 @@ for ax, series, title in ((axes[0], PCT, "(a) Top x% of documents removed"), (ax
     style(ax, title, legend=False)
     legends.append((ax, [*absl.handles(series=("unfiltered",), series_color=absl.NEUTRAL["unfiltered"]),
                          *absl.handles([(l, c) for l, _, c in series], series=("random", "filtered"))]))
-axes[0].set_ylabel(absl.label("Mean query loss"))
+axes[0].set_ylabel("Mean query loss")
 absl.legend_above_each(fig, legends, 3)
 if absl.WRITE_ABSOLUTE:
     fig.savefig(OUT_ABS)
@@ -130,10 +128,9 @@ for ax, series, title in ((ax1, PCT, "(a) Top x% of documents removed"), (ax2, T
                     yerr=[[p[1] for _, p in pts], [p[2] for _, p in pts]],
                     color=color, label=label, marker="o", markersize=5, linewidth=2, capsize=3, capthick=1.2)
         for n, p in pts:
-            print(f"{title[:3]} {label:7s} N={n // 1000:>3}k relative={p[0]:5.2f}% "
-                  + (f"+-{p[1]:.2f}" if absl.STAT == "mean" else f"[-{p[1]:.2f} +{p[2]:.2f}]"))
+            print(f"{title[:3]} {label:7s} N={n // 1000:>3}k relative={p[0]:5.2f}% +-{p[1]:.2f}")
     style(ax, title)
-ax1.set_ylabel(absl.label("Query loss increase (%)"))
+ax1.set_ylabel("Query loss increase (%)")
 fig.tight_layout()
 if absl.WRITE_RELATIVE:
     fig.savefig(OUT_REL)

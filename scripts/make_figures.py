@@ -2,19 +2,14 @@
 """Regenerate every paper figure into figures/ and check the set is exact.
 
     python scripts/make_figures.py
-    python scripts/make_figures.py --stat median   # figures_median/, tables_median/
 
 Runs each plot script in turn (all write PDF), then requires figures/ to hold
 exactly EXPECTED_FIGURES -- a missing figure or a stray .png/.pdf fails the
 build -- and finishes with scripts/figure_audit.py, which re-checks the file set
 and reports the data points each figure still lacks.
 
---stat median (or QLD_STAT=median in the environment) rebuilds the whole set
-with the per-query median in place of the mean (absolute_losses.STAT; the
-EK-FAC/MAGIC top-1% points are then recomputed from the merged summaries, since
-experiments.csv holds only means) into figures_median/ and tables_median/,
-leaving figures/ and tables/ untouched. The producers and the audit take their
-output dirs from FIGURES_DIR / TABLES_DIR, which this script exports.
+The producers and the audit take their output dirs from FIGURES_DIR /
+TABLES_DIR, which this script exports.
 
 Not generated here, on purpose: filter_batch_appendix and filter_scaling_appendix
 (folded into filter_muon_appendix), filter_scaling_law (scaling_law_plot.py) and
@@ -27,10 +22,8 @@ import subprocess
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-STAT = os.environ.get("QLD_STAT", "mean")
-_suffix = lambda stat: "" if stat == "mean" else f"_{stat}"
-FIGURES = os.environ.get("FIGURES_DIR") or os.path.join(ROOT, "figures" + _suffix(STAT))
-TABLES = os.environ.get("TABLES_DIR") or os.path.join(ROOT, "tables" + _suffix(STAT))
+FIGURES = os.environ.get("FIGURES_DIR") or os.path.join(ROOT, "figures")
+TABLES = os.environ.get("TABLES_DIR") or os.path.join(ROOT, "tables")
 
 # script -> figures it writes: each QLD figure beside its *_relative companion
 # (the same difference as a percent of the matched control's loss,
@@ -81,20 +74,12 @@ def check_figure_set(verbose=True):
 
 
 def main():
-    global STAT, FIGURES, TABLES
     ap = argparse.ArgumentParser(description="Regenerate every paper figure.")
-    ap.add_argument("--stat", choices=("mean", "median"), default=None,
-                    help="per-query aggregate (default: QLD_STAT or mean); median "
-                         "writes to figures_median/ and tables_median/")
     ap.add_argument("--relative", action="store_true", help="also write the *_relative companions (sets QLD_RELATIVE=1)")
     a = ap.parse_args()
     if a.relative:
         os.environ["QLD_RELATIVE"] = "1"
-    if a.stat and a.stat != STAT:
-        STAT = a.stat
-        FIGURES = os.path.join(ROOT, "figures" + _suffix(STAT))
-        TABLES = os.path.join(ROOT, "tables" + _suffix(STAT))
-    os.environ.update(QLD_STAT=STAT, FIGURES_DIR=FIGURES, TABLES_DIR=TABLES)
+    os.environ.update(FIGURES_DIR=FIGURES, TABLES_DIR=TABLES)
     os.makedirs(FIGURES, exist_ok=True)
     for script, _ in PRODUCERS:
         print(f"== {script}", flush=True)

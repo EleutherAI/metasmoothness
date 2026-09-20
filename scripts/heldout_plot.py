@@ -49,10 +49,7 @@ def heldout(run, f):
 
 
 def ci(q):
-    """(stat, err_lo, err_hi): 1.96 x SEM of the mean, or under QLD_STAT=median
-    the bootstrap interval of the median (absolute_losses.boot_ci)."""
-    if absl.STAT != "mean":
-        return absl.boot_ci(q)
+    """(mean, err_lo, err_hi): 1.96 x SEM of the mean."""
     e = 1.96 * st.stdev(q) / math.sqrt(len(q))
     return st.mean(q), e, e
 
@@ -91,11 +88,10 @@ for ax, (title, f) in zip(axes, PANELS):
                 continue
             m, e, e_hi = ci(q)
             xs.append(tokens(n) * dodge); ys.append(m); lo.append(e); hi.append(e_hi)
-            print(f"{title[:3]} {label[:8]:8s} N={n // 1000:>3}k n={len(q):2d} QLD={m:+.4f} "
-                  + (f"+-{e:.4f}" if absl.STAT == "mean" else f"[-{e:.4f} +{e_hi:.4f}]"))
+            print(f"{title[:3]} {label[:8]:8s} N={n // 1000:>3}k n={len(q):2d} QLD={m:+.4f} +-{e:.4f}")
         ax.errorbar(xs, ys, yerr=[lo, hi], color=color, label=label, marker="o", markersize=5, linewidth=2, capsize=3, capthick=1.2)
     style(ax, title)
-axes[0].set_ylabel(absl.label("Query loss difference"))
+axes[0].set_ylabel("Query loss difference")
 axes[0].legend(frameon=False, fontsize=9, loc="upper left")
 fig.tight_layout()
 fig.savefig(OUT)
@@ -115,7 +111,7 @@ for ax, (title, f) in zip(axes, PANELS):
                 print(f"{title[:3]} {label[:8]:8s} N={n // 1000:>3}k n={p['n']:2d} unfiltered={p['unfiltered'][0]:.4f} "
                       f"random={p['random'][0]:.4f} filtered={p['filtered'][0]:.4f}")
     style(ax, title)
-axes[0].set_ylabel(absl.label("Mean query loss"))
+axes[0].set_ylabel("Mean query loss")
 absl.legend_above(fig, absl.handles([(l, c) for l, c, _ in CONDITIONS]), 5)
 if absl.WRITE_ABSOLUTE:
     fig.savefig(OUT_ABS)
@@ -138,11 +134,10 @@ for ax, (title, f) in zip(axes, PANELS):
                                     min_queries=20 if label.startswith("Held") else 2)
             if p:
                 xs.append(tokens(n) * dodge); ys.append(p[0]); lo.append(p[1]); hi.append(p[2])
-                print(f"{title[:3]} {label[:8]:8s} N={n // 1000:>3}k relative={p[0]:5.2f}% "
-                      + (f"+-{p[1]:.2f}" if absl.STAT == "mean" else f"[-{p[1]:.2f} +{p[2]:.2f}]"))
+                print(f"{title[:3]} {label[:8]:8s} N={n // 1000:>3}k relative={p[0]:5.2f}% +-{p[1]:.2f}")
         ax.errorbar(xs, ys, yerr=[lo, hi], color=color, label=label, marker="o", markersize=5, linewidth=2, capsize=3, capthick=1.2)
     style(ax, title)
-axes[0].set_ylabel(absl.label("Query loss increase (%)"))
+axes[0].set_ylabel("Query loss increase (%)")
 axes[0].legend(frameon=False, fontsize=9, loc="upper left")
 fig.tight_layout()
 if absl.WRITE_RELATIVE:

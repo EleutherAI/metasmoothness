@@ -21,7 +21,6 @@ import csv
 import os
 import pathlib
 
-import absolute_losses as absl  # STAT / qld_from_summary: the QLD_STAT=median column
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 OUT = pathlib.Path(os.environ.get("TABLES_DIR") or ROOT / "tables") / "qld_lds_adamw_muon.tex"
@@ -53,14 +52,6 @@ def cell(r, val, lo, hi, digits):
     v = (r.get(val) or "").strip()
     if not v:
         return "--"
-    if val == "filter_ekfac_delta" and absl.STAT != "mean":
-        # experiments.csv holds only the mean: recompute from the merged summary
-        p = absl.qld_from_summary(r["run_id"], "filter_proponents_ekfac")
-        if p is not None:
-            d, l, h = p
-            return f"{d:.{digits}f} [{d - l:.{digits}f}, {d + h:.{digits}f}]"
-        print(f"  warning: {r['run_id']}/filter_proponents_ekfac: no complete summary, "
-              f"{absl.STAT} cell falls back to the experiments.csv mean")
     out = f"{float(v):.{digits}f}"
     l, h = (r.get(lo) or "").strip(), (r.get(hi) or "").strip()
     if l and h:

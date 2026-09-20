@@ -89,7 +89,7 @@ def main():
                       f"random={p['random'][0]:.4f} filtered={p['filtered'][0]:.4f}")
             else:
                 print(f"{title[:3]} N={n // 1000:>3}k no per-query losses ({RUNS[n]}/{subdir})")
-    axes[0].set_ylabel(absl.label("Mean query loss"))
+    axes[0].set_ylabel("Mean query loss")
     absl.legend_above(fig, axes[0].get_legend_handles_labels()[0], 4)
     path = args.outdir / "filter_scaling_absolute.pdf"
     if absl.WRITE_ABSOLUTE:
@@ -112,7 +112,7 @@ def main():
         ax.errorbar(xs, ys, yerr=[lo, hi], color=BLUE, marker="o", markersize=5,
                     linewidth=2, capsize=3, capthick=1.2, label="EK-FAC proponents")
         style(ax, title)
-    axes[0].set_ylabel(absl.label("Query loss increase (%)"))
+    axes[0].set_ylabel("Query loss increase (%)")
     axes[0].legend(frameon=False, fontsize=9, loc="upper left")
     fig.tight_layout()
     path = args.outdir / "filter_scaling_relative.pdf"
